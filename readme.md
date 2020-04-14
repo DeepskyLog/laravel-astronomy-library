@@ -2,14 +2,14 @@
 
 # laravel-astronomylibrary
 
-> Astronomcial calculations for php / laravel
+> Astronomical calculations for php / laravel
 
 [![Latest Version on Packagist][ico-version]][link-packagist]
 [![Total Downloads][ico-downloads]][link-downloads]
 [![Build Status][ico-travis]][link-travis]
 [![StyleCI][ico-styleci]][link-styleci]
 
-This is where your description should go. Take a look at [contributing.md](contributing.md) to see a to do list.
+Take a look at [contributing.md](contributing.md) to see a to do list.
 
 ## Installation
 
@@ -28,7 +28,7 @@ Please see the [changelog](changelog.md) for more information on what has change
 ## Testing
 
 ``` bash
-composer test
+phpunit
 ```
 
 ## Contributing
@@ -46,7 +46,7 @@ If you discover any security related issues, please email developers@deepskylog.
 
 ## License
 
-GPLv3. Please see the [license file](license.md) for more information.
+GPLv3. Please see the [license file](LICENSE) for more information.
 
 [ico-version]: https://img.shields.io/packagist/v/deepskylog/laravel-astronomy-library.svg?style=flat-square
 [ico-downloads]: https://img.shields.io/packagist/dt/deepskylog/laravel-astronomy-library.svg?style=flat-square
