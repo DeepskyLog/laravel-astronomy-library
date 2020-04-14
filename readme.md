@@ -44,14 +44,14 @@ If you discover any security related issues, please email developers@deepskylog.
 
 GPLv3. Please see the [license file](license.md) for more information.
 
-[ico-version]: https://img.shields.io/packagist/v/DeepskyLog/laravel-astronomy-library.svg?style=flat-square
-[ico-downloads]: https://img.shields.io/packagist/dt/DeepskyLog/laravel-astronomy-library.svg?style=flat-square
-[ico-travis]: https://img.shields.io/travis/DeepskyLog/laravel-astronomy-library/master.svg?style=flat-square
-[ico-styleci]: https://styleci.io/repos/12345678/shield
+[ico-version]: https://img.shields.io/packagist/v/deepskylog/laravel-astronomy-library.svg?style=flat-square
+[ico-downloads]: https://img.shields.io/packagist/dt/deepskylog/laravel-astronomy-library.svg?style=flat-square
+[ico-travis]: https://img.shields.io/travis/deepskylog/laravel-astronomy-library/master.svg?style=flat-square
+[ico-styleci]: https://styleci.io/repos/255550499/shield
 
-[link-packagist]: https://packagist.org/packages/DeepskyLog/laravel-astronomy-library
-[link-downloads]: https://packagist.org/packages/DeepskyLog/laravel-astronomy-library
-[link-travis]: https://travis-ci.org/DeepskyLog/laravel-astronomy-library
+[link-packagist]: https://packagist.org/packages/deepskylog/laravel-astronomy-library
+[link-downloads]: https://packagist.org/packages/deepskylog/laravel-astronomy-library
+[link-travis]: https://travis-ci.org/deepskylog/laravel-astronomy-library
 [link-styleci]: https://styleci.io/repos/255550499
 [link-author]: https://github.com/DeepskyLog
 [link-contributors]: ../../contributors

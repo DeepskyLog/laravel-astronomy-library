@@ -1,7 +1,7 @@
 {
     "name": "deepskylog/laravel-astronomy-library",
     "description": "A library to execute astronomical calculations",
-    "license": "GPLv3",
+    "license": "GPL-3.0-or-later",
     "authors": [
         {
             "name": "The DeepskyLog Team",
