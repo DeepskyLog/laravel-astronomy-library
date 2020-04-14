@@ -1,10 +1,10 @@
 <?php
 
-namespace deepskylog\laravel-astronomy-library\Facades;
+namespace deepskylog\AstronomyLibrary\Facades;
 
 use Illuminate\Support\Facades\Facade;
 
-class laravel-astronomy-library extends Facade
+class AstronomyLibrary extends Facade
 {
     /**
      * Get the registered name of the component.
