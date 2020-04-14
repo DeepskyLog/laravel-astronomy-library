@@ -1,6 +1,6 @@
 <?php
 
-namespace DeepskyLog\laravel-astronomy-library\Facades;
+namespace deepskylog\laravel-astronomy-library\Facades;
 
 use Illuminate\Support\Facades\Facade;
 

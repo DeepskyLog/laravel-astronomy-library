@@ -1,12 +1,12 @@
 {
-    "name": "DeepskyLog/laravel-astronomy-library",
+    "name": "deepskylog/laravel-astronomy-library",
     "description": "A library to execute astronomical calculations",
     "license": "GPLv3",
     "authors": [
         {
             "name": "The DeepskyLog Team",
             "email": "developers@DeepskyLog.be",
-            "homepage": "https://www.DeepskyLog.org/"
+            "homepage": "https://www.deepskylog.org/"
         }
     ],
     "homepage": "https://github.com/DeepskyLog/laravel-astronomy-library",
@@ -22,21 +22,21 @@
     },
     "autoload": {
         "psr-4": {
-            "DeepskyLog\\laravel-astronomy-library\\": "src/"
+            "deepskylog\\laravel-astronomy-library\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "DeepskyLog\\laravel-astronomy-library\\Tests\\": "tests"
+            "deepskylog\\laravel-astronomy-library\\Tests\\": "tests"
         }
     },
     "extra": {
         "laravel": {
             "providers": [
-                "DeepskyLog\\laravel-astronomy-library\\laravel-astronomy-libraryServiceProvider"
+                "deepskylog\\laravel-astronomy-library\\laravel-astronomy-libraryServiceProvider"
             ],
             "aliases": {
-                "laravel-astronomy-library": "DeepskyLog\\laravel-astronomy-library\\Facades\\laravel-astronomy-library"
+                "laravel-astronomy-library": "deepskylog\\laravel-astronomy-library\\Facades\\laravel-astronomy-library"
             }
         }
     }

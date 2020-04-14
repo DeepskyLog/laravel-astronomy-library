@@ -1,6 +1,6 @@
 <?php
 
-namespace DeepskyLog\laravel-astronomy-library;
+namespace deepskylog\laravel-astronomy-library;
 
 class laravel-astronomy-library
 {

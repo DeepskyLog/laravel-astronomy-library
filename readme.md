@@ -12,7 +12,7 @@ This is where your description should go. Take a look at [contributing.md](contr
 Via Composer
 
 ``` bash
-$ composer require DeepskyLog/laravel-astronomy-library
+composer require deepskylog/laravel-astronomy-library
 ```
 
 ## Usage
@@ -24,7 +24,7 @@ Please see the [changelog](changelog.md) for more information on what has change
 ## Testing
 
 ``` bash
-$ composer test
+composer test
 ```
 
 ## Contributing
@@ -33,7 +33,7 @@ Please see [contributing.md](contributing.md) for details and a todolist.
 
 ## Security
 
-If you discover any security related issues, please email developers@DeepskyLog.be instead of using the issue tracker.
+If you discover any security related issues, please email developers@deepskylog.be instead of using the issue tracker.
 
 ## Credits
 
@@ -52,6 +52,6 @@ GPLv3. Please see the [license file](license.md) for more information.
 [link-packagist]: https://packagist.org/packages/DeepskyLog/laravel-astronomy-library
 [link-downloads]: https://packagist.org/packages/DeepskyLog/laravel-astronomy-library
 [link-travis]: https://travis-ci.org/DeepskyLog/laravel-astronomy-library
-[link-styleci]: https://styleci.io/repos/12345678
+[link-styleci]: https://styleci.io/repos/255550499
 [link-author]: https://github.com/DeepskyLog
 [link-contributors]: ../../contributors
