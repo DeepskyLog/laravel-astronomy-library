@@ -12,7 +12,7 @@ This is where your description should go. Take a look at [contributing.md](contr
 Via Composer
 
 ``` bash
-composer require deepskylog/laravel-astronomylibrary
+composer require deepskylog/laravel-astronomy-library
 ```
 
 ## Usage
