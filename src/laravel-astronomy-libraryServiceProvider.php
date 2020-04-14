@@ -1,6 +1,6 @@
 <?php
 
-namespace DeepskyLog\laravel-astronomy-library;
+namespace deepskylog\laravel-astronomy-library;
 
 use Illuminate\Support\ServiceProvider;
 
@@ -13,8 +13,8 @@ class laravel-astronomy-libraryServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        // $this->loadTranslationsFrom(__DIR__.'/../resources/lang', 'DeepskyLog');
-        // $this->loadViewsFrom(__DIR__.'/../resources/views', 'DeepskyLog');
+        // $this->loadTranslationsFrom(__DIR__.'/../resources/lang', 'deepskylog');
+        // $this->loadViewsFrom(__DIR__.'/../resources/views', 'deepskylog');
         // $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
         // $this->loadRoutesFrom(__DIR__.'/routes.php');
 
@@ -63,17 +63,17 @@ class laravel-astronomy-libraryServiceProvider extends ServiceProvider
 
         // Publishing the views.
         /*$this->publishes([
-            __DIR__.'/../resources/views' => base_path('resources/views/vendor/DeepskyLog'),
+            __DIR__.'/../resources/views' => base_path('resources/views/vendor/deepskylog'),
         ], 'laravel-astronomy-library.views');*/
 
         // Publishing assets.
         /*$this->publishes([
-            __DIR__.'/../resources/assets' => public_path('vendor/DeepskyLog'),
+            __DIR__.'/../resources/assets' => public_path('vendor/deepskylog'),
         ], 'laravel-astronomy-library.views');*/
 
         // Publishing the translation files.
         /*$this->publishes([
-            __DIR__.'/../resources/lang' => resource_path('lang/vendor/DeepskyLog'),
+            __DIR__.'/../resources/lang' => resource_path('lang/vendor/deepskylog'),
         ], 'laravel-astronomy-library.views');*/
 
         // Registering package commands.
