@@ -1,15 +1,13 @@
 <?php
 
-namespace deepskylog\laravel-astronomy-library;
+namespace deepskylog\AstronomyLibrary;
 
 use Illuminate\Support\ServiceProvider;
 
-class laravel-astronomy-libraryServiceProvider extends ServiceProvider
+class AstronomyLibraryServiceProvider extends ServiceProvider
 {
     /**
      * Perform post-registration booting of services.
-     *
-     * @return void
      */
     public function boot()
     {
@@ -26,17 +24,21 @@ class laravel-astronomy-libraryServiceProvider extends ServiceProvider
 
     /**
      * Register any package services.
-     *
-     * @return void
      */
     public function register()
     {
-        $this->mergeConfigFrom(__DIR__.'/../config/laravel-astronomy-library.php', 'laravel-astronomy-library');
+        $this->mergeConfigFrom(
+            __DIR__.'/../config/astronomyLibrary.php',
+            'astronomyLibrary'
+        );
 
         // Register the service the package provides.
-        $this->app->singleton('laravel-astronomy-library', function ($app) {
-            return new laravel-astronomy-library;
-        });
+        $this->app->singleton(
+            'AstronomyLibrary',
+            function ($app) {
+                return new AstronomyLibrary;
+            }
+        );
     }
 
     /**
@@ -51,15 +53,16 @@ class laravel-astronomy-libraryServiceProvider extends ServiceProvider
 
     /**
      * Console-specific booting.
-     *
-     * @return void
      */
     protected function bootForConsole()
     {
         // Publishing the configuration file.
-        $this->publishes([
-            __DIR__.'/../config/laravel-astronomy-library.php' => config_path('laravel-astronomy-library.php'),
-        ], 'laravel-astronomy-library.config');
+        $this->publishes(
+            [
+                __DIR__.'/../config/astronomyLibrary.php' => config_path('astronomyLibrary.php'),
+            ],
+            'astronomyLibrary.config'
+        );
 
         // Publishing the views.
         /*$this->publishes([

@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to `laravel-astronomy-library` will be documented in this file.
+All notable changes to `laravel-astronomylibrary` will be documented in this file.
 
 ## Version 1.0
 
