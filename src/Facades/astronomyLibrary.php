@@ -4,7 +4,7 @@ namespace deepskylog\AstronomyLibrary\Facades;
 
 use Illuminate\Support\Facades\Facade;
 
-class AstronomyLibrary extends Facade
+class astronomyLibrary extends Facade
 {
     /**
      * Get the registered name of the component.
