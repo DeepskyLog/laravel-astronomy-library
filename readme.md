@@ -1,4 +1,8 @@
+[![Logo](public/img/logo2.png)](https://www.deepskylog.org/)
+
 # laravel-astronomylibrary
+
+> Astronomcial calculations for php / laravel
 
 [![Latest Version on Packagist][ico-version]][link-packagist]
 [![Total Downloads][ico-downloads]][link-downloads]
