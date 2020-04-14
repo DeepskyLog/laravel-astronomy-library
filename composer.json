@@ -18,7 +18,8 @@
         "phpunit/phpunit": "^9.1",
         "mockery/mockery": "^1.1",
         "orchestra/testbench": "~3|~4",
-        "sempro/phpunit-pretty-print": "^1.0"
+        "sempro/phpunit-pretty-print": "^1.0",
+        "cedx/coveralls": "^12.0"
     },
     "autoload": {
         "psr-4": {
