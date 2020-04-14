@@ -8,7 +8,6 @@ class AstronomyLibraryServiceProvider extends ServiceProvider
 {
     /**
      * Perform post-registration booting of services.
-     *
      */
     public function boot()
     {
@@ -25,12 +24,11 @@ class AstronomyLibraryServiceProvider extends ServiceProvider
 
     /**
      * Register any package services.
-     *
      */
     public function register()
     {
         $this->mergeConfigFrom(
-            __DIR__ . '/../config/astronomyLibrary.php',
+            __DIR__.'/../config/astronomyLibrary.php',
             'astronomyLibrary'
         );
 
@@ -55,14 +53,13 @@ class AstronomyLibraryServiceProvider extends ServiceProvider
 
     /**
      * Console-specific booting.
-     *
      */
     protected function bootForConsole()
     {
         // Publishing the configuration file.
         $this->publishes(
             [
-                __DIR__ . '/../config/astronomyLibrary.php' => config_path('astronomyLibrary.php'),
+                __DIR__.'/../config/astronomyLibrary.php' => config_path('astronomyLibrary.php'),
             ],
             'astronomyLibrary.config'
         );
