@@ -2,7 +2,7 @@
 
 # laravel-astronomylibrary
 
-> Astronomcial calculations for php / laravel
+> Astronomical calculations for php / laravel
 
 [![Latest Version on Packagist][ico-version]][link-packagist]
 [![Total Downloads][ico-downloads]][link-downloads]
