@@ -39,4 +39,26 @@ class AstronomyLibrary
     {
         $this->_date = $carbonDate;
     }
+
+    /**
+     * Returns the date and time.
+     *
+     * @return Carbon The Carbon date
+     */
+    public function getDate(): Carbon
+    {
+        return $this->_date;
+    }
+
+    /**
+     * Sets the date and time.
+     *
+     * @param Carbon $date The new Carbon date
+     *
+     * @return None
+     */
+    public function setDate(Carbon $date): void
+    {
+        $this->_date = $date;
+    }
 }
