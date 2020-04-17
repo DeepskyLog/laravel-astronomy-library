@@ -3,7 +3,7 @@
 namespace deepskylog\AstronomyLibrary\Testing;
 
 use deepskylog\AstronomyLibrary\AstronomyLibraryServiceProvider;
-use \Illuminate\Foundation\Testing\TestCase;
+use Illuminate\Foundation\Testing\TestCase;
 
 class BaseTestCase extends TestCase
 {

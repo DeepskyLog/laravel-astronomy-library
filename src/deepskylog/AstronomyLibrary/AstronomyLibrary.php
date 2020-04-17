@@ -5,7 +5,6 @@
  * PHP Version 7
  *
  * @category AstronomyLibrary
- * @package  AstronomyLibrary
  * @author   Deepsky Developers <developers@deepskylog.be>
  * @license  GPL3 <https://opensource.org/licenses/GPL-3.0>
  * @link     http://www.deepskylog.org
@@ -21,7 +20,6 @@ use Carbon\Carbon;
  * PHP Version 7
  *
  * @category AstronomyLibrary
- * @package  AstronomyLibrary
  * @author   Deepsky Developers <developers@deepskylog.be>
  * @license  GPL3 <https://opensource.org/licenses/GPL-3.0>
  * @link     http://www.deepskylog.org
