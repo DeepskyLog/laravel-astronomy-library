@@ -1,15 +1,15 @@
-[![Logo](public/img/logo2.png)](https://www.deepskylog.org/)
-
 # laravel-astronomylibrary
 
 > Astronomical calculations for php / laravel
+
+[![Logo](public/img/logo2.png)](https://www.deepskylog.org/)
 
 [![Latest Version on Packagist][ico-version]][link-packagist]
 [![Total Downloads][ico-downloads]][link-downloads]
 [![Build Status][ico-travis]][link-travis]
 [![StyleCI][ico-styleci]][link-styleci]
 
-This is where your description should go. Take a look at [contributing.md](contributing.md) to see a to do list.
+Take a look at [contributing.md](contributing.md) if you are interesting in helping out.
 
 ## Installation
 
@@ -21,6 +21,38 @@ composer require deepskylog/laravel-astronomy-library
 
 ## Usage
 
+```php
+<?php
+// Use the factory to create a AstronomyLibrary instance
+$astrolib = new AstronomyLibrary($carbonDate);
+```
+
+### Time methods
+
+```php
+// Get the date of the AstronomyLibrary instance
+$date = $astrolib->getDate();
+
+// Set a new date to the AstronomyLibrary instance
+$astrolib->setDate($carbonDate);
+
+// Get the julian day of the AstronomyLibrary instance
+$jd = $astrolib->getJd();
+
+// Set the julian day of the AstronomyLibrary instance. Also update the carbon date.
+$astrolib->setJd($jd);
+```
+
+### Static Time methods
+
+```php
+// Convert from Carbon date to Julian day
+$jd = Time::getJd($carbonDate);
+
+// Convert from Julian day to Carbon date
+$carbonDate = Time::fromJd($jd);
+```
+
 ## Change log
 
 Please see the [changelog](changelog.md) for more information on what has changed recently.
@@ -28,7 +60,7 @@ Please see the [changelog](changelog.md) for more information on what has change
 ## Testing
 
 ``` bash
-composer test
+phpunit
 ```
 
 ## Contributing
@@ -46,7 +78,7 @@ If you discover any security related issues, please email developers@deepskylog.
 
 ## License
 
-GPLv3. Please see the [license file](license.md) for more information.
+GPLv3. Please see the [license file](LICENSE) for more information.
 
 [ico-version]: https://img.shields.io/packagist/v/deepskylog/laravel-astronomy-library.svg?style=flat-square
 [ico-downloads]: https://img.shields.io/packagist/dt/deepskylog/laravel-astronomy-library.svg?style=flat-square

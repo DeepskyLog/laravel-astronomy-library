@@ -12,31 +12,27 @@
     "homepage": "https://github.com/DeepskyLog/laravel-astronomylibrary",
     "keywords": ["Laravel", "laravel-astronomylibrary"],
     "require": {
-        "illuminate/support": "~5|~6|~7"
+        "php": ">=7.1",
+        "laravel/framework": "^5.6 || ^6.0 || ^7.0"
     },
     "require-dev": {
         "phpunit/phpunit": "^9.1",
         "mockery/mockery": "^1.1",
-        "orchestra/testbench": "~3|~4",
-        "sempro/phpunit-pretty-print": "^1.0"
+        "orchestra/testbench": "~5",
+        "laravel/laravel": "^5.6 || ^6.0 || ^7.0"
     },
     "autoload": {
-        "psr-4": {
-            "deepskylog\\laravel-astronomylibrary\\": "src/"
-        }
-    },
-    "autoload-dev": {
-        "psr-4": {
-            "deepskylog\\laravel-astronomylibrary\\Tests\\": "tests"
+        "psr-0": {
+            "deepskylog\\AstronomyLibrary\\": "src/"
         }
     },
     "extra": {
         "laravel": {
             "providers": [
-                "deepskylog\\laravel-astronomylibrary\\laravel-astronomylibraryServiceProvider"
+                "deepskylog\\AstronomyLibrary\\AstronomyLibraryServiceProvider"
             ],
             "aliases": {
-                "laravel-astronomylibrary": "deepskylog\\laravel-astronomylibrary\\Facades\\laravel-astronomylibrary"
+                "laravel-astronomylibrary": "deepskylog\\AstronomyLibrary\\Facades\\astronomyLibrary"
             }
         }
     }
