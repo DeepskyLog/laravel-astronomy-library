@@ -71,4 +71,16 @@ class AstronomyLibrary
     {
         return Time::getJd($this->_date);
     }
+
+    /**
+     * Sets the julian day and adapt the date.
+     *
+     * @param float $jd The julian day
+     *
+     * @return None
+     */
+    public function setJd(float $jd): void
+    {
+        $this->_date = Time::fromJd($jd);
+    }
 }

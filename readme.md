@@ -38,6 +38,9 @@ $astrolib->setDate($carbonDate);
 
 // Get the julian day of the AstronomyLibrary instance
 $jd = $astrolib->getJd();
+
+// Set the julian day of the AstronomyLibrary instance. Also update the carbon date.
+$astrolib->setJd($jd);
 ```
 
 ### Static Time methods
@@ -45,6 +48,9 @@ $jd = $astrolib->getJd();
 ```php
 // Convert from Carbon date to Julian day
 $jd = Time::getJd($carbonDate);
+
+// Convert from Julian day to Carbon date
+$carbonDate = Time::fromJd($jd);
 ```
 
 ## Change log
