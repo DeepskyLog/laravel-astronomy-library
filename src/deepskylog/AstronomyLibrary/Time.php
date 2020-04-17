@@ -53,8 +53,8 @@ class Time
         if ($date < Carbon::create(1582, 10, 4, 0, 0, 0, 'UTC')) {
             $b = 0;
         } else {
-            $a = (int)($year / 100);
-            $b = 2 - $a + (int)($a / 4);
+            $a = (int) ($year / 100);
+            $b = 2 - $a + (int) ($a / 4);
         }
 
         if ($date > Carbon::create(1582, 10, 4, 0, 0, 0, 'UTC')
@@ -94,7 +94,7 @@ class Time
         }
 
         $jd = $jd + 0.5;
-        $z = (int)$jd;
+        $z = (int) $jd;
         $f = $jd - $z;
 
         if ($z < 2299161.0) {
@@ -114,21 +114,21 @@ class Time
 
         $day = $b - $d - floor(30.6001 * $e);
 
-        $hour = (int)($f * 24);
+        $hour = (int) ($f * 24);
         $decimalMinute = (($f * 24) - $hour) * 60;
-        $minute = (int)$decimalMinute;
-        $second = (int)(($decimalMinute - $minute) * 60);
+        $minute = (int) $decimalMinute;
+        $second = (int) (($decimalMinute - $minute) * 60);
 
         if ($e < 14) {
-            $month = (int)($e - 1);
+            $month = (int) ($e - 1);
         } else {
-            $month = (int)($e - 13);
+            $month = (int) ($e - 13);
         }
 
         if ($month > 2) {
-            $year = (int)($c - 4716);
+            $year = (int) ($c - 4716);
         } else {
-            $year = (int)($c - 4715);
+            $year = (int) ($c - 4715);
         }
 
         return Carbon::create($year, $month, $day, $hour, $minute, $second, 'UTC');
