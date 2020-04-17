@@ -54,7 +54,7 @@ class AstronomyLibraryServiceProvider extends ServiceProvider
         // Publishing the configuration file.
         $this->publishes(
             [
-                __DIR__ . '/../config/astronomyLibrary.php' => config_path('astronomyLibrary.php'),
+                __DIR__.'/../config/astronomyLibrary.php' => config_path('astronomyLibrary.php'),
             ],
             'astronomyLibrary.config'
         );

@@ -12,11 +12,11 @@
 
 namespace Tests\Unit;
 
-use DateTimeZone;
 use Carbon\Carbon;
-use deepskylog\AstronomyLibrary\Time;
+use DateTimeZone;
 use deepskylog\AstronomyLibrary\AstronomyLibrary;
 use deepskylog\AstronomyLibrary\Testing\BaseTestCase;
+use deepskylog\AstronomyLibrary\Time;
 
 /**
  * Tests for the time methods.
@@ -35,7 +35,7 @@ class TimeTest extends BaseTestCase
      *
      * @var string
      */
-    protected $appPath = __DIR__ . '/../../vendor/laravel/laravel/bootstrap/app.php';
+    protected $appPath = __DIR__.'/../../vendor/laravel/laravel/bootstrap/app.php';
 
     /**
      * Setup the test environment.

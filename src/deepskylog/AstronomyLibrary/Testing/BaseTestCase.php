@@ -22,8 +22,8 @@ class BaseTestCase extends TestCase
     public function createApplication()
     {
         // relative path in package folder
-        if (!$this->appPath) {
-            return null;
+        if (! $this->appPath) {
+            return;
         }
 
         $app = require $this->appPath;
