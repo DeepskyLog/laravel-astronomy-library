@@ -41,24 +41,26 @@ class Time
         // Get the time in UTC
         $date->setTimezone('UTC');
 
-        // TODO: Make sure to use julian or gregorian if needed
-        // TODO: julian 4 October 1582 -> Gregorian: 15 October 1582
+        $day = (($date->second / 60 + $date->minute) / 60 + $date->hour) / 24
+            + $date->day;
+
+        $month = $date->month;
+        $year = $date->year;
+
+        if ($month <= 2) {
+            $year = --$year;
+            $month = $month + 12;
+        }
+
         if ($date < Carbon::create(1582, 10, 4, 0, 0, 0, 'UTC')) {
-            $julianDay = gregoriantojd($date->month, $date->day, $date->year);
+            $b = 0;
         } else {
-            $julianDay = gregoriantojd($date->month, $date->day, $date->year);
+            $a = (int)($year / 100);
+            $b = 2 - $a + (int)($a / 4);
         }
 
-        $dayfrac = $date->hour / 24 - .5;
-        if ($dayfrac < 0) {
-            $dayfrac += 1;
-        }
-
-        //now set the fraction of a day
-        $frac = $dayfrac + ($date->minute + $date->second / 60) / 60 / 24;
-
-        $julianDay = $julianDay + $frac;
-
-        return $julianDay;
+        return floor(365.25 * ($year + 4716)) +
+            floor(30.6001 * ($month + 1)) + $day
+            + $b - 1524.5;
     }
 }

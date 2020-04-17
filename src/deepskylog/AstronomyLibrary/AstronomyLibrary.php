@@ -61,4 +61,14 @@ class AstronomyLibrary
     {
         $this->_date = $date;
     }
+
+    /**
+     * Returns the julian day of the date.
+     *
+     * @return float The julian day
+     */
+    public function getJd(): float
+    {
+        return Time::getJd($this->_date);
+    }
 }
