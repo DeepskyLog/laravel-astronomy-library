@@ -13,6 +13,6 @@ class astronomyLibrary extends Facade
      */
     protected static function getFacadeAccessor()
     {
-        return 'laravel-astronomy-library';
+        return \deepskylog\AstronomyLibrary\AstronomyLibrary::class;
     }
 }
