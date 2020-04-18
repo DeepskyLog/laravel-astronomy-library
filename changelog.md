@@ -7,5 +7,4 @@ All notable changes to `laravel-astronomylibrary` will be documented in this fil
 ### Added
 
 - Methods to convert from Carbon dates to julian date
-- TODO: Methods to convert between NELM, SQM and bortle
-- TODO: Methods to calculate dynamical time
+- Methods to convert between NELM, SQM and bortle
