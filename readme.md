@@ -1,4 +1,4 @@
-# laravel-astronomylibrary
+# laravel-astronomy-library
 
 > Astronomical calculations for php / laravel
 
@@ -10,7 +10,7 @@
 [![StyleCI][ico-styleci]][link-styleci]
 
 Take a look at [contributing.md](contributing.md) if you are interesting in helping out.
-The laravel-astronomylibrary is part of [DeepskyLog](https://www.deepskylog.org). If you are interested in helping with the development of DeepskyLog, see the [documentation](https://github.com/DeepskyLog/DeepskyLog/blob/laravel/README.md).
+The laravel-astronomy-library is part of [DeepskyLog](https://www.deepskylog.org). If you are interested in helping with the development of DeepskyLog, see the [documentation](https://github.com/DeepskyLog/DeepskyLog/blob/laravel/README.md).
 
 ## Installation
 
