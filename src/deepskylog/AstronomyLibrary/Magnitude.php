@@ -102,7 +102,7 @@ class Magnitude
      *
      * @param float $sqm The sqm value
      *
-     * @return integer The bortle value
+     * @return int The bortle value
      */
     public static function sqmToBortle($sqm): int
     {
