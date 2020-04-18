@@ -1,4 +1,4 @@
-# laravel-astronomylibrary
+# laravel-astronomy-library
 
 > Astronomical calculations for php / laravel
 
@@ -10,6 +10,7 @@
 [![StyleCI][ico-styleci]][link-styleci]
 
 Take a look at [contributing.md](contributing.md) if you are interesting in helping out.
+The laravel-astronomy-library is part of [DeepskyLog](https://www.deepskylog.org). If you are interested in helping with the development of DeepskyLog, see the [documentation](https://github.com/DeepskyLog/DeepskyLog/blob/laravel/README.md).
 
 ## Installation
 
@@ -51,6 +52,30 @@ $jd = Time::getJd($carbonDate);
 
 // Convert from Julian day to Carbon date
 $carbonDate = Time::fromJd($jd);
+```
+
+## Magnitude methods
+
+### Static magnitude methods
+
+```php
+// Convert from Naked Eye Limiting Magnitude to SQM value
+$sqm = Magnitude::nelmToSqm($sqm, $fstOffset);
+
+// Convert from Naked Eye Limiting Magnitude to bortle scale
+$bortle = Magnitude::nelmToBortle($sqm);
+
+// Convert from SQM value to Naked Eye Limiting Magnitude
+$nelm = Magnitude::sqmToNelm($sqm, $fstOffset);
+
+// Convert from SQM value to bortle scale
+$bortle = Magnitude::sqmToBortle($sqm);
+
+// Convert from bortle scale to Naked Eye Limiting Magnitude
+$nelm = Magnitude::bortleToNelm($bortle, $fstOffset);
+
+// Convert from bortle scale to SQM value
+$sqm = Magnitude::bortleToNelm($bortle, $fstOffset);
 ```
 
 ## Change log
