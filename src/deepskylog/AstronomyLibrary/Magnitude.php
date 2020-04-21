@@ -178,7 +178,7 @@ class Magnitude
      *
      * @return float The naked eye limiting magnitude
      */
-    public static function bortleToNelm(int $bortle, float $fstOffset): float
+    public static function bortleToNelm(int $bortle, float $fstOffset = 0.0): float
     {
         if ($bortle > 9) {
             throw new InvalidArgumentException(
