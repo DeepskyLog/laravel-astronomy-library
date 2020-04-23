@@ -35,7 +35,7 @@ class TimeTest extends BaseTestCase
      *
      * @var string
      */
-    protected $appPath = __DIR__.'/../../vendor/laravel/laravel/bootstrap/app.php';
+    protected $appPath = __DIR__ . '/../../vendor/laravel/laravel/bootstrap/app.php';
 
     /**
      * Setup the test environment.
@@ -311,5 +311,23 @@ class TimeTest extends BaseTestCase
         $jd = -1234.4321;
         $this->expectException(\Carbon\Exceptions\InvalidDateException::class);
         Time::fromJd($jd);
+    }
+
+    /**
+     * Test getting delta T.
+     *
+     * @return None
+     */
+    public function testGetDeltaT()
+    {
+        $this->assertEquals(
+            47.52,
+            Time::deltaT(Carbon::create(1977, 1, 1, 21, 36, 0, 'UTC'))
+        );
+
+        $this->assertEquals(
+            7359,
+            Time::deltaT(Carbon::create(333, 1, 1, 21, 36, 0, 'UTC'))
+        );
     }
 }

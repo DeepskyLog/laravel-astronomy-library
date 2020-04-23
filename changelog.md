@@ -18,7 +18,6 @@ All notable changes to `laravel-astronomy-library` will be documented in this fi
 ![Delta t values](docs/deltat.png "Delta t values")
 
   - This means adding a table to the database, and a cronjob to update the table every day / week / month.
-  - Add option to calculate using formulae or table -> We also need a config file -> possibility to publish.
 
 ## Version 1.0
 

@@ -133,4 +133,61 @@ class Time
 
         return Carbon::create($year, $month, $day, $hour, $minute, $second, 'UTC');
     }
+
+    /**
+     * Calculates delta t for the given date.
+     *
+     * @param Carbon $date The date
+     *
+     * @return float delta t in seconds
+     */
+    public static function deltaT(Carbon $date): float
+    {
+        $y = $date->year + ($date->month - 0.5) / 12;
+
+        if ($date < Carbon::create(-500, 1, 1, 12, 12, 12, 'UTC')) {
+            $u = ($y - 1820) / 100;
+
+            $deltaT = (int)(-20 + 32 * ($u ** 2));
+        } elseif ($date < Carbon::create(500, 1, 1, 12, 12, 12, 'UTC')) {
+            $u = $y / 100;
+
+            $deltaT = (int)(10583.6 - 1014.41 * $u
+                + 33.78311 * ($u ** 2)
+                - 5.952053 * ($u ** 3)
+                - 0.1798452 * ($u ** 4)
+                + 0.022174192 * ($u ** 5)
+                + 0.0090316521 * ($u ** 6));
+        } elseif ($date < Carbon::create(1600, 1, 1, 12, 12, 12, 'UTC')) {
+            $u = ($y - 1000) / 100;
+
+            $deltaT = (int)(1574.2 - 556.01 * $u
+                + 71.23472 * ($u ** 2)
+                + 0.319781 * ($u ** 3)
+                - 0.8503463 * ($u ** 4)
+                - 0.005050998 * ($u ** 5)
+                 + 0.0083572073 * ($u ** 6));
+        } elseif ($date < Carbon::create(1620, 1, 1, 12, 12, 12, 'UTC')) {
+            $t = $y - 1600;
+
+            $deltaT = (int)(
+                120 - 0.9808 * $t - 0.01532 * ($t ** 2) + ($t ** 3) / 7129
+            );
+        } elseif ($date < Carbon::create(2021, 1, 1, 12, 12, 12, 'UTC')) {
+            // TODO: Get value from database
+            $deltaT = 0.0;
+        } elseif ($date < Carbon::create(2050, 1, 1, 12, 12, 12, 'UTC')) {
+            $t = $y - 2000;
+
+            $deltaT = 62.92 + 0.32217 * $t + 0.005589 * $t ** 2;
+        } elseif ($date < Carbon::create(2150, 1, 1, 12, 12, 12, 'UTC')) {
+            $deltaT = -20 + 32 * (($y - 1820) / 100) ** 2 - 0.5628 * (2150 - $y);
+        } else {
+            $u = ($y - 1820) / 100;
+
+            $deltaT = -20 + 32 * $u ** 2;
+        }
+
+        return $deltaT;
+    }
 }
