@@ -7,10 +7,8 @@ use Maatwebsite\Excel\Concerns\ToModel;
 
 class DeltaTImport implements ToModel
 {
-    // TODO: remove link to test package.
-
     /**
-     * @param array $row
+     * @param array $row The row of the csv file
      *
      * @return \Illuminate\Database\Eloquent\Model|null
      */
