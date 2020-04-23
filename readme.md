@@ -14,10 +14,17 @@ The laravel-astronomy-library is part of [DeepskyLog](https://www.deepskylog.org
 
 ## Installation
 
-Via Composer
+AstronomyLibrary can be installed via composer:
 
 ``` bash
 composer require deepskylog/laravel-astronomy-library
+```
+
+You need to publish and run the migration:
+
+``` bash
+php artisan vendor:publish --provider="deepskylog\AstronomyLibrary\AstronomyLibraryServiceProvider" --tag="migrations"
+php artisan migrate
 ```
 
 ## Documentation
@@ -56,6 +63,9 @@ $jd = Time::getJd($carbonDate);
 
 // Convert from Julian day to Carbon date
 $carbonDate = Time::fromJd($jd);
+
+// Get delta T for the current date
+$deltat = Time::deltaT($carbonDate);
 ```
 
 ## Magnitude methods
