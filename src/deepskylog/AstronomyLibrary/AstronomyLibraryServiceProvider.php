@@ -13,8 +13,18 @@ class AstronomyLibraryServiceProvider extends ServiceProvider
     {
         // $this->loadTranslationsFrom(__DIR__.'/../resources/lang', 'deepskylog');
         // $this->loadViewsFrom(__DIR__.'/../resources/views', 'deepskylog');
-        // $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
         // $this->loadRoutesFrom(__DIR__.'/routes.php');
+
+        // Publish the migration
+        $this->publishes(
+            [
+                __DIR__ . '/../database/migrations/create_deltat_table.php.stub' => database_path(
+                    'migrations/' . date('Y_m_d_His', time())
+                    . '_create_deltat_table.php'
+                ),
+            ],
+            'migrations'
+        );
 
         // Publishing is only necessary when using the CLI.
         if ($this->app->runningInConsole()) {
@@ -54,7 +64,7 @@ class AstronomyLibraryServiceProvider extends ServiceProvider
         // Publishing the configuration file.
         $this->publishes(
             [
-                __DIR__.'/../config/astronomyLibrary.php' => config_path('astronomyLibrary.php'),
+                __DIR__ . '/../config/astronomyLibrary.php' => config_path('astronomyLibrary.php'),
             ],
             'astronomyLibrary.config'
         );

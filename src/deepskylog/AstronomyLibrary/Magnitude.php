@@ -50,6 +50,7 @@ class Magnitude
         }
         $sqm = 21.58
             - 5 * log10(pow(10, (1.586 - ($nelm + $fstOffset) / 5.0)) - 1.0);
+
         if ($sqm > 22.0) {
             return 22.0;
         } else {
@@ -160,7 +161,7 @@ class Magnitude
             );
         }
 
-        $nelm = (7.97 - 5 * log10(1 + pow(10, 4.316 - $sqm / 5.0)));
+        $nelm = (7.93 - 5 * log10(1 + pow(10, 4.316 - $sqm / 5.0)));
 
         if ($nelm < 2.5) {
             $nelm = 2.5;
@@ -178,7 +179,7 @@ class Magnitude
      *
      * @return float The naked eye limiting magnitude
      */
-    public static function bortleToNelm(int $bortle, float $fstOffset): float
+    public static function bortleToNelm(int $bortle, float $fstOffset = 0.0): float
     {
         if ($bortle > 9) {
             throw new InvalidArgumentException(
