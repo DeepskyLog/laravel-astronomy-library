@@ -81,4 +81,14 @@ class AstronomyLibrary
     {
         $this->_date = Time::fromJd($jd);
     }
+
+    /**
+     * Returns delta t of the date.
+     *
+     * @return float delta t
+     */
+    public function getDeltaT(): float
+    {
+        return Time::deltaT($this->_date);
+    }
 }

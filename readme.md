@@ -42,17 +42,20 @@ $astrolib = new AstronomyLibrary($carbonDate);
 ### Time methods
 
 ```php
-// Get the date of the AstronomyLibrary instance
+// Get the date of the AstronomyLibrary instance.
 $date = $astrolib->getDate();
 
-// Set a new date to the AstronomyLibrary instance
+// Set a new date to the AstronomyLibrary instance.
 $astrolib->setDate($carbonDate);
 
-// Get the julian day of the AstronomyLibrary instance
+// Get the julian day of the AstronomyLibrary instance.
 $jd = $astrolib->getJd();
 
 // Set the julian day of the AstronomyLibrary instance. Also update the carbon date.
 $astrolib->setJd($jd);
+
+// Get delta t for the date of the AstronomyLibrary instance.
+$deltat = $astrolib->getDeltaT();
 ```
 
 ### Static Time methods
