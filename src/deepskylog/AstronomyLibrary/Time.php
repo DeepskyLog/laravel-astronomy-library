@@ -173,9 +173,19 @@ class Time
             $deltaT = (int)(
                 120 - 0.9808 * $t - 0.01532 * ($t ** 2) + ($t ** 3) / 7129
             );
-        } elseif ($date < Carbon::create(2021, 1, 1, 12, 12, 12, 'UTC')) {
-            // TODO: Get value from database
-            $deltaT = 0.0;
+        } elseif ($date < Carbon::create(
+            DeltaT::first()['year'] + 1,
+            1,
+            1,
+            12,
+            12,
+            12,
+            'UTC'
+        )
+        ) {
+            $databaseEntry = DeltaT::where('year', '=', $date->year)->first();
+
+            return $databaseEntry['deltat'];
         } elseif ($date < Carbon::create(2050, 1, 1, 12, 12, 12, 'UTC')) {
             $t = $y - 2000;
 
