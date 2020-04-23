@@ -18,9 +18,9 @@ class AstronomyLibraryServiceProvider extends ServiceProvider
         // Publish the migration
         $this->publishes(
             [
-                __DIR__ . '/../database/migrations/create_deltat_table.php.stub' => database_path(
-                    'migrations/' . date('Y_m_d_His', time())
-                    . '_create_deltat_table.php'
+                __DIR__.'/../database/migrations/create_deltat_table.php.stub' => database_path(
+                    'migrations/'.date('Y_m_d_His', time())
+                    .'_create_deltat_table.php'
                 ),
             ],
             'migrations'
@@ -64,7 +64,7 @@ class AstronomyLibraryServiceProvider extends ServiceProvider
         // Publishing the configuration file.
         $this->publishes(
             [
-                __DIR__ . '/../config/astronomyLibrary.php' => config_path('astronomyLibrary.php'),
+                __DIR__.'/../config/astronomyLibrary.php' => config_path('astronomyLibrary.php'),
             ],
             'astronomyLibrary.config'
         );
