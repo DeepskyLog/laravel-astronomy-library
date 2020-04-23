@@ -1,12 +1,12 @@
 <?php
 
-use App\Imports\DeltaTImport;
+use deepskylog\AstronomyLibrary\Imports\DeltaTImport;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateFilterColorTable extends Migration
+class CreateDeltaTTable extends Migration
 {
     /**
      * Run the migrations.
@@ -22,7 +22,7 @@ class CreateFilterColorTable extends Migration
             }
         );
 
-        Excel::import(new DeltaTImport(), '../../../data/delta t.xlsx');
+        Excel::import(new DeltaTImport(), 'database/deltat.csv');
     }
 
     /**

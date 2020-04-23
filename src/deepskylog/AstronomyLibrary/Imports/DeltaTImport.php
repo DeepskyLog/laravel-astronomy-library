@@ -1,12 +1,14 @@
 <?php
 
-namespace App\Imports;
+namespace deepskylog\AstronomyLibrary\Imports;
 
-use App\DeltaT;
+use deepskylog\AstronomyLibrary\DeltaT;
 use Maatwebsite\Excel\Concerns\ToModel;
 
 class DeltaTImport implements ToModel
 {
+    // TODO: remove link to test package.
+
     /**
      * @param array $row
      *
