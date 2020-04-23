@@ -32,7 +32,7 @@ class MagnitudeTest extends BaseTestCase
      *
      * @var string
      */
-    protected $appPath = __DIR__.'/../../vendor/laravel/laravel/bootstrap/app.php';
+    protected $appPath = __DIR__ . '/../../vendor/laravel/laravel/bootstrap/app.php';
 
     /**
      * Setup the test environment.
@@ -94,17 +94,28 @@ class MagnitudeTest extends BaseTestCase
      */
     public function testConvertSqmToNelm()
     {
-        $this->assertEqualsWithDelta(6.7, Magnitude::sqmToNelm(22.0), 0.1);
-        $this->assertEqualsWithDelta(6.6, Magnitude::sqmToNelm(21.94), 0.1);
-        $this->assertEqualsWithDelta(6.5, Magnitude::sqmToNelm(21.73), 0.1);
-        $this->assertEqualsWithDelta(6.4, Magnitude::sqmToNelm(21.53), 0.1);
-        $this->assertEqualsWithDelta(6.2, Magnitude::sqmToNelm(21.15), 0.1);
-        $this->assertEqualsWithDelta(6.0, Magnitude::sqmToNelm(20.80), 0.1);
-        $this->assertEqualsWithDelta(5.8, Magnitude::sqmToNelm(20.47), 0.1);
-        $this->assertEqualsWithDelta(5.5, Magnitude::sqmToNelm(20.01), 0.1);
-        $this->assertEqualsWithDelta(5.0, Magnitude::sqmToNelm(19.30), 0.1);
-        $this->assertEqualsWithDelta(4.5, Magnitude::sqmToNelm(18.65), 0.1);
-        $this->assertEqualsWithDelta(4.0, Magnitude::sqmToNelm(18.03), 0.1);
-        $this->assertEqualsWithDelta(3.0, Magnitude::sqmToNelm(16.88), 0.1);
+        $this->assertEqualsWithDelta(6.62, Magnitude::sqmToNelm(22.0), 0.01);
+        $this->assertEqualsWithDelta(6.6, Magnitude::sqmToNelm(21.94), 0.01);
+        $this->assertEqualsWithDelta(6.5, Magnitude::sqmToNelm(21.73), 0.01);
+        $this->assertEqualsWithDelta(6.4, Magnitude::sqmToNelm(21.53), 0.01);
+        $this->assertEqualsWithDelta(6.2, Magnitude::sqmToNelm(21.15), 0.01);
+        $this->assertEqualsWithDelta(6.0, Magnitude::sqmToNelm(20.80), 0.01);
+        $this->assertEqualsWithDelta(5.8, Magnitude::sqmToNelm(20.47), 0.01);
+        $this->assertEqualsWithDelta(5.5, Magnitude::sqmToNelm(20.01), 0.01);
+        $this->assertEqualsWithDelta(5.0, Magnitude::sqmToNelm(19.30), 0.01);
+        $this->assertEqualsWithDelta(4.5, Magnitude::sqmToNelm(18.65), 0.01);
+        $this->assertEqualsWithDelta(4.0, Magnitude::sqmToNelm(18.03), 0.01);
+        $this->assertEqualsWithDelta(3.0, Magnitude::sqmToNelm(16.88), 0.01);
+    }
+
+    /**
+     * Test converting from Nelm to Sqm and back.
+     *
+     * @return None
+     */
+    public function testConvertNelmToSqmAndBack()
+    {
+        $this->assertEqualsWithDelta(20.008595203233345, Magnitude::nelmToSqm(5.5), 0.000001);
+        $this->assertEqualsWithDelta(5.5, Magnitude::sqmToNelm(20.008595203233345), 0.000001);
     }
 }

@@ -20,6 +20,10 @@ Via Composer
 composer require deepskylog/laravel-astronomy-library
 ```
 
+## Documentation
+
+For more documentation on the mathematical background, see [docs.md](docs/docs.md).
+
 ## Usage
 
 ```php
