@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Imports;
+namespace deepskylog\AstronomyLibrary\Imports;
 
-use App\DeltaT;
+use deepskylog\AstronomyLibrary\DeltaT;
 use Maatwebsite\Excel\Concerns\ToModel;
 
 class DeltaTImport implements ToModel
 {
     /**
-     * @param array $row
+     * @param array $row The row of the csv file
      *
      * @return \Illuminate\Database\Eloquent\Model|null
      */

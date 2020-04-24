@@ -321,11 +321,6 @@ class TimeTest extends BaseTestCase
     public function testGetDeltaT()
     {
         $this->assertEquals(
-            47.52,
-            Time::deltaT(Carbon::create(1977, 1, 1, 21, 36, 0, 'UTC'))
-        );
-
-        $this->assertEquals(
             7359,
             Time::deltaT(Carbon::create(333, 1, 1, 21, 36, 0, 'UTC'))
         );
