@@ -27,6 +27,24 @@ php artisan vendor:publish --provider="deepskylog\AstronomyLibrary\AstronomyLibr
 php artisan migrate
 ```
 
+The database table with the delta t values can be updated using the following command:
+
+``` bash
+php artisan deltat:update
+```
+
+A job is automatically scheduled every 4 months to update the delta t value. This job can be executed using:
+
+``` bash
+php artisan schedule:run
+```
+
+It is possible to run these jobs automatically by adding the following line to your crontab:
+
+``` bash
+* * * * * cd /path-to-your-project && php artisan schedule:run >> /dev/null 2>&1
+```
+
 ## Documentation
 
 For more documentation on the mathematical background, see [docs.md](docs/docs.md).

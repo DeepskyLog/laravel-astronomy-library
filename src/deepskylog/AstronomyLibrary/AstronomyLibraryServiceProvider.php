@@ -46,13 +46,21 @@ class AstronomyLibraryServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        // Register the service the package provides.
         $this->app->singleton(
-            'AstronomyLibrary',
+            'deepskylog.AstronomyLibrary.console.kernel',
             function ($app) {
-                return new AstronomyLibrary;
+                $dispatcher = $app->make(
+                    \Illuminate\Contracts\Events\Dispatcher::class
+                );
+
+                return new \deepskylog\AstronomyLibrary\Console\Kernel(
+                    $app,
+                    $dispatcher
+                );
             }
         );
+
+        $this->app->make('deepskylog.AstronomyLibrary.console.kernel');
     }
 
     /**
