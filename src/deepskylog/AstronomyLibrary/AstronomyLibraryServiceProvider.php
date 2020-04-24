@@ -2,6 +2,7 @@
 
 namespace deepskylog\AstronomyLibrary;
 
+use deepskylog\AstronomyLibrary\Commands\UpdateDeltaTTable;
 use Illuminate\Support\ServiceProvider;
 
 class AstronomyLibraryServiceProvider extends ServiceProvider
@@ -18,16 +19,16 @@ class AstronomyLibraryServiceProvider extends ServiceProvider
         // Publish the migration
         $this->publishes(
             [
-                __DIR__ . '/../../database/migrations/create_deltat_table.php.stub' => database_path(
-                    'migrations/' . date('Y_m_d_His', time())
-                    . '_create_deltat_table.php'
+                __DIR__.'/../../database/migrations/create_deltat_table.php.stub' => database_path(
+                    'migrations/'.date('Y_m_d_His', time())
+                    .'_create_deltat_table.php'
                 ),
             ],
             'migrations'
         );
         $this->publishes(
             [
-                __DIR__ . '/../../../data/deltat.csv' => database_path(
+                __DIR__.'/../../../data/deltat.csv' => database_path(
                     'deltat.csv'
                 ),
             ],
@@ -45,13 +46,21 @@ class AstronomyLibraryServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        // Register the service the package provides.
         $this->app->singleton(
-            'AstronomyLibrary',
+            'deepskylog.AstronomyLibrary.console.kernel',
             function ($app) {
-                return new AstronomyLibrary;
+                $dispatcher = $app->make(
+                    \Illuminate\Contracts\Events\Dispatcher::class
+                );
+
+                return new \deepskylog\AstronomyLibrary\Console\Kernel(
+                    $app,
+                    $dispatcher
+                );
             }
         );
+
+        $this->app->make('deepskylog.AstronomyLibrary.console.kernel');
     }
 
     /**
@@ -93,6 +102,6 @@ class AstronomyLibraryServiceProvider extends ServiceProvider
         ], 'laravel-astronomy-library.views');*/
 
         // Registering package commands.
-        // $this->commands([]);
+        $this->commands([UpdateDeltaTTable::class]);
     }
 }
