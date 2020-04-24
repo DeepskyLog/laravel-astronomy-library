@@ -3,6 +3,7 @@
 namespace deepskylog\AstronomyLibrary;
 
 use Illuminate\Support\ServiceProvider;
+use deepskylog\AstronomyLibrary\Commands\UpdateDeltaTTable;
 
 class AstronomyLibraryServiceProvider extends ServiceProvider
 {
@@ -93,6 +94,6 @@ class AstronomyLibraryServiceProvider extends ServiceProvider
         ], 'laravel-astronomy-library.views');*/
 
         // Registering package commands.
-        // $this->commands([]);
+        $this->commands([UpdateDeltaTTable::class]);
     }
 }
