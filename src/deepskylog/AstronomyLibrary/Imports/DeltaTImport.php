@@ -17,7 +17,7 @@ class DeltaTImport implements ToModel
         return new DeltaT(
             [
                 'year' => $row[0],
-                'deltat' => $row[1]
+                'deltat' => $row[1],
             ]
         );
     }

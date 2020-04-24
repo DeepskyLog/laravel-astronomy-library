@@ -3,9 +3,9 @@
 namespace deepskylog\AstronomyLibrary\Commands;
 
 use deepskylog\AstronomyLibrary\DeltaT;
+use deepskylog\AstronomyLibrary\Imports\DeltaTImport;
 use Illuminate\Console\Command;
 use Maatwebsite\Excel\Facades\Excel;
-use deepskylog\AstronomyLibrary\Imports\DeltaTImport;
 
 class UpdateDeltaTTable extends Command
 {
@@ -25,7 +25,6 @@ class UpdateDeltaTTable extends Command
 
     /**
      * Create a new command instance.
-     *
      */
     public function __construct()
     {
