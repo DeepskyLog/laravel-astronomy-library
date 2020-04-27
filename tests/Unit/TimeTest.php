@@ -325,4 +325,33 @@ class TimeTest extends BaseTestCase
             Time::deltaT(Carbon::create(333, 1, 1, 21, 36, 0, 'UTC'))
         );
     }
+
+    /**
+     * Test getting dynamical time.
+     *
+     * @return None
+     */
+    public function testGetDynamicalTimeStatic()
+    {
+        $date = Carbon::create(333, 2, 6, 6, 0, 0, 'UTC');
+        $this->assertEquals(
+            Time::dynamicalTime($date),
+            Carbon::create(333, 2, 6, 8, 2, 38, 'UTC')
+        );
+    }
+
+    /**
+     * Test getting dynamical time.
+     *
+     * @return None
+     */
+    public function testGetDynamicalTime()
+    {
+        $date = Carbon::create(333, 2, 6, 6, 0, 0, 'UTC');
+        $astronomylib = new AstronomyLibrary($date);
+        $this->assertEquals(
+            $astronomylib->getDynamicalTime(),
+            Carbon::create(333, 2, 6, 8, 2, 38, 'UTC')
+        );
+    }
 }

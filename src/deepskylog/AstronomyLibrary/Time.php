@@ -135,6 +135,18 @@ class Time
     }
 
     /**
+     * Returns the dynamical time as the time + delta t.
+     *
+     * @param Carbon $date The date
+     *
+     * @return Carbon The dynamical time
+     */
+    public static function dynamicalTime(Carbon $date): Carbon
+    {
+        return $date->addSeconds(Time::deltaT($date));
+    }
+
+    /**
      * Calculates delta t for the given date.
      *
      * @param Carbon $date The date

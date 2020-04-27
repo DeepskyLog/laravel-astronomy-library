@@ -1,5 +1,7 @@
 # Laravel-astronomy-library documentation
 
+Most of the calculations are from the formulae in Astronomical Algorithms by Jean Meeus.
+
 ## Time
 
 ### Julian day

@@ -74,6 +74,9 @@ $astrolib->setJd($jd);
 
 // Get delta t for the date of the AstronomyLibrary instance.
 $deltat = $astrolib->getDeltaT();
+
+// Get the dynamical time of the AstronomyLibrary insctance.
+$dynamicalTime = $astrolib->getDynamicalTime();
 ```
 
 ### Static Time methods
@@ -85,8 +88,11 @@ $jd = Time::getJd($carbonDate);
 // Convert from Julian day to Carbon date
 $carbonDate = Time::fromJd($jd);
 
-// Get delta T for the current date
+// Get delta T for the given date
 $deltat = Time::deltaT($carbonDate);
+
+// Get the dynamical time for the given date
+$dynamicalTime = Time::dynamicalTime($carbonDate);
 ```
 
 ## Magnitude methods

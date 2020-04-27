@@ -91,4 +91,14 @@ class AstronomyLibrary
     {
         return Time::deltaT($this->_date);
     }
+
+    /**
+     * Returns dynamical dateof the date.
+     *
+     * @return Carbon The dynamical time
+     */
+    public function getDynamicalTime(): Carbon
+    {
+        return Time::dynamicalTime($this->_date);
+    }
 }
