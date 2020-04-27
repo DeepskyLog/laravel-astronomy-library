@@ -354,4 +354,79 @@ class TimeTest extends BaseTestCase
             Carbon::create(333, 2, 6, 8, 2, 38, 'UTC')
         );
     }
+
+    /**
+     * Test getting mean siderial time.
+     *
+     * @return None
+     */
+    public function testGetMeanSiderialTimeStatic()
+    {
+        $date = Carbon::create(1987, 4, 10, 19, 21, 0, 'UTC');
+
+        $this->assertEquals(
+            Time::meanSiderialTime($date),
+            Carbon::create(1987, 4, 10, 8, 34, 57.089579, 'UTC')
+        );
+
+        $date = Carbon::create(1987, 4, 10, 0, 0, 0, 'UTC');
+
+        $this->assertEquals(
+            Time::meanSiderialTime($date),
+            Carbon::create(1987, 4, 10, 13, 10, 46.366822, 'UTC')
+        );
+    }
+
+    /**
+     * Test getting apparent siderial time.
+     *
+     * @return None
+     */
+    public function testGetApparentSiderialTimeStatic()
+    {
+        $date = Carbon::create(1987, 4, 10, 0, 0, 0, 'UTC');
+
+        $this->assertEquals(
+            Time::apparentSiderialTime($date),
+            Carbon::create(1987, 4, 10, 13, 10, 46.135138, 'UTC')
+        );
+    }
+
+    /**
+     * Test getting nutation.
+     *
+     * @return None
+     */
+    public function testGetNutation()
+    {
+        $date = Carbon::create(1987, 4, 10, 0, 0, 0, 'UTC');
+
+        $jd = Time::getJd($date);
+
+        $nutat = Time::nutation($jd);
+
+        $this->assertEqualsWithDelta(
+            -3.788,
+            $nutat[0],
+            0.001
+        );
+
+        $this->assertEqualsWithDelta(
+            9.443,
+            $nutat[1],
+            0.001
+        );
+
+        $this->assertEqualsWithDelta(
+            23.44094629,
+            $nutat[2],
+            0.00000001
+        );
+
+        $this->assertEqualsWithDelta(
+            23.44356921,
+            $nutat[3],
+            0.00000001
+        );
+    }
 }

@@ -93,12 +93,43 @@ class AstronomyLibrary
     }
 
     /**
-     * Returns dynamical dateof the date.
+     * Returns dynamical time of the date.
      *
      * @return Carbon The dynamical time
      */
     public function getDynamicalTime(): Carbon
     {
         return Time::dynamicalTime($this->_date);
+    }
+
+    /**
+     * Returns mean siderial time of the date.
+     *
+     * @return Carbon The siderial time
+     */
+    public function getMeanSiderialTime(): Carbon
+    {
+        return Time::meanSiderialTime($this->_date);
+    }
+
+    /**
+     * Returns apparent siderial time of the date.
+     *
+     * @return Carbon The siderial time
+     */
+    public function getApparentSiderialTime(): Carbon
+    {
+        return Time::apparentSiderialTime($this->_date);
+    }
+
+    /**
+     * Returns nutation of the date.
+     *
+     * @return array The array with nutation in Longitude, nutation in Obliquity,
+     *               mean Obliquity and true Obliquity
+     */
+    public function getNutation(): array
+    {
+        return Time::nutation($this->getJd());
     }
 }

@@ -75,8 +75,17 @@ $astrolib->setJd($jd);
 // Get delta t for the date of the AstronomyLibrary instance.
 $deltat = $astrolib->getDeltaT();
 
-// Get the dynamical time of the AstronomyLibrary insctance.
+// Get the dynamical time of the AstronomyLibrary instance.
 $dynamicalTime = $astrolib->getDynamicalTime();
+
+// Get the mean siderial time for AstronomyLibrary instance.
+$meanSiderialTime = $astrolib->getMeanSiderialTime();
+
+// Get the apparent siderial time for AstronomyLibrary instance.
+$meanSiderialTime = $astrolib->getApparentSiderialTime();
+
+// Get the nutation for the AstronomyLibrary instance.
+$nutation = $astrolib->getNutation();
 ```
 
 ### Static Time methods
@@ -93,6 +102,15 @@ $deltat = Time::deltaT($carbonDate);
 
 // Get the dynamical time for the given date
 $dynamicalTime = Time::dynamicalTime($carbonDate);
+
+// Get the mean siderial time for the given date
+$meanSiderialTime = Time::meanSiderialTime($carbonDate);
+
+// Get the apparent siderial time for the given date
+$meanSiderialTime = Time::apparentSiderialTime($carbonDate);
+
+// Get the nutation for the given julian day
+$nutation = Time::nutation($jd);
 ```
 
 ## Magnitude methods

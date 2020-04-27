@@ -4,7 +4,11 @@ All notable changes to `laravel-astronomy-library` will be documented in this fi
 
 ## Version 1.2
 
+### Added
+
 - Added methods to calculate the dynamical time.
+- Added methods to calculate the mean and apparent siderial time at Greenwich.
+- Added methods to calculate the nutation for a given date.
 
 ## Version 1.1
 
@@ -20,8 +24,7 @@ All notable changes to `laravel-astronomy-library` will be documented in this fi
   - The values from 2011 onward are taken from the VVS mailing list, provided by Jean Meeus.
   - This is the graph with the delta t values from 1620 to today:
 ![Delta t values](docs/deltat.png "Delta t values")
-
-  - This means adding a table to the database, and a cronjob to update the table every day / week / month.
+  - A new table delta_t is added to the database, and a cronjob to update the table every day / week / month is added to the scheduler.
 
 ## Version 1.0
 

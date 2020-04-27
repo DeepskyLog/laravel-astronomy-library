@@ -16,6 +16,14 @@ The standard calculations in php to calculate the julian day do not take into ac
 ![Delta t values](deltat.png "Delta t values")
 - The formulae for the years that are not tabulated, are taken from the [NASA Eclipse Website](https://eclipse.gsfc.nasa.gov/SEcat5/deltatpoly.html)
 
+### Nutation
+
+- The array that is returned from the calculation of the nutation (Time::nutation(jd)) contains the following information:
+  - nutation in Longitude
+  - nutation in Obliquity
+  - mean Obliquity
+  - true Obliquity
+
 ## Magnitude
 
 ### Conversion between NELM, SQM and Bortle Scale
