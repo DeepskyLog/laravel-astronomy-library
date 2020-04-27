@@ -2,8 +2,8 @@
 
 namespace deepskylog\AstronomyLibrary;
 
-use Illuminate\Support\ServiceProvider;
 use deepskylog\AstronomyLibrary\Commands\UpdateDeltaTTable;
+use Illuminate\Support\ServiceProvider;
 
 class AstronomyLibraryServiceProvider extends ServiceProvider
 {
@@ -19,16 +19,16 @@ class AstronomyLibraryServiceProvider extends ServiceProvider
         // Publish the migration
         $this->publishes(
             [
-                __DIR__ . '/../../database/migrations/create_deltat_table.php.stub' => database_path(
-                    'migrations/' . date('Y_m_d_His', time())
-                    . '_create_deltat_table.php'
+                __DIR__.'/../../database/migrations/create_deltat_table.php.stub' => database_path(
+                    'migrations/'.date('Y_m_d_His', time())
+                    .'_create_deltat_table.php'
                 ),
             ],
             'migrations'
         );
         $this->publishes(
             [
-                __DIR__ . '/../../../data/deltat.csv' => database_path(
+                __DIR__.'/../../../data/deltat.csv' => database_path(
                     'deltat.csv'
                 ),
             ],

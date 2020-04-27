@@ -164,11 +164,11 @@ class Time
         if ($date < Carbon::create(-500, 1, 1, 12, 12, 12, 'UTC')) {
             $u = ($y - 1820) / 100;
 
-            $deltaT = (int)(-20 + 32 * ($u ** 2));
+            $deltaT = (int) (-20 + 32 * ($u ** 2));
         } elseif ($date < Carbon::create(500, 1, 1, 12, 12, 12, 'UTC')) {
             $u = $y / 100;
 
-            $deltaT = (int)(10583.6 - 1014.41 * $u
+            $deltaT = (int) (10583.6 - 1014.41 * $u
                 + 33.78311 * ($u ** 2)
                 - 5.952053 * ($u ** 3)
                 - 0.1798452 * ($u ** 4)
@@ -177,7 +177,7 @@ class Time
         } elseif ($date < Carbon::create(1600, 1, 1, 12, 12, 12, 'UTC')) {
             $u = ($y - 1000) / 100;
 
-            $deltaT = (int)(1574.2 - 556.01 * $u
+            $deltaT = (int) (1574.2 - 556.01 * $u
                 + 71.23472 * ($u ** 2)
                 + 0.319781 * ($u ** 3)
                 - 0.8503463 * ($u ** 4)
@@ -186,7 +186,7 @@ class Time
         } elseif ($date < Carbon::create(1620, 1, 1, 12, 12, 12, 'UTC')) {
             $t = $y - 1600;
 
-            $deltaT = (int)(
+            $deltaT = (int) (
                 120 - 0.9808 * $t - 0.01532 * ($t ** 2) + ($t ** 3) / 7129
             );
         } elseif ($date < Carbon::create(

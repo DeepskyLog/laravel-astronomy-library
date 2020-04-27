@@ -11,6 +11,6 @@ class DeltaT extends Model
     protected $table = 'delta_t';
 
     protected $fillable = [
-        'year', 'deltat'
+        'year', 'deltat',
     ];
 }
