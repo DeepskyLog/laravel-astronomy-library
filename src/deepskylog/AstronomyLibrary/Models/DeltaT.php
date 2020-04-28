@@ -1,6 +1,6 @@
 <?php
 
-namespace deepskylog\AstronomyLibrary;
+namespace deepskylog\AstronomyLibrary\Models;
 
 use Illuminate\Database\Eloquent\Model;
 

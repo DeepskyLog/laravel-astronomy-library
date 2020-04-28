@@ -2,6 +2,19 @@
 
 All notable changes to `laravel-astronomy-library` will be documented in this file.
 
+## Version 2.0
+
+### Changed
+
+- The constructor of AstronomyLibrary now needs the geographical coordinates as parameter.
+
+### Added
+
+- Added methods to calculate the dynamical time.
+- Added methods to calculate the mean and apparent siderial time at the given location.
+- Added methods to calculate the nutation for a given date.
+- Added GeographicalCoordinates class.
+
 ## Version 1.1
 
 ### Fixed
@@ -16,8 +29,7 @@ All notable changes to `laravel-astronomy-library` will be documented in this fi
   - The values from 2011 onward are taken from the VVS mailing list, provided by Jean Meeus.
   - This is the graph with the delta t values from 1620 to today:
 ![Delta t values](docs/deltat.png "Delta t values")
-
-  - This means adding a table to the database, and a cronjob to update the table every day / week / month.
+  - A new table delta_t is added to the database, and a cronjob to update the table every day / week / month is added to the scheduler.
 
 ## Version 1.0
 

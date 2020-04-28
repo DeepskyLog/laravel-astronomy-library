@@ -54,7 +54,8 @@ For more documentation on the mathematical background, see [docs.md](docs/docs.m
 ```php
 <?php
 // Use the factory to create a AstronomyLibrary instance
-$astrolib = new AstronomyLibrary($carbonDate);
+$coords = new GeographicalCoordinates(-70.73330, -29.25);
+$astrolib = new AstronomyLibrary($carbonDate, $coords);
 ```
 
 ### Time methods
@@ -66,6 +67,12 @@ $date = $astrolib->getDate();
 // Set a new date to the AstronomyLibrary instance.
 $astrolib->setDate($carbonDate);
 
+// Get the coordinates of the AstronomyLibrary instance.
+$coords = $astrolib->getGeographicalCoordinates();
+
+// Set the coordinates of the AstronomyLibrary instance.
+$astrolib->setGeographicalCoordinates($newCoords);
+
 // Get the julian day of the AstronomyLibrary instance.
 $jd = $astrolib->getJd();
 
@@ -74,6 +81,18 @@ $astrolib->setJd($jd);
 
 // Get delta t for the date of the AstronomyLibrary instance.
 $deltat = $astrolib->getDeltaT();
+
+// Get the dynamical time of the AstronomyLibrary instance.
+$dynamicalTime = $astrolib->getDynamicalTime();
+
+// Get the mean siderial time for AstronomyLibrary instance.
+$meanSiderialTime = $astrolib->getMeanSiderialTime();
+
+// Get the apparent siderial time for AstronomyLibrary instance.
+$meanSiderialTime = $astrolib->getApparentSiderialTime();
+
+// Get the nutation for the AstronomyLibrary instance.
+$nutation = $astrolib->getNutation();
 ```
 
 ### Static Time methods
@@ -85,8 +104,20 @@ $jd = Time::getJd($carbonDate);
 // Convert from Julian day to Carbon date
 $carbonDate = Time::fromJd($jd);
 
-// Get delta T for the current date
+// Get delta T for the given date
 $deltat = Time::deltaT($carbonDate);
+
+// Get the dynamical time for the given date
+$dynamicalTime = Time::dynamicalTime($carbonDate);
+
+// Get the mean siderial time for the given date
+$meanSiderialTime = Time::meanSiderialTime($carbonDate);
+
+// Get the apparent siderial time for the given date
+$meanSiderialTime = Time::apparentSiderialTime($carbonDate);
+
+// Get the nutation for the given julian day
+$nutation = Time::nutation($jd);
 ```
 
 ## Magnitude methods

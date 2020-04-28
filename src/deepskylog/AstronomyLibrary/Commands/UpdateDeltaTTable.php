@@ -2,8 +2,8 @@
 
 namespace deepskylog\AstronomyLibrary\Commands;
 
-use deepskylog\AstronomyLibrary\DeltaT;
 use deepskylog\AstronomyLibrary\Imports\DeltaTImport;
+use deepskylog\AstronomyLibrary\Models\DeltaT;
 use Illuminate\Console\Command;
 use Maatwebsite\Excel\Facades\Excel;
 

@@ -2,7 +2,7 @@
 
 namespace deepskylog\AstronomyLibrary\Imports;
 
-use deepskylog\AstronomyLibrary\DeltaT;
+use deepskylog\AstronomyLibrary\Models\DeltaT;
 use Maatwebsite\Excel\Concerns\ToModel;
 
 class DeltaTImport implements ToModel

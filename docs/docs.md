@@ -1,5 +1,7 @@
 # Laravel-astronomy-library documentation
 
+Most of the calculations are from the formulae in Astronomical Algorithms by Jean Meeus.
+
 ## Time
 
 ### Julian day
@@ -13,6 +15,14 @@ The standard calculations in php to calculate the julian day do not take into ac
 - This is the graph with the delta t values from 1620 to today:
 ![Delta t values](deltat.png "Delta t values")
 - The formulae for the years that are not tabulated, are taken from the [NASA Eclipse Website](https://eclipse.gsfc.nasa.gov/SEcat5/deltatpoly.html)
+
+### Nutation
+
+- The array that is returned from the calculation of the nutation (Time::nutation(jd)) contains the following information:
+  - nutation in Longitude
+  - nutation in Obliquity
+  - mean Obliquity
+  - true Obliquity
 
 ## Magnitude
 

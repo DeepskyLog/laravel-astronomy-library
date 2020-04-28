@@ -15,6 +15,7 @@ namespace Tests\Unit;
 use Carbon\Carbon;
 use DateTimeZone;
 use deepskylog\AstronomyLibrary\AstronomyLibrary;
+use deepskylog\AstronomyLibrary\GeographicalCoordinates;
 use deepskylog\AstronomyLibrary\Testing\BaseTestCase;
 use deepskylog\AstronomyLibrary\Time;
 
@@ -55,13 +56,14 @@ class TimeTest extends BaseTestCase
     public function testConvertToJd()
     {
         $date = Carbon::create(1970, 10, 11, 0, 0, 0, 'UTC');
-        $astrolib = new AstronomyLibrary($date);
+        $coords = new GeographicalCoordinates(12.345, 32.1);
+        $astrolib = new AstronomyLibrary($date, $coords);
 
         $this->assertEquals($date, $astrolib->getDate());
         $this->assertEquals(2440870.5, $astrolib->getJd());
 
         $now = Carbon::now(new DateTimeZone('Europe/Brussels'));
-        $astrolib = new AstronomyLibrary($now);
+        $astrolib = new AstronomyLibrary($now, $coords);
 
         $this->assertEquals($now, $astrolib->getDate());
 
@@ -79,7 +81,8 @@ class TimeTest extends BaseTestCase
     public function testUpdateJd()
     {
         $date = Carbon::create(1970, 10, 11, 0, 0, 0, 'UTC');
-        $astrolib = new AstronomyLibrary($date);
+        $coords = new GeographicalCoordinates(12.345, 32.1);
+        $astrolib = new AstronomyLibrary($date, $coords);
 
         $this->assertEquals($date, $astrolib->getDate());
         $this->assertEquals(2440870.5, $astrolib->getJd());
@@ -323,6 +326,121 @@ class TimeTest extends BaseTestCase
         $this->assertEquals(
             7359,
             Time::deltaT(Carbon::create(333, 1, 1, 21, 36, 0, 'UTC'))
+        );
+    }
+
+    /**
+     * Test getting dynamical time.
+     *
+     * @return None
+     */
+    public function testGetDynamicalTimeStatic()
+    {
+        $date = Carbon::create(333, 2, 6, 6, 0, 0, 'UTC');
+        $this->assertEquals(
+            Time::dynamicalTime($date),
+            Carbon::create(333, 2, 6, 8, 2, 38, 'UTC')
+        );
+    }
+
+    /**
+     * Test getting dynamical time.
+     *
+     * @return None
+     */
+    public function testGetDynamicalTime()
+    {
+        $date = Carbon::create(333, 2, 6, 6, 0, 0, 'UTC');
+        $coords = new GeographicalCoordinates(12.345, 32.1);
+        $astronomylib = new AstronomyLibrary($date, $coords);
+        $this->assertEquals(
+            $astronomylib->getDynamicalTime(),
+            Carbon::create(333, 2, 6, 8, 2, 38, 'UTC')
+        );
+    }
+
+    /**
+     * Test getting mean siderial time.
+     *
+     * @return None
+     */
+    public function testGetMeanSiderialTimeStatic()
+    {
+        $date = Carbon::create(1987, 4, 10, 19, 21, 0, 'UTC');
+        $coords = new GeographicalCoordinates(0.0, 32.1);
+
+        $this->assertEquals(
+            Time::meanSiderialTime($date, $coords),
+            Carbon::create(1987, 4, 10, 8, 34, 57.089579, 'UTC')
+        );
+
+        $date = Carbon::create(1987, 4, 10, 0, 0, 0, 'UTC');
+
+        $this->assertEquals(
+            Time::meanSiderialTime($date, $coords),
+            Carbon::create(1987, 4, 10, 13, 10, 46.366822, 'UTC')
+        );
+
+        $coords->setLongitude(13.41);
+        $date = Carbon::create(2020, 4, 28, 13, 47, 8, 'Europe/Brussels');
+
+        $this->assertEquals(
+            Time::apparentSiderialTime($date, $coords),
+            Carbon::create(2020, 4, 28, 3, 8, 24.210309, 'UTC')
+        );
+    }
+
+    /**
+     * Test getting apparent siderial time.
+     *
+     * @return None
+     */
+    public function testGetApparentSiderialTimeStatic()
+    {
+        $date = Carbon::create(1987, 4, 10, 0, 0, 0, 'UTC');
+        $coords = new GeographicalCoordinates(0.0, 32.1);
+
+        $this->assertEquals(
+            Time::apparentSiderialTime($date, $coords),
+            Carbon::create(1987, 4, 10, 13, 10, 46.135138, 'UTC')
+        );
+    }
+
+    /**
+     * Test getting nutation.
+     *
+     * @return None
+     */
+    public function testGetNutation()
+    {
+        $date = Carbon::create(1987, 4, 10, 0, 0, 0, 'UTC');
+
+        $jd = Time::getJd($date);
+
+        $nutat = Time::nutation($jd);
+
+        $this->assertEqualsWithDelta(
+            -3.788,
+            $nutat[0],
+            0.001
+        );
+
+        $this->assertEqualsWithDelta(
+            9.443,
+            $nutat[1],
+            0.001
+        );
+
+        $this->assertEqualsWithDelta(
+            23.44094629,
+            $nutat[2],
+            0.00000001
+        );
+
+        $this->assertEqualsWithDelta(
+            23.44356921,
+            $nutat[3],
+            0.00000001
         );
     }
 }
