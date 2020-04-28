@@ -15,6 +15,7 @@ namespace Tests\Unit;
 use Carbon\Carbon;
 use DateTimeZone;
 use deepskylog\AstronomyLibrary\AstronomyLibrary;
+use deepskylog\AstronomyLibrary\GeographicalCoordinates;
 use deepskylog\AstronomyLibrary\Testing\BaseTestCase;
 use deepskylog\AstronomyLibrary\Time;
 
@@ -35,7 +36,7 @@ class TimeTest extends BaseTestCase
      *
      * @var string
      */
-    protected $appPath = __DIR__.'/../../vendor/laravel/laravel/bootstrap/app.php';
+    protected $appPath = __DIR__ . '/../../vendor/laravel/laravel/bootstrap/app.php';
 
     /**
      * Setup the test environment.
@@ -55,13 +56,14 @@ class TimeTest extends BaseTestCase
     public function testConvertToJd()
     {
         $date = Carbon::create(1970, 10, 11, 0, 0, 0, 'UTC');
-        $astrolib = new AstronomyLibrary($date);
+        $coords = new GeographicalCoordinates(12.345, 32.1);
+        $astrolib = new AstronomyLibrary($date, $coords);
 
         $this->assertEquals($date, $astrolib->getDate());
         $this->assertEquals(2440870.5, $astrolib->getJd());
 
         $now = Carbon::now(new DateTimeZone('Europe/Brussels'));
-        $astrolib = new AstronomyLibrary($now);
+        $astrolib = new AstronomyLibrary($now, $coords);
 
         $this->assertEquals($now, $astrolib->getDate());
 
@@ -79,7 +81,8 @@ class TimeTest extends BaseTestCase
     public function testUpdateJd()
     {
         $date = Carbon::create(1970, 10, 11, 0, 0, 0, 'UTC');
-        $astrolib = new AstronomyLibrary($date);
+        $coords = new GeographicalCoordinates(12.345, 32.1);
+        $astrolib = new AstronomyLibrary($date, $coords);
 
         $this->assertEquals($date, $astrolib->getDate());
         $this->assertEquals(2440870.5, $astrolib->getJd());
@@ -348,7 +351,8 @@ class TimeTest extends BaseTestCase
     public function testGetDynamicalTime()
     {
         $date = Carbon::create(333, 2, 6, 6, 0, 0, 'UTC');
-        $astronomylib = new AstronomyLibrary($date);
+        $coords = new GeographicalCoordinates(12.345, 32.1);
+        $astronomylib = new AstronomyLibrary($date, $coords);
         $this->assertEquals(
             $astronomylib->getDynamicalTime(),
             Carbon::create(333, 2, 6, 8, 2, 38, 'UTC')
@@ -363,17 +367,26 @@ class TimeTest extends BaseTestCase
     public function testGetMeanSiderialTimeStatic()
     {
         $date = Carbon::create(1987, 4, 10, 19, 21, 0, 'UTC');
+        $coords = new GeographicalCoordinates(0.0, 32.1);
 
         $this->assertEquals(
-            Time::meanSiderialTime($date),
+            Time::meanSiderialTime($date, $coords),
             Carbon::create(1987, 4, 10, 8, 34, 57.089579, 'UTC')
         );
 
         $date = Carbon::create(1987, 4, 10, 0, 0, 0, 'UTC');
 
         $this->assertEquals(
-            Time::meanSiderialTime($date),
+            Time::meanSiderialTime($date, $coords),
             Carbon::create(1987, 4, 10, 13, 10, 46.366822, 'UTC')
+        );
+
+        $coords->setLongitude(13.41);
+        $date = Carbon::create(2020, 4, 28, 13, 47, 8, 'Europe/Brussels');
+
+        $this->assertEquals(
+            Time::apparentSiderialTime($date, $coords),
+            Carbon::create(2020, 4, 28, 3, 8, 24.210309, 'UTC')
         );
     }
 
@@ -385,9 +398,10 @@ class TimeTest extends BaseTestCase
     public function testGetApparentSiderialTimeStatic()
     {
         $date = Carbon::create(1987, 4, 10, 0, 0, 0, 'UTC');
+        $coords = new GeographicalCoordinates(0.0, 32.1);
 
         $this->assertEquals(
-            Time::apparentSiderialTime($date),
+            Time::apparentSiderialTime($date, $coords),
             Carbon::create(1987, 4, 10, 13, 10, 46.135138, 'UTC')
         );
     }

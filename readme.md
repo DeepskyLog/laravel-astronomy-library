@@ -54,7 +54,8 @@ For more documentation on the mathematical background, see [docs.md](docs/docs.m
 ```php
 <?php
 // Use the factory to create a AstronomyLibrary instance
-$astrolib = new AstronomyLibrary($carbonDate);
+$coords = new GeographicalCoordinates(-70.73330, -29.25);
+$astrolib = new AstronomyLibrary($carbonDate, $coords);
 ```
 
 ### Time methods
@@ -65,6 +66,12 @@ $date = $astrolib->getDate();
 
 // Set a new date to the AstronomyLibrary instance.
 $astrolib->setDate($carbonDate);
+
+// Get the coordinates of the AstronomyLibrary instance.
+$coords = $astrolib->getGeographicalCoordinates();
+
+// Set the coordinates of the AstronomyLibrary instance.
+$astrolib->setGeographicalCoordinates($newCoords);
 
 // Get the julian day of the AstronomyLibrary instance.
 $jd = $astrolib->getJd();

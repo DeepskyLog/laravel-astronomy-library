@@ -2,13 +2,18 @@
 
 All notable changes to `laravel-astronomy-library` will be documented in this file.
 
-## Version 1.2
+## Version 2.0
+
+### Changed
+
+- The constructor of AstronomyLibrary now needs the geographical coordinates as parameter.
 
 ### Added
 
 - Added methods to calculate the dynamical time.
-- Added methods to calculate the mean and apparent siderial time at Greenwich.
+- Added methods to calculate the mean and apparent siderial time at the given location.
 - Added methods to calculate the nutation for a given date.
+- Added GeographicalCoordinates class.
 
 ## Version 1.1
 

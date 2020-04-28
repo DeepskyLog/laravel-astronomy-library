@@ -14,6 +14,7 @@
 namespace deepskylog\AstronomyLibrary;
 
 use Carbon\Carbon;
+use deepskylog\AstronomyLibrary\Models\DeltaT;
 
 /**
  * Procedures to work with times.
@@ -218,15 +219,18 @@ class Time
     }
 
     /**
-     * Calculates the mean siderial time at Greenwich for the given date.
+     * Calculates the mean siderial time for the given date.
      * Chapter 11 in Astronomical Algorithms.
      *
-     * @param Carbon $date The date
+     * @param Carbon                  $date   The date
+     * @param GeographicalCoordinates $coords The geographical coordinates
      *
      * @return Carbon the siderial time
      */
-    public static function meanSiderialTime(Carbon $date): Carbon
-    {
+    public static function meanSiderialTime(
+        Carbon $date,
+        GeographicalCoordinates $coords
+    ): Carbon {
         $jd = Time::getJd($date);
         $T = ($jd - 2451545.0) / 36525;
 
@@ -234,6 +238,9 @@ class Time
             + 360.98564736629 * ($jd - 2451545.0)
             + 0.000387933 * $T ** 2
             - $T ** 3 / 38710000;
+
+        // Add the extra hours for the longitude
+        $theta0 += $coords->getLongitude();
 
         // Bring $theta0 in the 0 - 360.0 interval
         $theta0 -= floor($theta0 / 360.0) * 360;
@@ -256,16 +263,19 @@ class Time
     }
 
     /**
-     * Calculates the apparent siderial time at Greenwich for the given date.
+     * Calculates the apparent siderial time for the given date.
      * Chapter 11 in Astronomical Algorithms.
      *
-     * @param Carbon $date The date
+     * @param Carbon                  $date   The date
+     * @param GeographicalCoordinates $coords The geographical coordinates
      *
      * @return Carbon the siderial time
      */
-    public static function apparentSiderialTime(Carbon $date): Carbon
-    {
-        $siderialTime = Time::meanSiderialTime($date);
+    public static function apparentSiderialTime(
+        Carbon $date,
+        GeographicalCoordinates $coords
+    ): Carbon {
+        $siderialTime = Time::meanSiderialTime($date, $coords);
         $jd = Time::getJd($date);
 
         $nutation = Time::nutation($jd);

@@ -26,16 +26,21 @@ use Carbon\Carbon;
  */
 class AstronomyLibrary
 {
-    private $_date;
+    private Carbon $_date;
+    private GeographicalCoordinates $_coordinates;
 
     /**
      * The constructor.
      *
-     * @param Carbon $carbonDate The date
+     * @param Carbon                  $carbonDate  The date
+     * @param GeographicalCoordinates $coordinates The geographical coordinates
      */
-    public function __construct(Carbon $carbonDate)
-    {
+    public function __construct(
+        Carbon $carbonDate,
+        GeographicalCoordinates $coordinates
+    ) {
         $this->_date = $carbonDate;
+        $this->_coordinates = $coordinates;
     }
 
     /**
@@ -58,6 +63,29 @@ class AstronomyLibrary
     public function setDate(Carbon $date): void
     {
         $this->_date = $date;
+    }
+
+    /**
+     * Returns the geographical coordinates.
+     *
+     * @return GeographicalCoordinates The geographical coordinates
+     */
+    public function getGeographicalCoordinates(): GeographicalCoordinates
+    {
+        return $this->_coordinates;
+    }
+
+    /**
+     * Sets the date and time.
+     *
+     * @param GeographicalCoordinates $coordinates The new geographical coordinates
+     *
+     * @return None
+     */
+    public function setGeographicalCoordinates(
+        GeographicalCoordinates $coordinates
+    ): void {
+        $this->_coordinates = $coordinates;
     }
 
     /**
@@ -109,7 +137,7 @@ class AstronomyLibrary
      */
     public function getMeanSiderialTime(): Carbon
     {
-        return Time::meanSiderialTime($this->_date);
+        return Time::meanSiderialTime($this->_date, $this->_coordinates);
     }
 
     /**
@@ -119,7 +147,7 @@ class AstronomyLibrary
      */
     public function getApparentSiderialTime(): Carbon
     {
-        return Time::apparentSiderialTime($this->_date);
+        return Time::apparentSiderialTime($this->_date, $this->_coordinates);
     }
 
     /**
