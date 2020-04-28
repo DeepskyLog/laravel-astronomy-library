@@ -2,6 +2,11 @@
 
 All notable changes to `laravel-astronomy-library` will be documented in this file.
 
+## Version 2.0.1
+
+- Bump minimum php version to 7.4.
+- Bump minimum laravel version to 7.0.
+
 ## Version 2.0
 
 ### Changed
