@@ -147,7 +147,7 @@ class Time
      */
     public static function dynamicalTime(Carbon $date): Carbon
     {
-        return $date->addSeconds(Time::deltaT($date));
+        return $date->addSeconds(self::deltaT($date));
     }
 
     /**
@@ -231,7 +231,7 @@ class Time
         Carbon $date,
         GeographicalCoordinates $coords
     ): Carbon {
-        $jd = Time::getJd($date);
+        $jd = self::getJd($date);
         $T = ($jd - 2451545.0) / 36525;
 
         $theta0 = 280.46061837
@@ -246,9 +246,9 @@ class Time
         $theta0 -= floor($theta0 / 360.0) * 360;
 
         $decimalHours = $theta0 / 15.0;
-        $hour = (int)($decimalHours);
+        $hour = (int) ($decimalHours);
         $decimalMinutes = ($decimalHours - $hour) * 60.0;
-        $minutes = (int)$decimalMinutes;
+        $minutes = (int) $decimalMinutes;
         $seconds = ($decimalMinutes - $minutes) * 60.0;
 
         return Carbon::create(
@@ -275,10 +275,10 @@ class Time
         Carbon $date,
         GeographicalCoordinates $coords
     ): Carbon {
-        $siderialTime = Time::meanSiderialTime($date, $coords);
-        $jd = Time::getJd($date);
+        $siderialTime = self::meanSiderialTime($date, $coords);
+        $jd = self::getJd($date);
 
-        $nutation = Time::nutation($jd);
+        $nutation = self::nutation($jd);
         $correction = cos(deg2rad($nutation[3])) * $nutation[0] / 15.0;
         $correction *= 1000000.0;
 
@@ -454,7 +454,7 @@ class Time
         $trueObliquity = $meanObliquity + $nutObliquity / 3600.0;
 
         return [
-            $nutLongitude, $nutObliquity, $meanObliquity, $trueObliquity
+            $nutLongitude, $nutObliquity, $meanObliquity, $trueObliquity,
         ];
     }
 }
