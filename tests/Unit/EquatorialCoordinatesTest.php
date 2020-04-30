@@ -1,6 +1,6 @@
 <?php
 /**
- * Tests for the GeographicalCoordinates class.
+ * Tests for the EquatorialCoordinates class.
  *
  * PHP Version 7
  *
@@ -12,11 +12,11 @@
 
 namespace Tests\Unit;
 
-use deepskylog\AstronomyLibrary\Coordinates\GeographicalCoordinates;
 use deepskylog\AstronomyLibrary\Testing\BaseTestCase;
+use deepskylog\AstronomyLibrary\Coordinates\EquatorialCoordinates;
 
 /**
- * Tests for the GeographicalCoordinates class.
+ * Tests for the EquatorialCoordinates class.
  *
  * PHP Version 7
  *
@@ -25,7 +25,7 @@ use deepskylog\AstronomyLibrary\Testing\BaseTestCase;
  * @license  GPL3 <https://opensource.org/licenses/GPL-3.0>
  * @link     http://www.deepskylog.org
  */
-class GeographicalCoordinatesTest extends BaseTestCase
+class EquatorialCoordinatesTest extends BaseTestCase
 {
     /**
      * Base app path.
@@ -51,106 +51,106 @@ class GeographicalCoordinatesTest extends BaseTestCase
      */
     public function testGetSetCoordinates()
     {
-        $coords = new GeographicalCoordinates(15.748, -5.42);
-        $this->assertEquals(15.748, $coords->getLongitude());
-        $this->assertEquals(-5.42, $coords->getLatitude());
+        $coords = new EquatorialCoordinates(15.748, -5.42);
+        $this->assertEquals(15.748, $coords->getRA());
+        $this->assertEquals(-5.42, $coords->getDeclination());
 
-        $coords->setLatitude(15.2);
-        $this->assertEquals(15.2, $coords->getLatitude());
+        $coords->setDeclination(15.2);
+        $this->assertEquals(15.2, $coords->getDeclination());
 
-        $coords->setLongitude(4.2);
-        $this->assertEquals(4.2, $coords->getLongitude());
+        $coords->setRA(4.2);
+        $this->assertEquals(4.2, $coords->getRA());
     }
 
     /**
-     * Test exceptions for wrong latitude.
+     * Test exceptions for wrong Right Ascension.
      *
      * @return None
      */
-    public function testWrongLatitude()
+    public function testWrongRA()
     {
         $this->expectException(\InvalidArgumentException::class);
-        $coords = new GeographicalCoordinates(95.748, 95.42);
+        $coords = new EquatorialCoordinates(25.748, 5.42);
     }
 
     /**
-     * Test exceptions for wrong latitude.
+     * Test exceptions for wrong Right Ascension.
      *
      * @return None
      */
-    public function testWrongLatitude2()
+    public function testWrongRA2()
     {
         $this->expectException(\InvalidArgumentException::class);
-        $coords = new GeographicalCoordinates(-19.748, -95.42);
+        $coords = new EquatorialCoordinates(-1.748, -5.42);
     }
 
     /**
-     * Test exceptions for wrong longitude.
+     * Test exceptions for wrong declination.
      *
      * @return None
      */
-    public function testWrongLongitude()
+    public function testWrongDeclination()
     {
         $this->expectException(\InvalidArgumentException::class);
-        $coords = new GeographicalCoordinates(195.748, -5.42);
+        $coords = new EquatorialCoordinates(15.748, 95.42);
     }
 
     /**
-     * Test exceptions for wrong longitude.
+     * Test exceptions for wrong declination.
      *
      * @return None
      */
-    public function testWrongLongitude2()
+    public function testWrongDeclination2()
     {
         $this->expectException(\InvalidArgumentException::class);
-        $coords = new GeographicalCoordinates(-195.748, -5.42);
+        $coords = new EquatorialCoordinates(15.748, -95.42);
     }
 
     /**
-     * Test exceptions for wrong latitude.
+     * Test exceptions for wrong declination.
      *
      * @return None
      */
-    public function testSetWrongLatitude()
+    public function testSetWrongDeclination()
     {
         $this->expectException(\InvalidArgumentException::class);
-        $coords = new GeographicalCoordinates(95.748, 5.42);
-        $coords->setLatitude(-91.2);
+        $coords = new EquatorialCoordinates(5.748, 5.42);
+        $coords->setDeclination(-91.2);
     }
 
     /**
-     * Test exceptions for wrong latitude.
+     * Test exceptions for wrong declination.
      *
      * @return None
      */
-    public function testSetWrongLatitude2()
+    public function testSetWrongDeclination2()
     {
         $this->expectException(\InvalidArgumentException::class);
-        $coords = new GeographicalCoordinates(-19.748, -9.42);
-        $coords->setLatitude(92.5);
+        $coords = new EquatorialCoordinates(19.748, -9.42);
+        $coords->setDeclination(92.5);
     }
 
     /**
-     * Test exceptions for wrong longitude.
+     * Test exceptions for wrong right ascension.
      *
      * @return None
      */
-    public function testSetWrongLongitude()
+    public function testSetWrongRA()
     {
         $this->expectException(\InvalidArgumentException::class);
-        $coords = new GeographicalCoordinates(15.748, -5.42);
-        $coords->setLongitude(-181.2);
+        $coords = new EquatorialCoordinates(15.748, -5.42);
+        $coords->setRA(-1.2);
     }
 
     /**
-     * Test exceptions for wrong longitude.
+     * Test exceptions for wrong right ascension.
      *
      * @return None
      */
     public function testSetWrongLongitude2()
     {
         $this->expectException(\InvalidArgumentException::class);
-        $coords = new GeographicalCoordinates(-15.748, -5.42);
-        $coords->setLongitude(181.2);
+        $coords = new EquatorialCoordinates(15.748, -5.42);
+        $coords->setRA(24.2);
     }
 }

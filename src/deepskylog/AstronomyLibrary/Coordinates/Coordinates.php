@@ -26,22 +26,6 @@ namespace deepskylog\AstronomyLibrary\Coordinates;
 abstract class Coordinates
 {
     /**
-     * Returns a readable string of the coordinate.
-     *
-     * @return string A readable string of the coordinate in degrees,
-     *                minutes, seconds
-     */
-    abstract public function printLongitude(): string;
-
-    /**
-     * Returns a readable string of the coordinate.
-     *
-     * @return string A readable string of the coordinate in degrees,
-     *                minutes, seconds
-     */
-    abstract public function printLatitude(): string;
-
-    /**
      * Converts the coordinate to degrees°minutes'seconds''.
      *
      * @param float $coords The coordinates to print

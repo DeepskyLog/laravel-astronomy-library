@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Coordinates class.
+ * GeographicalCoordinates class.
  *
  * PHP Version 7
  *
@@ -16,7 +16,7 @@ namespace deepskylog\AstronomyLibrary\Coordinates;
 use InvalidArgumentException;
 
 /**
- * Coordinates class.
+ * GeographicalCoordinates class.
  *
  * PHP Version 7
  *
@@ -53,7 +53,7 @@ class GeographicalCoordinates extends Coordinates
     {
         if ($longitude < -180.0 || $longitude > 180.0) {
             throw new InvalidArgumentException(
-                'Geographical longitude should be between -180 and 180.'
+                'Geographical longitude should be between -180° and 180°.'
             );
         }
         $this->_longitude = $longitude;
@@ -70,7 +70,7 @@ class GeographicalCoordinates extends Coordinates
     {
         if ($latitude < -90.0 || $latitude > 90.0) {
             throw new InvalidArgumentException(
-                'Geographical latitude should be between -90 and 90.'
+                'Geographical latitude should be between -90° and 90°.'
             );
         }
         $this->_latitude = $latitude;
