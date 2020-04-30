@@ -15,6 +15,7 @@ namespace deepskylog\AstronomyLibrary;
 
 use Carbon\Carbon;
 use deepskylog\AstronomyLibrary\Models\DeltaT;
+use deepskylog\AstronomyLibrary\Coordinates\GeographicalCoordinates;
 
 /**
  * Procedures to work with times.

@@ -12,7 +12,7 @@
 
 namespace Tests\Unit;
 
-use deepskylog\AstronomyLibrary\GeographicalCoordinates;
+use deepskylog\AstronomyLibrary\Coordinates\GeographicalCoordinates;
 use deepskylog\AstronomyLibrary\Testing\BaseTestCase;
 
 /**
@@ -32,7 +32,7 @@ class GeographicalCoordinatesTest extends BaseTestCase
      *
      * @var string
      */
-    protected $appPath = __DIR__.'/../../vendor/laravel/laravel/bootstrap/app.php';
+    protected $appPath = __DIR__ . '/../../vendor/laravel/laravel/bootstrap/app.php';
 
     /**
      * Setup the test environment.
@@ -54,6 +54,8 @@ class GeographicalCoordinatesTest extends BaseTestCase
         $coords = new GeographicalCoordinates(15.748, -5.42);
         $this->assertEquals(15.748, $coords->getLongitude());
         $this->assertEquals(-5.42, $coords->getLatitude());
+
+        dd($coords->printLongitude() . ' - ' . $coords->printLatitude());
 
         $coords->setLatitude(15.2);
         $this->assertEquals(15.2, $coords->getLatitude());

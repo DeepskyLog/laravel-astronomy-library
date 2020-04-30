@@ -2,6 +2,18 @@
 
 All notable changes to `laravel-astronomy-library` will be documented in this file.
 
+## Version 2.1
+
+### Changed
+
+- GeographicalCoordinates class now inherits from the abstract Coordinates class.
+- Moved GeographicalCoordinates to deepskylog\AstronomyLibrary\Coordinates.
+
+### Added
+
+- Added abstract Coordinates class.
+- Added EquatorialCoordinates, EclipticalCoordinates, and GalacticCoordinates classes.
+
 ## Version 2.0.1
 
 - Bump minimum php version to 7.4.

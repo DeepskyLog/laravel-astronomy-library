@@ -11,7 +11,7 @@
  * @link     http://www.deepskylog.org
  */
 
-namespace deepskylog\AstronomyLibrary;
+namespace deepskylog\AstronomyLibrary\Coordinates;
 
 use InvalidArgumentException;
 
@@ -25,7 +25,7 @@ use InvalidArgumentException;
  * @license  GPL3 <https://opensource.org/licenses/GPL-3.0>
  * @link     http://www.deepskylog.org
  */
-class GeographicalCoordinates
+class GeographicalCoordinates extends Coordinates
 {
     private float $_longitude;
     private float $_latitude;
@@ -94,5 +94,27 @@ class GeographicalCoordinates
     public function getLatitude(): float
     {
         return $this->_latitude;
+    }
+
+    /**
+     * Returns a readable string of the latitude.
+     *
+     * @return string A readable string of the coordinate in degrees,
+     *                minutes, seconds
+     */
+    public function printLatitude(): string
+    {
+        return $this->convertToDegrees($this->getLatitude());
+    }
+
+    /**
+     * Returns a readable string of the longitude.
+     *
+     * @return string A readable string of the coordinate in degrees,
+     *                minutes, seconds
+     */
+    public function printLongitude(): string
+    {
+        return $this->convertToDegrees($this->getLongitude());
     }
 }
