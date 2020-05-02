@@ -73,6 +73,7 @@ $coords = $astrolib->getGeographicalCoordinates();
 // Set the coordinates of the AstronomyLibrary instance.
 $astrolib->setGeographicalCoordinates($newCoords);
 
+// TODO: Add Equatorial, Galactic and EclipticalCoordinates
 // Get the julian day of the AstronomyLibrary instance.
 $jd = $astrolib->getJd();
 
