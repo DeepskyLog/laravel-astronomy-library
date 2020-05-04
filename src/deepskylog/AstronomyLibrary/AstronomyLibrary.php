@@ -29,6 +29,8 @@ class AstronomyLibrary
 {
     private Carbon $_date;
     private GeographicalCoordinates $_coordinates;
+    private array $_nutation;
+    private float $_jd;
 
     /**
      * The constructor.
@@ -42,6 +44,8 @@ class AstronomyLibrary
     ) {
         $this->_date = $carbonDate;
         $this->_coordinates = $coordinates;
+        $this->_jd = Time::getJd($this->_date);
+        $this->_nutation = Time::nutation($this->getJd());
     }
 
     /**
@@ -64,6 +68,8 @@ class AstronomyLibrary
     public function setDate(Carbon $date): void
     {
         $this->_date = $date;
+        $this->_jd = Time::getJd($this->_date);
+        $this->_nutation = Time::nutation($this->getJd());
     }
 
     /**
@@ -96,7 +102,7 @@ class AstronomyLibrary
      */
     public function getJd(): float
     {
-        return Time::getJd($this->_date);
+        return $this->_jd;
     }
 
     /**
@@ -108,6 +114,7 @@ class AstronomyLibrary
      */
     public function setJd(float $jd): void
     {
+        $this->_jd = $jd;
         $this->_date = Time::fromJd($jd);
     }
 
@@ -159,6 +166,6 @@ class AstronomyLibrary
      */
     public function getNutation(): array
     {
-        return Time::nutation($this->getJd());
+        return $this->_nutation;
     }
 }

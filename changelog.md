@@ -8,6 +8,7 @@ All notable changes to `laravel-astronomy-library` will be documented in this fi
 
 - GeographicalCoordinates class now inherits from the abstract Coordinates class.
 - Moved GeographicalCoordinates to deepskylog\AstronomyLibrary\Coordinates.
+- The method apparentSiderialTime of the Time class can take an extra parameter nutation.
 
 ### Added
 
