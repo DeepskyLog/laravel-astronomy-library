@@ -60,97 +60,30 @@ class GeographicalCoordinatesTest extends BaseTestCase
 
         $coords->setLongitude(4.2);
         $this->assertEquals(4.2, $coords->getLongitude());
-    }
 
-    /**
-     * Test exceptions for wrong latitude.
-     *
-     * @return None
-     */
-    public function testWrongLatitude()
-    {
-        $this->expectException(\InvalidArgumentException::class);
         $coords = new GeographicalCoordinates(95.748, 95.42);
-    }
+        $this->assertEquals(-84.58, $coords->getLatitude());
 
-    /**
-     * Test exceptions for wrong latitude.
-     *
-     * @return None
-     */
-    public function testWrongLatitude2()
-    {
-        $this->expectException(\InvalidArgumentException::class);
-        $coords = new GeographicalCoordinates(-19.748, -95.42);
-    }
+        $coords = new GeographicalCoordinates(95.748, -95.42);
+        $this->assertEquals(84.58, $coords->getLatitude());
 
-    /**
-     * Test exceptions for wrong longitude.
-     *
-     * @return None
-     */
-    public function testWrongLongitude()
-    {
-        $this->expectException(\InvalidArgumentException::class);
         $coords = new GeographicalCoordinates(195.748, -5.42);
-    }
+        $this->assertEquals(-164.252, $coords->getLongitude());
 
-    /**
-     * Test exceptions for wrong longitude.
-     *
-     * @return None
-     */
-    public function testWrongLongitude2()
-    {
-        $this->expectException(\InvalidArgumentException::class);
         $coords = new GeographicalCoordinates(-195.748, -5.42);
-    }
+        $this->assertEquals(164.252, $coords->getLongitude());
 
-    /**
-     * Test exceptions for wrong latitude.
-     *
-     * @return None
-     */
-    public function testSetWrongLatitude()
-    {
-        $this->expectException(\InvalidArgumentException::class);
         $coords = new GeographicalCoordinates(95.748, 5.42);
         $coords->setLatitude(-91.2);
-    }
+        $this->assertEquals(88.8, $coords->getLatitude());
 
-    /**
-     * Test exceptions for wrong latitude.
-     *
-     * @return None
-     */
-    public function testSetWrongLatitude2()
-    {
-        $this->expectException(\InvalidArgumentException::class);
-        $coords = new GeographicalCoordinates(-19.748, -9.42);
         $coords->setLatitude(92.5);
-    }
+        $this->assertEquals(-87.5, $coords->getLatitude());
 
-    /**
-     * Test exceptions for wrong longitude.
-     *
-     * @return None
-     */
-    public function testSetWrongLongitude()
-    {
-        $this->expectException(\InvalidArgumentException::class);
-        $coords = new GeographicalCoordinates(15.748, -5.42);
         $coords->setLongitude(-181.2);
-    }
+        $this->assertEquals(178.8, $coords->getLongitude());
 
-    /**
-     * Test exceptions for wrong longitude.
-     *
-     * @return None
-     */
-    public function testSetWrongLongitude2()
-    {
-        $this->expectException(\InvalidArgumentException::class);
-        $coords = new GeographicalCoordinates(-15.748, -5.42);
         $coords->setLongitude(181.2);
+        $this->assertEquals(-178.8, $coords->getLongitude());
     }
 }

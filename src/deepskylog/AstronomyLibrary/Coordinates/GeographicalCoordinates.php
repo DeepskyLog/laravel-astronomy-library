@@ -13,8 +13,6 @@
 
 namespace deepskylog\AstronomyLibrary\Coordinates;
 
-use InvalidArgumentException;
-
 /**
  * GeographicalCoordinates class.
  *
@@ -38,6 +36,11 @@ class GeographicalCoordinates extends Coordinates
      */
     public function __construct(float $longitude, float $latitude)
     {
+        $this->setMinValue1(-180.0);
+        $this->setMaxValue1(180.0);
+        $this->setMinValue2(-90.0);
+        $this->setMaxValue2(90.0);
+
         $this->setLongitude($longitude);
         $this->setLatitude($latitude);
     }
@@ -52,9 +55,7 @@ class GeographicalCoordinates extends Coordinates
     public function setLongitude(float $longitude): void
     {
         if ($longitude < -180.0 || $longitude > 180.0) {
-            throw new InvalidArgumentException(
-                'Geographical longitude should be between -180° and 180°.'
-            );
+            $longitude = $this->bringInInterval1($longitude);
         }
         $this->_longitude = $longitude;
     }
@@ -69,9 +70,7 @@ class GeographicalCoordinates extends Coordinates
     public function setLatitude(float $latitude): void
     {
         if ($latitude < -90.0 || $latitude > 90.0) {
-            throw new InvalidArgumentException(
-                'Geographical latitude should be between -90° and 90°.'
-            );
+            $latitude = $this->bringInInterval2($latitude);
         }
         $this->_latitude = $latitude;
     }
