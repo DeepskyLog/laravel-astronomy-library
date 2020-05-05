@@ -33,3 +33,8 @@ The standard calculations in php to calculate the julian day do not take into ac
 ### Conversion between NELM, SQM and Bortle Scale
 
 The formulae to convert between NELM and SQM are taken from the Telescope Limiting Magnitude article by [Schaefer, 1990](http://adsbit.harvard.edu/cgi-bin/nph-iarticle_query?bibcode=1990PASP..102..212S).
+
+### Coordinates
+
+- There are classes for Ecliptical, Equatorial, Galactic, Horizontal and Geographical Coordinates.
+- The formulae to do the conversions between Coordinate systems are from Astronomical Algorithms by Jean Meeus.

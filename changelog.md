@@ -2,7 +2,7 @@
 
 All notable changes to `laravel-astronomy-library` will be documented in this file.
 
-## Version 2.1
+## Version 3.0
 
 ### Changed
 
@@ -13,7 +13,8 @@ All notable changes to `laravel-astronomy-library` will be documented in this fi
 ### Added
 
 - Added abstract Coordinates class.
-- Added EquatorialCoordinates, EclipticalCoordinates, and GalacticCoordinates classes.
+- Added EquatorialCoordinates, EclipticalCoordinates, Horizontal and GalacticCoordinates classes.
+- Added conversion between the Coordinates classes.
 
 ## Version 2.0.1
 
