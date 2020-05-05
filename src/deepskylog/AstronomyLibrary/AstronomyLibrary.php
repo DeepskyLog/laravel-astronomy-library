@@ -13,6 +13,10 @@
 namespace deepskylog\AstronomyLibrary;
 
 use Carbon\Carbon;
+use deepskylog\AstronomyLibrary\Coordinates\GalacticCoordinates;
+use deepskylog\AstronomyLibrary\Coordinates\EclipticalCoordinates;
+use deepskylog\AstronomyLibrary\Coordinates\EquatorialCoordinates;
+use deepskylog\AstronomyLibrary\Coordinates\HorizontalCoordinates;
 use deepskylog\AstronomyLibrary\Coordinates\GeographicalCoordinates;
 
 /**
@@ -31,6 +35,7 @@ class AstronomyLibrary
     private GeographicalCoordinates $_coordinates;
     private array $_nutation;
     private float $_jd;
+    private Carbon $_siderialTime;
 
     /**
      * The constructor.
@@ -46,6 +51,10 @@ class AstronomyLibrary
         $this->_coordinates = $coordinates;
         $this->_jd = Time::getJd($this->_date);
         $this->_nutation = Time::nutation($this->getJd());
+        $this->_siderialTime = Time::apparentSiderialTime(
+            $this->_date,
+            $this->_coordinates
+        );
     }
 
     /**
@@ -70,6 +79,10 @@ class AstronomyLibrary
         $this->_date = $date;
         $this->_jd = Time::getJd($this->_date);
         $this->_nutation = Time::nutation($this->getJd());
+        $this->_siderialTime = Time::apparentSiderialTime(
+            $this->_date,
+            $this->_coordinates
+        );
     }
 
     /**
@@ -93,6 +106,12 @@ class AstronomyLibrary
         GeographicalCoordinates $coordinates
     ): void {
         $this->_coordinates = $coordinates;
+        $this->_jd = Time::getJd($this->_date);
+        $this->_nutation = Time::nutation($this->getJd());
+        $this->_siderialTime = Time::apparentSiderialTime(
+            $this->_date,
+            $this->_coordinates
+        );
     }
 
     /**
@@ -116,6 +135,11 @@ class AstronomyLibrary
     {
         $this->_jd = $jd;
         $this->_date = Time::fromJd($jd);
+        $this->_nutation = Time::nutation($this->getJd());
+        $this->_siderialTime = Time::apparentSiderialTime(
+            $this->_date,
+            $this->_coordinates
+        );
     }
 
     /**
@@ -155,7 +179,7 @@ class AstronomyLibrary
      */
     public function getApparentSiderialTime(): Carbon
     {
-        return Time::apparentSiderialTime($this->_date, $this->_coordinates);
+        return $this->_siderialTime;
     }
 
     /**
@@ -167,5 +191,90 @@ class AstronomyLibrary
     public function getNutation(): array
     {
         return $this->_nutation;
+    }
+
+    /**
+     * Converts from Equatorial coordinates to ecliptical coordinates.
+     *
+     * @param EquatorialCoordinates $coords the equatorial coordinates to convert
+     *
+     * @return EclipticalCoordinates the ecliptical coordinates for J2000
+     */
+    public function equatorialToEcliptical(
+        EquatorialCoordinates $coords
+    ): EclipticalCoordinates {
+        return $coords->convertToEclipticalJ2000();
+    }
+
+    /**
+     * Converts from Ecliptical coordinates to Equatorial coordinates.
+     *
+     * @param EclipticalCoordinates $coords the ecliptical coordinates to convert
+     *
+     * @return EquatorialCoordinates The equatorial coordinates in J2000
+     */
+    public function eclipticalToEquatorial(
+        EclipticalCoordinates $coords
+    ): EquatorialCoordinates {
+        return $coords->convertToEquatorialJ2000();
+    }
+
+    /**
+     * Converts from Equatorial coordinates to horizontal coordinates.
+     *
+     * @param EquatorialCoordinates $coords the equatorial coordinates to convert
+     *
+     * @return HorizontalCoordinates the horizontal coordinates for the date and
+     *                               location
+     */
+    public function equatorialToHorizontal(
+        EquatorialCoordinates $coords
+    ): HorizontalCoordinates {
+        return $coords->convertToHorizontal(
+            $this->getGeographicalCoordinates(),
+            $this->getApparentSiderialTime()
+        );
+    }
+
+    /**
+     * Converts from Horizontal coordinates to Equatorial coordinates.
+     *
+     * @param HorizontalCoordinates $coords the horizontal coordinates to convert
+     *
+     * @return EquatorialCoordinates The equatorial coordinates
+     */
+    public function horizontalToEquatorial(
+        HorizontalCoordinates $coords
+    ): EquatorialCoordinates {
+        return $coords->convertToEquatorial(
+            $this->getGeographicalCoordinates(),
+            $this->getApparentSiderialTime()
+        );
+    }
+
+    /**
+     * Converts from Equatorial coordinates to Galactic coordinates.
+     *
+     * @param EquatorialCoordinates $coords the equatorial coordinates to convert
+     *
+     * @return GalacticCoordinates The galactic coordinates (J2000)
+     */
+    public function equatorialToGalactic(
+        EquatorialCoordinates $coords
+    ): GalacticCoordinates {
+        return $coords->convertToGalactic();
+    }
+
+    /**
+     * Converts from Galactic coordinates to Equatorial coordinates.
+     *
+     * @param GalacticCoordinates $coords the galactic coordinates to convert
+     *
+     * @return EquatorialCoordinates The equatorial coordinates
+     */
+    public function galacticToEquatorial(
+        GalacticCoordinates $coords
+    ): EquatorialCoordinates {
+        return $coords->convertToEquatorial();
     }
 }
