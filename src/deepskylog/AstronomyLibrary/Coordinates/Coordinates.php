@@ -59,9 +59,9 @@ abstract class Coordinates
             $degrees++;
         }
 
-        return $sign . sprintf('%02d', $degrees) . '°'
-        . sprintf('%02d', $minutes) . "'"
-        . sprintf('%02d', $seconds) . '"';
+        return $sign.sprintf('%02d', $degrees).'°'
+        .sprintf('%02d', $minutes)."'"
+        .sprintf('%02d', $seconds).'"';
     }
 
     /**
@@ -88,9 +88,9 @@ abstract class Coordinates
             $degrees++;
         }
 
-        return sprintf('%02d', $degrees) . 'h'
-        . sprintf('%02d', $minutes) . "'"
-        . sprintf('%02d', $seconds) . '"';
+        return sprintf('%02d', $degrees).'h'
+        .sprintf('%02d', $minutes)."'"
+        .sprintf('%02d', $seconds).'"';
     }
 
     /**

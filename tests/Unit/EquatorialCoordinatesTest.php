@@ -14,9 +14,9 @@ namespace Tests\Unit;
 
 use Carbon\Carbon;
 use deepskylog\AstronomyLibrary\AstronomyLibrary;
-use deepskylog\AstronomyLibrary\Testing\BaseTestCase;
 use deepskylog\AstronomyLibrary\Coordinates\EquatorialCoordinates;
 use deepskylog\AstronomyLibrary\Coordinates\GeographicalCoordinates;
+use deepskylog\AstronomyLibrary\Testing\BaseTestCase;
 
 /**
  * Tests for the EquatorialCoordinates class.
@@ -35,7 +35,7 @@ class EquatorialCoordinatesTest extends BaseTestCase
      *
      * @var string
      */
-    protected $appPath = __DIR__ . '/../../vendor/laravel/laravel/bootstrap/app.php';
+    protected $appPath = __DIR__.'/../../vendor/laravel/laravel/bootstrap/app.php';
 
     /**
      * Setup the test environment.

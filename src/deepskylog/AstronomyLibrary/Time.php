@@ -14,8 +14,8 @@
 namespace deepskylog\AstronomyLibrary;
 
 use Carbon\Carbon;
-use deepskylog\AstronomyLibrary\Models\DeltaT;
 use deepskylog\AstronomyLibrary\Coordinates\GeographicalCoordinates;
+use deepskylog\AstronomyLibrary\Models\DeltaT;
 
 /**
  * Procedures to work with times.
@@ -269,7 +269,7 @@ class Time
      *
      * @param Carbon                  $date     The date
      * @param GeographicalCoordinates $coords   The geographical coordinates
-     * @param Array                   $nutation The nutation array
+     * @param array                   $nutation The nutation array
      *
      * @return Carbon the siderial time
      */
@@ -279,7 +279,7 @@ class Time
         array $nutation = null
     ): Carbon {
         $siderialTime = self::meanSiderialTime($date, $coords);
-        if (!$nutation) {
+        if (! $nutation) {
             $jd = self::getJd($date);
 
             $nutation = self::nutation($jd);
