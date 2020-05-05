@@ -2,6 +2,20 @@
 
 All notable changes to `laravel-astronomy-library` will be documented in this file.
 
+## Version 3.0
+
+### Changed
+
+- GeographicalCoordinates class now inherits from the abstract Coordinates class.
+- Moved GeographicalCoordinates to deepskylog\AstronomyLibrary\Coordinates.
+- The method apparentSiderialTime of the Time class can take an extra parameter nutation.
+
+### Added
+
+- Added abstract Coordinates class.
+- Added EquatorialCoordinates, EclipticalCoordinates, Horizontal and GalacticCoordinates classes.
+- Added conversion between the Coordinates classes.
+
 ## Version 2.0.1
 
 - Bump minimum php version to 7.4.

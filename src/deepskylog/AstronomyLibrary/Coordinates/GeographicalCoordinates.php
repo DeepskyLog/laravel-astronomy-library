@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Coordinates class.
+ * GeographicalCoordinates class.
  *
  * PHP Version 7
  *
@@ -11,12 +11,10 @@
  * @link     http://www.deepskylog.org
  */
 
-namespace deepskylog\AstronomyLibrary;
-
-use InvalidArgumentException;
+namespace deepskylog\AstronomyLibrary\Coordinates;
 
 /**
- * Coordinates class.
+ * GeographicalCoordinates class.
  *
  * PHP Version 7
  *
@@ -25,7 +23,7 @@ use InvalidArgumentException;
  * @license  GPL3 <https://opensource.org/licenses/GPL-3.0>
  * @link     http://www.deepskylog.org
  */
-class GeographicalCoordinates
+class GeographicalCoordinates extends Coordinates
 {
     private float $_longitude;
     private float $_latitude;
@@ -38,6 +36,11 @@ class GeographicalCoordinates
      */
     public function __construct(float $longitude, float $latitude)
     {
+        $this->setMinValue1(-180.0);
+        $this->setMaxValue1(180.0);
+        $this->setMinValue2(-90.0);
+        $this->setMaxValue2(90.0);
+
         $this->setLongitude($longitude);
         $this->setLatitude($latitude);
     }
@@ -52,9 +55,7 @@ class GeographicalCoordinates
     public function setLongitude(float $longitude): void
     {
         if ($longitude < -180.0 || $longitude > 180.0) {
-            throw new InvalidArgumentException(
-                'Geographical longitude should be between -180 and 180.'
-            );
+            $longitude = $this->bringInInterval1($longitude);
         }
         $this->_longitude = $longitude;
     }
@@ -69,9 +70,7 @@ class GeographicalCoordinates
     public function setLatitude(float $latitude): void
     {
         if ($latitude < -90.0 || $latitude > 90.0) {
-            throw new InvalidArgumentException(
-                'Geographical latitude should be between -90 and 90.'
-            );
+            $latitude = $this->bringInInterval2($latitude);
         }
         $this->_latitude = $latitude;
     }
@@ -94,5 +93,27 @@ class GeographicalCoordinates
     public function getLatitude(): float
     {
         return $this->_latitude;
+    }
+
+    /**
+     * Returns a readable string of the latitude.
+     *
+     * @return string A readable string of the coordinate in degrees,
+     *                minutes, seconds
+     */
+    public function printLatitude(): string
+    {
+        return $this->convertToDegrees($this->getLatitude());
+    }
+
+    /**
+     * Returns a readable string of the longitude.
+     *
+     * @return string A readable string of the coordinate in degrees,
+     *                minutes, seconds
+     */
+    public function printLongitude(): string
+    {
+        return $this->convertToDegrees($this->getLongitude());
     }
 }

@@ -144,6 +144,92 @@ $nelm = Magnitude::bortleToNelm($bortle, $fstOffset);
 $sqm = Magnitude::bortleToNelm($bortle, $fstOffset);
 ```
 
+## Coordinate methods
+
+### Coordinate methods on AstronomyLibrary instance
+
+```php
+// Convert from Equatorial Coordinates to Ecliptical
+$coords = new EquatorialCoordinates(11.23, 32.12);
+$ecliptical = $astrolib->equatorialToEcliptical($coords);
+
+// Convert from Equatorial coordinates to horizontal coordinates.
+$horizontal = $astrolib->equatorialToHorizontal($coords);
+
+// Convert from Equatorial coordinates to Galactic coordinates.
+$galactic = $astrolib->equatorialToGalactic($coords);
+
+// Convert from Ecliptical coordinates to Equatorial coordinates.
+$coords = new EclipticalCoordinates(11.23, 32.12);
+$equatorial = $astrolib->eclipticalToEquatorial($coords);
+
+// Convert from Horizontal coordinates to Equatorial coordinates.
+$coords = new HorizontalCoordinates(18.5, 22.2);
+$equatorial = $astrolib->horizontalToEquatorial($coords);
+
+// Convert from Galactic coordinates to Equatorial coordinates.
+$coords = new GalacticCoordinates(12.5, 45.6);
+$equatorial = astrolib->galacticToEquatorial($coords);
+```
+
+### Coordinate methods on equatorial coordinates
+
+```php
+$coords = new EquatorialCoordinates(15.21, -45.21);
+$coords->setRA(22.21);
+$coords->setDeclination(42.37);
+$ra = $coords->getRA();
+$decl = $coods->getDeclination();
+print ($coords->printRA());
+print ($coords->printDeclination());
+$ecliptical = $coords->convertToEcliptical($nutObliquity);
+$ecliptical = $coords->convertToEclipticalJ2000();
+$ecliptical = $coords->convertToEclipticalB1950();
+$horizontal = $coords->convertToHorizontal($geo_coords, $siderial_time);
+$galactic = $coords->convertToGalactic();
+```
+
+### Coordinate methods on ecliptical coordinates
+
+```php
+$coords = new EclipticalCoordinates(15.21, -45.21);
+$coords->setLongitude(22.21);
+$coords->setLatitude(42.37);
+$longitude = $coords->getLongitude();
+$latitude = $coods->getLatitude();
+print ($coords->printLongitude());
+print ($coords->printLatitude());
+$equatorial = $coords->convertToEquatorial($nutObliquity);
+$equatorial = $coords->convertToEquatorialJ2000();
+$equatorial = $coords->convertToEquatorialB1950();
+```
+
+### Coordinate methods on horizontal coordinates
+
+```php
+$coords = new HorizontalCoordinates(15.21, -45.21);
+$coords->setAzimuth(22.21);
+$coords->setAltitude(42.37);
+$azimuth = $coords->getAzimuth();
+$altitude = $coods->getAltitude();
+print ($coords->printAzimuth());
+print ($coords->printAltitude());
+$equatorial = $coords->convertToEquatorial($geo_coords, $siderial_time);
+```
+
+### Coordinate methods on galactic coordinates
+
+```php
+$coords = new GalacticCoordinates(15.21, -45.21);
+$coords->setLongitude(22.21);
+$coords->setLatitude(42.37);
+$longitude = $coords->getLongitude();
+$latitude = $coods->getLatitude();
+print ($coords->printLongitude());
+print ($coords->printLatitude());
+$equatorial = $coords->convertToEquatorial();
+```
+
 ## Change log
 
 Please see the [changelog](changelog.md) for more information on what has changed recently.

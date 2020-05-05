@@ -14,6 +14,7 @@
 namespace deepskylog\AstronomyLibrary;
 
 use Carbon\Carbon;
+use deepskylog\AstronomyLibrary\Coordinates\GeographicalCoordinates;
 use deepskylog\AstronomyLibrary\Models\DeltaT;
 
 /**
@@ -266,19 +267,23 @@ class Time
      * Calculates the apparent siderial time for the given date.
      * Chapter 11 in Astronomical Algorithms.
      *
-     * @param Carbon                  $date   The date
-     * @param GeographicalCoordinates $coords The geographical coordinates
+     * @param Carbon                  $date     The date
+     * @param GeographicalCoordinates $coords   The geographical coordinates
+     * @param array                   $nutation The nutation array
      *
      * @return Carbon the siderial time
      */
     public static function apparentSiderialTime(
         Carbon $date,
-        GeographicalCoordinates $coords
+        GeographicalCoordinates $coords,
+        array $nutation = null
     ): Carbon {
         $siderialTime = self::meanSiderialTime($date, $coords);
-        $jd = self::getJd($date);
+        if (! $nutation) {
+            $jd = self::getJd($date);
 
-        $nutation = self::nutation($jd);
+            $nutation = self::nutation($jd);
+        }
         $correction = cos(deg2rad($nutation[3])) * $nutation[0] / 15.0;
         $correction *= 1000000.0;
 
