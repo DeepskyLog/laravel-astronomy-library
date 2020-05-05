@@ -60,97 +60,42 @@ class EclipticalCoordinatesTest extends BaseTestCase
 
         $coords->setLongitude(4.2);
         $this->assertEquals(4.2, $coords->getLongitude());
-    }
 
-    /**
-     * Test exceptions for wrong latitude.
-     *
-     * @return None
-     */
-    public function testWrongLatitude()
-    {
-        $this->expectException(\InvalidArgumentException::class);
         $coords = new EclipticalCoordinates(95.748, 95.42);
-    }
+        $this->assertEquals(-84.58, $coords->getLatitude());
 
-    /**
-     * Test exceptions for wrong latitude.
-     *
-     * @return None
-     */
-    public function testWrongLatitude2()
-    {
-        $this->expectException(\InvalidArgumentException::class);
         $coords = new EclipticalCoordinates(-19.748, -95.42);
-    }
+        $this->assertEquals(84.58, $coords->getLatitude());
 
-    /**
-     * Test exceptions for wrong longitude.
-     *
-     * @return None
-     */
-    public function testWrongLongitude()
-    {
-        $this->expectException(\InvalidArgumentException::class);
         $coords = new EclipticalCoordinates(365.748, -5.42);
-    }
+        $this->assertEquals(5.748, $coords->getLongitude());
 
-    /**
-     * Test exceptions for wrong longitude.
-     *
-     * @return None
-     */
-    public function testWrongLongitude2()
-    {
-        $this->expectException(\InvalidArgumentException::class);
         $coords = new EclipticalCoordinates(-1.748, -5.42);
-    }
+        $this->assertEquals(358.252, $coords->getLongitude());
 
-    /**
-     * Test exceptions for wrong latitude.
-     *
-     * @return None
-     */
-    public function testSetWrongLatitude()
-    {
-        $this->expectException(\InvalidArgumentException::class);
-        $coords = new EclipticalCoordinates(95.748, 5.42);
         $coords->setLatitude(-91.2);
-    }
+        $this->assertEquals(88.8, $coords->getLatitude());
 
-    /**
-     * Test exceptions for wrong latitude.
-     *
-     * @return None
-     */
-    public function testSetWrongLatitude2()
-    {
-        $this->expectException(\InvalidArgumentException::class);
-        $coords = new EclipticalCoordinates(-19.748, -9.42);
         $coords->setLatitude(92.5);
-    }
+        $this->assertEquals(-87.5, $coords->getLatitude());
 
-    /**
-     * Test exceptions for wrong longitude.
-     *
-     * @return None
-     */
-    public function testSetWrongLongitude()
-    {
-        $this->expectException(\InvalidArgumentException::class);
-        $coords = new EclipticalCoordinates(15.748, -5.42);
         $coords->setLongitude(-1.2);
+        $this->assertEquals(358.8, $coords->getLongitude());
+
+        $coords->setLongitude(361.2);
+        $this->assertEquals(1.2, $coords->getLongitude());
     }
 
     /**
-     * Test exceptions for wrong longitude.
+     * Test conversion from ecliptical coordinates to equatorial coordinates.
      *
      * @return None
      */
-    public function testSetWrongLongitude2()
+    public function testConversionToEquatorial()
     {
-        $this->expectException(\InvalidArgumentException::class);
-        $coords = new EclipticalCoordinates(-15.748, -5.42);
-        $coords->setLongitude(361.2);
+        $coords = new EclipticalCoordinates(113.215630, 6.684170);
+        $equa = $coords->convertToEquatorialJ2000();
+        $this->assertEqualsWithDelta(7.7552628, $equa->getRa(), 0.00001);
+        $this->assertEqualsWithDelta(28.026183, $equa->getDeclination(), 0.00001);
     }
 }

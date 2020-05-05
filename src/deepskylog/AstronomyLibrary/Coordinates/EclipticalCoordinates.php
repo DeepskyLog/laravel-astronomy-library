@@ -13,8 +13,6 @@
 
 namespace deepskylog\AstronomyLibrary\Coordinates;
 
-use InvalidArgumentException;
-
 /**
  * EclipticalCoordinates class.
  *
@@ -38,6 +36,11 @@ class EclipticalCoordinates extends Coordinates
      */
     public function __construct(float $longitude, float $latitude)
     {
+        $this->setMinValue1(0.0);
+        $this->setMaxValue1(360.0);
+        $this->setMinValue2(-90.0);
+        $this->setMaxValue2(90.0);
+
         $this->setLongitude($longitude);
         $this->setLatitude($latitude);
     }
@@ -52,9 +55,7 @@ class EclipticalCoordinates extends Coordinates
     public function setLongitude(float $longitude): void
     {
         if ($longitude < 0.0 || $longitude > 360.0) {
-            throw new InvalidArgumentException(
-                'Ecliptical longitude should be between 0° and 360°.'
-            );
+            $longitude = $this->bringInInterval1($longitude);
         }
         $this->_longitude = $longitude;
     }
@@ -69,9 +70,7 @@ class EclipticalCoordinates extends Coordinates
     public function setLatitude(float $latitude): void
     {
         if ($latitude < -90.0 || $latitude > 90.0) {
-            throw new InvalidArgumentException(
-                'Ecliptical latitude should be between -90° and 90°.'
-            );
+            $latitude = $this->bringInInterval2($latitude);
         }
         $this->_latitude = $latitude;
     }
@@ -116,5 +115,56 @@ class EclipticalCoordinates extends Coordinates
     public function printLatitude(): string
     {
         return $this->convertToDegrees($this->getLatitude());
+    }
+
+    /**
+     * Converts the ecliptical coordinates to equatorial coordinates.
+     *
+     * @param float $nutObliquity The nutation in obliquity
+     *
+     * @return EquatorialCoordinates The equatorial coordinates
+     */
+    public function convertToEquatorial(float $nutObliquity): EquatorialCoordinates
+    {
+        $ra = rad2deg(
+            atan2(
+                sin(deg2rad($this->_longitude)) *
+                cos(deg2rad($nutObliquity)) - tan(deg2rad($this->_latitude)) *
+                sin(deg2rad($nutObliquity)),
+                cos(deg2rad($this->_longitude))
+            )
+        );
+
+        $decl = rad2deg(
+            asin(
+                sin(deg2rad($this->_latitude)) * cos(deg2rad($nutObliquity))
+                + cos(deg2rad($this->_latitude)) * sin(deg2rad($nutObliquity)) *
+                sin(deg2rad($this->_longitude))
+            )
+        );
+
+        return new EquatorialCoordinates($ra / 15.0, $decl);
+    }
+
+    /**
+     * Converts the ecliptical coordinates to equatorial coordinates in
+     * the J2000 equinox.
+     *
+     * @return EquatorialCoordinates The equatorial coordinates
+     */
+    public function convertToEquatorialJ2000(): EquatorialCoordinates
+    {
+        return $this->convertToEquatorial(23.4392911);
+    }
+
+    /**
+     * Converts the ecliptical coordinates to equatorial coordinates in
+     * the B1950 equinox.
+     *
+     * @return EquatorialCoordinates The equatorial coordinates
+     */
+    public function convertToEquatorialB1950(): EquatorialCoordinates
+    {
+        return $this->convertToEquatorial(23.4457889);
     }
 }
