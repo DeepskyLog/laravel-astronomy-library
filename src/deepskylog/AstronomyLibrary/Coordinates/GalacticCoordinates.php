@@ -13,8 +13,6 @@
 
 namespace deepskylog\AstronomyLibrary\Coordinates;
 
-use InvalidArgumentException;
-
 /**
  * GalacticCoordinates class.
  *
@@ -38,6 +36,11 @@ class GalacticCoordinates extends Coordinates
      */
     public function __construct(float $longitude, float $latitude)
     {
+        $this->setMinValue1(0.0);
+        $this->setMaxValue1(360.0);
+        $this->setMinValue2(-90.0);
+        $this->setMaxValue2(90.0);
+
         $this->setLongitude($longitude);
         $this->setLatitude($latitude);
     }
@@ -52,9 +55,7 @@ class GalacticCoordinates extends Coordinates
     public function setLongitude(float $longitude): void
     {
         if ($longitude < 0.0 || $longitude > 360.0) {
-            throw new InvalidArgumentException(
-                'Galactic longitude should be between 0° and 360°.'
-            );
+            $longitude = $this->bringInInterval1($longitude);
         }
         $this->_longitude = $longitude;
     }
@@ -69,9 +70,7 @@ class GalacticCoordinates extends Coordinates
     public function setLatitude(float $latitude): void
     {
         if ($latitude < -90.0 || $latitude > 90.0) {
-            throw new InvalidArgumentException(
-                'Galactic latitude should be between -90° and 90°.'
-            );
+            $latitude = $this->bringInInterval2($latitude);
         }
         $this->_latitude = $latitude;
     }
@@ -116,5 +115,37 @@ class GalacticCoordinates extends Coordinates
     public function printLatitude(): string
     {
         return $this->convertToDegrees($this->getLatitude());
+    }
+
+    /**
+     * Converts the galactic coordinates to equatorial coordinates.
+     *
+     * @return EquatorialCoordinates The equatorial coordinates
+     */
+    public function convertToEquatorial(): EquatorialCoordinates
+    {
+        $b = $this->getLatitude();
+        $l = $this->getLongitude();
+
+        $ra = rad2deg(
+            atan2(
+                cos(deg2rad($b)) * sin(deg2rad(122.93192 - $l)),
+                sin(deg2rad($b)) * cos(deg2rad(27.12825))
+                - cos(deg2rad($b)) * sin(deg2rad(27.12825))
+                * cos(deg2rad(122.93192 - $l))
+            )
+        );
+
+        $decl = rad2deg(
+            asin(
+                sin(deg2rad($b)) * sin(deg2rad(27.12825)) +
+                cos(deg2rad($b)) * cos(deg2rad(27.12825))
+                * cos(deg2rad(122.93192 - $l))
+            )
+        );
+
+        $ra = $ra + 192.85948;
+
+        return new EquatorialCoordinates($ra / 15.0, $decl);
     }
 }

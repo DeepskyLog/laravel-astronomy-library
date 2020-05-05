@@ -60,97 +60,43 @@ class GalacticCoordinatesTest extends BaseTestCase
 
         $coords->setLongitude(4.2);
         $this->assertEquals(4.2, $coords->getLongitude());
-    }
 
-    /**
-     * Test exceptions for wrong latitude.
-     *
-     * @return None
-     */
-    public function testWrongLatitude()
-    {
-        $this->expectException(\InvalidArgumentException::class);
         $coords = new GalacticCoordinates(95.748, 95.42);
-    }
+        $this->assertEquals(-84.58, $coords->getLatitude());
 
-    /**
-     * Test exceptions for wrong latitude.
-     *
-     * @return None
-     */
-    public function testWrongLatitude2()
-    {
-        $this->expectException(\InvalidArgumentException::class);
         $coords = new GalacticCoordinates(-19.748, -95.42);
-    }
+        $this->assertEquals(84.58, $coords->getLatitude());
 
-    /**
-     * Test exceptions for wrong longitude.
-     *
-     * @return None
-     */
-    public function testWrongLongitude()
-    {
-        $this->expectException(\InvalidArgumentException::class);
         $coords = new GalacticCoordinates(365.748, -5.42);
-    }
+        $this->assertEquals(5.748, $coords->getLongitude());
 
-    /**
-     * Test exceptions for wrong longitude.
-     *
-     * @return None
-     */
-    public function testWrongLongitude2()
-    {
-        $this->expectException(\InvalidArgumentException::class);
         $coords = new GalacticCoordinates(-1.748, -5.42);
-    }
+        $this->assertEquals(358.252, $coords->getLongitude());
 
-    /**
-     * Test exceptions for wrong latitude.
-     *
-     * @return None
-     */
-    public function testSetWrongLatitude()
-    {
-        $this->expectException(\InvalidArgumentException::class);
-        $coords = new GalacticCoordinates(95.748, 5.42);
         $coords->setLatitude(-91.2);
-    }
+        $this->assertEquals(88.8, $coords->getLatitude());
 
-    /**
-     * Test exceptions for wrong latitude.
-     *
-     * @return None
-     */
-    public function testSetWrongLatitude2()
-    {
-        $this->expectException(\InvalidArgumentException::class);
-        $coords = new GalacticCoordinates(-19.748, -9.42);
         $coords->setLatitude(92.5);
-    }
+        $this->assertEquals(-87.5, $coords->getLatitude());
 
-    /**
-     * Test exceptions for wrong longitude.
-     *
-     * @return None
-     */
-    public function testSetWrongLongitude()
-    {
-        $this->expectException(\InvalidArgumentException::class);
-        $coords = new GalacticCoordinates(15.748, -5.42);
         $coords->setLongitude(-1.2);
+        $this->assertEquals(358.8, $coords->getLongitude());
+
+        $coords->setLongitude(361.2);
+        $this->assertEquals(1.2, $coords->getLongitude());
     }
 
     /**
-     * Test exceptions for wrong longitude.
+     * Test conversion from galactic coordinates to equatorial coordinates.
      *
      * @return None
      */
-    public function testSetWrongLongitude2()
+    public function testConversionToEquatorial()
     {
-        $this->expectException(\InvalidArgumentException::class);
-        $coords = new GalacticCoordinates(-15.748, -5.42);
-        $coords->setLongitude(361.2);
+        $coords = new GalacticCoordinates(68.34653864, -58.30545704);
+        $equa = $coords->convertToEquatorial();
+
+        $this->assertEqualsWithDelta(23.1546225, $equa->getRA(), 0.0001);
+        $this->assertEqualsWithDelta(-6.7198917, $equa->getDeclination(), 0.0001);
     }
 }
