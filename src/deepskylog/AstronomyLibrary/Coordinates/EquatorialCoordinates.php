@@ -274,7 +274,7 @@ class EquatorialCoordinates extends Coordinates
      *
      * @return float the local hour angle
      */
-    public function getHourAngle(Carbon $siderial_time):float
+    public function getHourAngle(Carbon $siderial_time): float
     {
         // Local hour angle = local siderial time - ra
         $sid = ((
