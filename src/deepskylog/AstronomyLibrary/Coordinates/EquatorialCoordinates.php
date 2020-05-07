@@ -186,13 +186,7 @@ class EquatorialCoordinates extends Coordinates
     ): HorizontalCoordinates {
         // Latitude of the observer
         $phi = $geo_coords->getLatitude();
-
-        // Local hour angle = local siderial time - ra
-        $sid = ((
-            ($siderial_time->milliseconds / 1000.0) + $siderial_time->second
-        ) / 60.0 + $siderial_time->minute) / 60 + $siderial_time->hour;
-
-        $H = ($sid - $this->getRA()) * 15.0;
+        $H = $this->getHourAngle($siderial_time);
 
         $azimuth = rad2deg(
             atan2(
@@ -241,5 +235,52 @@ class EquatorialCoordinates extends Coordinates
         );
 
         return new GalacticCoordinates(122.93192 - $l, $b);
+    }
+
+    /**
+     * Returns the parallactic angle of the object. The parallactic angle is
+     * negative before and positive after the passage throught the southern
+     * meridian. This is the effect of the moon that is lying down at moonrise.
+     * Astronomical Algorithms - chapter 13.
+     *
+     * @param GeographicalCoordinates $geo_coords    the geographical
+     *                                               coordinates
+     * @param Carbon                  $siderial_time the local siderial time
+     *
+     * @return float The parallactic angle q
+     */
+    public function getParallacticAngle(
+        GeographicalCoordinates $geo_coords,
+        Carbon $siderial_time
+    ): float {
+        $phi = $geo_coords->getLatitude();
+        $H = $this->getHourAngle($siderial_time);
+
+        $q = rad2deg(
+            atan2(
+                sin(deg2rad($H)),
+                tan(deg2rad($phi)) * cos(deg2rad($this->getDeclination()))
+                - sin(deg2rad($this->getDeclination())) * cos(deg2rad($H))
+            )
+        );
+
+        return $q;
+    }
+
+    /**
+     * Returns the local hour angle.
+     *
+     * @param Carbon $siderial_time The siderial time
+     *
+     * @return float the local hour angle
+     */
+    public function getHourAngle(Carbon $siderial_time): float
+    {
+        // Local hour angle = local siderial time - ra
+        $sid = ((
+            ($siderial_time->milliseconds / 1000.0) + $siderial_time->second
+        ) / 60.0 + $siderial_time->minute) / 60 + $siderial_time->hour;
+
+        return ($sid - $this->getRA()) * 15.0;
     }
 }

@@ -237,6 +237,23 @@ class AstronomyLibrary
     }
 
     /**
+     * Calculates the parallactic angle of an object. The parallactic angle is
+     * negative before and positive after the passage throught the southern
+     * meridian. This is the effect of the moon that is lying down at moonrise.
+     *
+     * @param EquatorialCoordinates $coords The coordinates of the object
+     *
+     * @return float the parallactic angle in degrees
+     */
+    public function parallacticAngle(EquatorialCoordinates $coords): float
+    {
+        return $coords->getParallacticAngle(
+            $this->getGeographicalCoordinates(),
+            $this->getApparentSiderialTime()
+        );
+    }
+
+    /**
      * Converts from Horizontal coordinates to Equatorial coordinates.
      *
      * @param HorizontalCoordinates $coords the horizontal coordinates to convert
