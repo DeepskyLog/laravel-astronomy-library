@@ -2,6 +2,12 @@
 
 All notable changes to `laravel-astronomy-library` will be documented in this file.
 
+## Version 3.1
+
+### Added
+
+- Calculation of parallactic angle.
+
 ## Version 3.0
 
 ### Changed

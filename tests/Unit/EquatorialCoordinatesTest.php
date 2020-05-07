@@ -16,6 +16,7 @@ use Carbon\Carbon;
 use deepskylog\AstronomyLibrary\AstronomyLibrary;
 use deepskylog\AstronomyLibrary\Coordinates\EquatorialCoordinates;
 use deepskylog\AstronomyLibrary\Coordinates\GeographicalCoordinates;
+use deepskylog\AstronomyLibrary\Coordinates\HorizontalCoordinates;
 use deepskylog\AstronomyLibrary\Testing\BaseTestCase;
 
 /**
@@ -35,7 +36,7 @@ class EquatorialCoordinatesTest extends BaseTestCase
      *
      * @var string
      */
-    protected $appPath = __DIR__.'/../../vendor/laravel/laravel/bootstrap/app.php';
+    protected $appPath = __DIR__ . '/../../vendor/laravel/laravel/bootstrap/app.php';
 
     /**
      * Setup the test environment.
@@ -130,5 +131,37 @@ class EquatorialCoordinatesTest extends BaseTestCase
         $gal = $coords->convertToGalactic();
         $this->assertEqualsWithDelta(68.34653864, $gal->getLongitude(), 0.0001);
         $this->assertEqualsWithDelta(-58.30545704, $gal->getLatitude(), 0.0001);
+    }
+
+    /**
+     * Test parallactic angle.
+     *
+     * @return None
+     */
+    public function testParallacticAngle()
+    {
+        $date = Carbon::now();
+        $geo = new GeographicalCoordinates(12.12, 45.12);
+        $astrolib = new AstronomyLibrary($date, $geo);
+        $hor = new HorizontalCoordinates(0, 15);
+        $equa = $astrolib->horizontalToEquatorial($hor);
+        $this->assertEquals(
+            0.0,
+            $equa->getParallacticAngle($geo, $astrolib->getApparentSiderialTime())
+        );
+
+        $hor = new HorizontalCoordinates(10, 25);
+        $equa = $astrolib->horizontalToEquatorial($hor);
+        $this->assertGreaterThan(
+            0.0,
+            $equa->getParallacticAngle($geo, $astrolib->getApparentSiderialTime())
+        );
+
+        $hor = new HorizontalCoordinates(-10, 25);
+        $equa = $astrolib->horizontalToEquatorial($hor);
+        $this->assertLessThan(
+            0.0,
+            $equa->getParallacticAngle($geo, $astrolib->getApparentSiderialTime())
+        );
     }
 }

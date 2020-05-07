@@ -170,6 +170,11 @@ $equatorial = $astrolib->horizontalToEquatorial($coords);
 // Convert from Galactic coordinates to Equatorial coordinates.
 $coords = new GalacticCoordinates(12.5, 45.6);
 $equatorial = astrolib->galacticToEquatorial($coords);
+
+// Get the parallactic angle
+$coords = new EquatorialCoordinates(5.24, 55.55);
+$parallacticAngle = $astrolib->parallacticAngle($coords);
+
 ```
 
 ### Coordinate methods on equatorial coordinates
@@ -187,6 +192,8 @@ $ecliptical = $coords->convertToEclipticalJ2000();
 $ecliptical = $coords->convertToEclipticalB1950();
 $horizontal = $coords->convertToHorizontal($geo_coords, $siderial_time);
 $galactic = $coords->convertToGalactic();
+$parallacticAngle = $coords->getParallacticAngle($geo_coords, $siderial_time);
+$hour_angle = $coords->getHourAngle($siderial_time);
 ```
 
 ### Coordinate methods on ecliptical coordinates
