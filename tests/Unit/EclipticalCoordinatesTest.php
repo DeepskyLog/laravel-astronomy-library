@@ -32,7 +32,7 @@ class EclipticalCoordinatesTest extends BaseTestCase
      *
      * @var string
      */
-    protected $appPath = __DIR__.'/../../vendor/laravel/laravel/bootstrap/app.php';
+    protected $appPath = __DIR__ . '/../../vendor/laravel/laravel/bootstrap/app.php';
 
     /**
      * Setup the test environment.
@@ -52,38 +52,38 @@ class EclipticalCoordinatesTest extends BaseTestCase
     public function testGetSetCoordinates()
     {
         $coords = new EclipticalCoordinates(15.748, -5.42);
-        $this->assertEquals(15.748, $coords->getLongitude());
-        $this->assertEquals(-5.42, $coords->getLatitude());
+        $this->assertEquals(15.748, $coords->getLongitude()->getCoordinate());
+        $this->assertEquals(-5.42, $coords->getLatitude()->getCoordinate());
 
         $coords->setLatitude(15.2);
-        $this->assertEquals(15.2, $coords->getLatitude());
+        $this->assertEquals(15.2, $coords->getLatitude()->getCoordinate());
 
         $coords->setLongitude(4.2);
-        $this->assertEquals(4.2, $coords->getLongitude());
+        $this->assertEquals(4.2, $coords->getLongitude()->getCoordinate());
 
         $coords = new EclipticalCoordinates(95.748, 95.42);
-        $this->assertEquals(-84.58, $coords->getLatitude());
+        $this->assertEquals(-84.58, $coords->getLatitude()->getCoordinate());
 
         $coords = new EclipticalCoordinates(-19.748, -95.42);
-        $this->assertEquals(84.58, $coords->getLatitude());
+        $this->assertEquals(84.58, $coords->getLatitude()->getCoordinate());
 
         $coords = new EclipticalCoordinates(365.748, -5.42);
-        $this->assertEquals(5.748, $coords->getLongitude());
+        $this->assertEquals(5.748, $coords->getLongitude()->getCoordinate());
 
         $coords = new EclipticalCoordinates(-1.748, -5.42);
-        $this->assertEquals(358.252, $coords->getLongitude());
+        $this->assertEquals(358.252, $coords->getLongitude()->getCoordinate());
 
         $coords->setLatitude(-91.2);
-        $this->assertEquals(88.8, $coords->getLatitude());
+        $this->assertEquals(88.8, $coords->getLatitude()->getCoordinate());
 
         $coords->setLatitude(92.5);
-        $this->assertEquals(-87.5, $coords->getLatitude());
+        $this->assertEquals(-87.5, $coords->getLatitude()->getCoordinate());
 
         $coords->setLongitude(-1.2);
-        $this->assertEquals(358.8, $coords->getLongitude());
+        $this->assertEquals(358.8, $coords->getLongitude()->getCoordinate());
 
         $coords->setLongitude(361.2);
-        $this->assertEquals(1.2, $coords->getLongitude());
+        $this->assertEquals(1.2, $coords->getLongitude()->getCoordinate());
     }
 
     /**
@@ -95,7 +95,15 @@ class EclipticalCoordinatesTest extends BaseTestCase
     {
         $coords = new EclipticalCoordinates(113.215630, 6.684170);
         $equa = $coords->convertToEquatorialJ2000();
-        $this->assertEqualsWithDelta(7.7552628, $equa->getRa(), 0.00001);
-        $this->assertEqualsWithDelta(28.026183, $equa->getDeclination(), 0.00001);
+        $this->assertEqualsWithDelta(
+            7.7552628,
+            $equa->getRa()->getCoordinate(),
+            0.00001
+        );
+        $this->assertEqualsWithDelta(
+            28.026183,
+            $equa->getDeclination()->getCoordinate(),
+            0.00001
+        );
     }
 }

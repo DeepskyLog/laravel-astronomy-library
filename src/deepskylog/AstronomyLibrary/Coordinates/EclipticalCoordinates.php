@@ -23,10 +23,10 @@ namespace deepskylog\AstronomyLibrary\Coordinates;
  * @license  GPL3 <https://opensource.org/licenses/GPL-3.0>
  * @link     http://www.deepskylog.org
  */
-class EclipticalCoordinates extends Coordinates
+class EclipticalCoordinates
 {
-    private float $_longitude;
-    private float $_latitude;
+    private Coordinate $_longitude;
+    private Coordinate $_latitude;
 
     /**
      * The constructor.
@@ -36,13 +36,8 @@ class EclipticalCoordinates extends Coordinates
      */
     public function __construct(float $longitude, float $latitude)
     {
-        $this->setMinValue1(0.0);
-        $this->setMaxValue1(360.0);
-        $this->setMinValue2(-90.0);
-        $this->setMaxValue2(90.0);
-
-        $this->setLongitude($longitude);
-        $this->setLatitude($latitude);
+        $this->_longitude = new Coordinate($longitude);
+        $this->_latitude = new Coordinate($latitude, -90.0, 90.0);
     }
 
     /**
@@ -54,10 +49,7 @@ class EclipticalCoordinates extends Coordinates
      */
     public function setLongitude(float $longitude): void
     {
-        if ($longitude < 0.0 || $longitude > 360.0) {
-            $longitude = $this->bringInInterval1($longitude);
-        }
-        $this->_longitude = $longitude;
+        $this->_longitude->setCoordinate($longitude);
     }
 
     /**
@@ -69,18 +61,15 @@ class EclipticalCoordinates extends Coordinates
      */
     public function setLatitude(float $latitude): void
     {
-        if ($latitude < -90.0 || $latitude > 90.0) {
-            $latitude = $this->bringInInterval2($latitude);
-        }
-        $this->_latitude = $latitude;
+        $this->_latitude->setCoordinate($latitude);
     }
 
     /**
      * Gets the ecliptical latitude.
      *
-     * @return float the ecliptical latitude in degrees
+     * @return Coordinate the ecliptical latitude
      */
-    public function getLatitude(): float
+    public function getLatitude(): Coordinate
     {
         return $this->_latitude;
     }
@@ -88,9 +77,9 @@ class EclipticalCoordinates extends Coordinates
     /**
      * Gets the ecliptical longitude.
      *
-     * @return float The ecliptical longitude in degrees
+     * @return Coordinate The ecliptical longitude in degrees
      */
-    public function getLongitude(): float
+    public function getLongitude(): Coordinate
     {
         return $this->_longitude;
     }
@@ -103,7 +92,7 @@ class EclipticalCoordinates extends Coordinates
      */
     public function printLongitude(): string
     {
-        return $this->convertToDegrees($this->getLongitude());
+        return $this->getLongitude()->convertToDegrees();
     }
 
     /**
@@ -114,7 +103,7 @@ class EclipticalCoordinates extends Coordinates
      */
     public function printLatitude(): string
     {
-        return $this->convertToDegrees($this->getLatitude());
+        return $this->getLatitude()->convertToDegrees();
     }
 
     /**
@@ -128,18 +117,21 @@ class EclipticalCoordinates extends Coordinates
     {
         $ra = rad2deg(
             atan2(
-                sin(deg2rad($this->_longitude)) *
-                cos(deg2rad($nutObliquity)) - tan(deg2rad($this->_latitude)) *
+                sin(deg2rad($this->_longitude->getCoordinate())) *
+                cos(deg2rad($nutObliquity))
+                - tan(deg2rad($this->_latitude->getCoordinate())) *
                 sin(deg2rad($nutObliquity)),
-                cos(deg2rad($this->_longitude))
+                cos(deg2rad($this->_longitude->getCoordinate()))
             )
         );
 
         $decl = rad2deg(
             asin(
-                sin(deg2rad($this->_latitude)) * cos(deg2rad($nutObliquity))
-                + cos(deg2rad($this->_latitude)) * sin(deg2rad($nutObliquity)) *
-                sin(deg2rad($this->_longitude))
+                sin(deg2rad($this->_latitude->getCoordinate()))
+                * cos(deg2rad($nutObliquity))
+                + cos(deg2rad($this->_latitude->getCoordinate()))
+                * sin(deg2rad($nutObliquity))
+                * sin(deg2rad($this->_longitude->getCoordinate()))
             )
         );
 

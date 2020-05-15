@@ -241,7 +241,7 @@ class Time
             - $T ** 3 / 38710000;
 
         // Add the extra hours for the longitude
-        $theta0 += $coords->getLongitude();
+        $theta0 += $coords->getLongitude()->getCoordinate();
 
         // Bring $theta0 in the 0 - 360.0 interval
         $theta0 -= floor($theta0 / 360.0) * 360;
@@ -279,7 +279,7 @@ class Time
         array $nutation = null
     ): Carbon {
         $siderialTime = self::meanSiderialTime($date, $coords);
-        if (! $nutation) {
+        if (!$nutation) {
             $jd = self::getJd($date);
 
             $nutation = self::nutation($jd);
@@ -290,6 +290,27 @@ class Time
         $siderialTime->microsecond($siderialTime->microsecond + $correction);
 
         return $siderialTime;
+    }
+
+    /**
+     * Calculates the apparent siderial time for the given date, at midnight,
+     * in Greenwich.
+     * Chapter 11 in Astronomical Algorithms.
+     *
+     * @param Carbon $date The date
+     *
+     * @return Carbon the siderial time
+     */
+    public static function apparentSiderialTimeGreenwich(
+        Carbon $date
+    ): Carbon {
+        $newDate = $date->copy();
+        $newDate->hour = 0;
+        $newDate->minute = 0;
+        $newDate->second = 0;
+        $greenwich = new GeographicalCoordinates(0.0, 51.476852);
+
+        return self::apparentSiderialTime($newDate, $greenwich);
     }
 
     /**

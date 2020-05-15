@@ -23,10 +23,10 @@ namespace deepskylog\AstronomyLibrary\Coordinates;
  * @license  GPL3 <https://opensource.org/licenses/GPL-3.0>
  * @link     http://www.deepskylog.org
  */
-class GalacticCoordinates extends Coordinates
+class GalacticCoordinates
 {
-    private float $_longitude;
-    private float $_latitude;
+    private Coordinate $_longitude;
+    private Coordinate $_latitude;
 
     /**
      * The constructor.
@@ -36,11 +36,6 @@ class GalacticCoordinates extends Coordinates
      */
     public function __construct(float $longitude, float $latitude)
     {
-        $this->setMinValue1(0.0);
-        $this->setMaxValue1(360.0);
-        $this->setMinValue2(-90.0);
-        $this->setMaxValue2(90.0);
-
         $this->setLongitude($longitude);
         $this->setLatitude($latitude);
     }
@@ -54,10 +49,7 @@ class GalacticCoordinates extends Coordinates
      */
     public function setLongitude(float $longitude): void
     {
-        if ($longitude < 0.0 || $longitude > 360.0) {
-            $longitude = $this->bringInInterval1($longitude);
-        }
-        $this->_longitude = $longitude;
+        $this->_longitude = new Coordinate($longitude, 0.0, 360.0);
     }
 
     /**
@@ -69,18 +61,15 @@ class GalacticCoordinates extends Coordinates
      */
     public function setLatitude(float $latitude): void
     {
-        if ($latitude < -90.0 || $latitude > 90.0) {
-            $latitude = $this->bringInInterval2($latitude);
-        }
-        $this->_latitude = $latitude;
+        $this->_latitude = new Coordinate($latitude, -90.0, 90.0);
     }
 
     /**
      * Gets the galactic latitude.
      *
-     * @return float the galactic latitude in degrees
+     * @return Coordainte the galactic latitude
      */
-    public function getLatitude(): float
+    public function getLatitude(): Coordinate
     {
         return $this->_latitude;
     }
@@ -88,9 +77,9 @@ class GalacticCoordinates extends Coordinates
     /**
      * Gets the galactic longitude.
      *
-     * @return float The galactic longitude in degrees
+     * @return Coordinate The galactic longitude in degrees
      */
-    public function getLongitude(): float
+    public function getLongitude(): Coordinate
     {
         return $this->_longitude;
     }
@@ -103,7 +92,7 @@ class GalacticCoordinates extends Coordinates
      */
     public function printLongitude(): string
     {
-        return $this->convertToDegrees($this->getLongitude());
+        return $this->getLongitude()->convertToDegrees();
     }
 
     /**
@@ -114,7 +103,7 @@ class GalacticCoordinates extends Coordinates
      */
     public function printLatitude(): string
     {
-        return $this->convertToDegrees($this->getLatitude());
+        return $this->getLatitude()->convertToDegrees();
     }
 
     /**
@@ -124,8 +113,8 @@ class GalacticCoordinates extends Coordinates
      */
     public function convertToEquatorial(): EquatorialCoordinates
     {
-        $b = $this->getLatitude();
-        $l = $this->getLongitude();
+        $b = $this->getLatitude()->getCoordinate();
+        $l = $this->getLongitude()->getCoordinate();
 
         $ra = rad2deg(
             atan2(

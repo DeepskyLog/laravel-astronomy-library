@@ -23,10 +23,10 @@ namespace deepskylog\AstronomyLibrary\Coordinates;
  * @license  GPL3 <https://opensource.org/licenses/GPL-3.0>
  * @link     http://www.deepskylog.org
  */
-class GeographicalCoordinates extends Coordinates
+class GeographicalCoordinates
 {
-    private float $_longitude;
-    private float $_latitude;
+    private Coordinate $_longitude;
+    private Coordinate $_latitude;
 
     /**
      * The constructor.
@@ -36,11 +36,6 @@ class GeographicalCoordinates extends Coordinates
      */
     public function __construct(float $longitude, float $latitude)
     {
-        $this->setMinValue1(-180.0);
-        $this->setMaxValue1(180.0);
-        $this->setMinValue2(-90.0);
-        $this->setMaxValue2(90.0);
-
         $this->setLongitude($longitude);
         $this->setLatitude($latitude);
     }
@@ -54,10 +49,7 @@ class GeographicalCoordinates extends Coordinates
      */
     public function setLongitude(float $longitude): void
     {
-        if ($longitude < -180.0 || $longitude > 180.0) {
-            $longitude = $this->bringInInterval1($longitude);
-        }
-        $this->_longitude = $longitude;
+        $this->_longitude = new Coordinate($longitude, -180.0, 180.0);
     }
 
     /**
@@ -69,18 +61,15 @@ class GeographicalCoordinates extends Coordinates
      */
     public function setLatitude(float $latitude): void
     {
-        if ($latitude < -90.0 || $latitude > 90.0) {
-            $latitude = $this->bringInInterval2($latitude);
-        }
-        $this->_latitude = $latitude;
+        $this->_latitude = new Coordinate($latitude, -90.0, 90.0);
     }
 
     /**
      * Gets the geographical longitude.
      *
-     * @return float The geographical longitude
+     * @return Coordinate The geographical longitude
      */
-    public function getLongitude(): float
+    public function getLongitude(): Coordinate
     {
         return $this->_longitude;
     }
@@ -88,9 +77,9 @@ class GeographicalCoordinates extends Coordinates
     /**
      * Gets the geographical latitude.
      *
-     * @return float The geographical latitude
+     * @return Coordinate The geographical latitude
      */
-    public function getLatitude(): float
+    public function getLatitude(): Coordinate
     {
         return $this->_latitude;
     }
@@ -103,7 +92,7 @@ class GeographicalCoordinates extends Coordinates
      */
     public function printLatitude(): string
     {
-        return $this->convertToDegrees($this->getLatitude());
+        return $this->getLatitude()->convertToDegrees();
     }
 
     /**
@@ -114,6 +103,6 @@ class GeographicalCoordinates extends Coordinates
      */
     public function printLongitude(): string
     {
-        return $this->convertToDegrees($this->getLongitude());
+        return $this->getLongitude()->convertToDegrees();
     }
 }
