@@ -55,38 +55,38 @@ class HorizontalCoordinatesTest extends BaseTestCase
     public function testGetSetCoordinates()
     {
         $coords = new HorizontalCoordinates(15.748, -5.42);
-        $this->assertEquals(15.748, $coords->getAzimuth());
-        $this->assertEquals(-5.42, $coords->getAltitude());
+        $this->assertEquals(15.748, $coords->getAzimuth()->getCoordinate());
+        $this->assertEquals(-5.42, $coords->getAltitude()->getCoordinate());
 
         $coords->setAzimuth(15.2);
-        $this->assertEquals(15.2, $coords->getAzimuth());
+        $this->assertEquals(15.2, $coords->getAzimuth()->getCoordinate());
 
         $coords->setAltitude(4.2);
-        $this->assertEquals(4.2, $coords->getAltitude());
+        $this->assertEquals(4.2, $coords->getAltitude()->getCoordinate());
 
         $coords = new HorizontalCoordinates(95.748, 95.42);
-        $this->assertEquals(-84.58, $coords->getAltitude());
+        $this->assertEquals(-84.58, $coords->getAltitude()->getCoordinate());
 
         $coords = new HorizontalCoordinates(-19.748, -95.42);
-        $this->assertEquals(84.58, $coords->getAltitude());
+        $this->assertEquals(84.58, $coords->getAltitude()->getCoordinate());
 
         $coords = new HorizontalCoordinates(365.748, -5.42);
-        $this->assertEquals(5.748, $coords->getAzimuth());
+        $this->assertEquals(5.748, $coords->getAzimuth()->getCoordinate());
 
         $coords = new HorizontalCoordinates(-1.748, -5.42);
-        $this->assertEquals(358.252, $coords->getAzimuth());
+        $this->assertEquals(358.252, $coords->getAzimuth()->getCoordinate());
 
         $coords->setAltitude(-91.2);
-        $this->assertEquals(88.8, $coords->getAltitude());
+        $this->assertEquals(88.8, $coords->getAltitude()->getCoordinate());
 
         $coords->setAltitude(92.5);
-        $this->assertEquals(-87.5, $coords->getAltitude());
+        $this->assertEquals(-87.5, $coords->getAltitude()->getCoordinate());
 
         $coords->setAzimuth(-1.2);
-        $this->assertEquals(358.8, $coords->getAzimuth());
+        $this->assertEquals(358.8, $coords->getAzimuth()->getCoordinate());
 
         $coords->setAzimuth(361.2);
-        $this->assertEquals(1.2, $coords->getAzimuth());
+        $this->assertEquals(1.2, $coords->getAzimuth()->getCoordinate());
     }
 
     /**
@@ -103,7 +103,15 @@ class HorizontalCoordinatesTest extends BaseTestCase
         $astrolib = new AstronomyLibrary($date, $location);
         $equa = $astrolib->horizontalToEquatorial($coords);
 
-        $this->assertEqualsWithDelta(23.1546225, $equa->getRA(), 0.0001);
-        $this->assertEqualsWithDelta(-6.7198917, $equa->getDeclination(), 0.0001);
+        $this->assertEqualsWithDelta(
+            23.1546225,
+            $equa->getRA()->getCoordinate(),
+            0.0001
+        );
+        $this->assertEqualsWithDelta(
+            -6.7198917,
+            $equa->getDeclination()->getCoordinate(),
+            0.0001
+        );
     }
 }

@@ -25,10 +25,10 @@ use Carbon\Carbon;
  * @license  GPL3 <https://opensource.org/licenses/GPL-3.0>
  * @link     http://www.deepskylog.org
  */
-class HorizontalCoordinates extends Coordinates
+class HorizontalCoordinates
 {
-    private float $_azimuth;
-    private float $_h;
+    private Coordinate $_azimuth;
+    private Coordinate $_h;
 
     /**
      * The constructor.
@@ -38,11 +38,6 @@ class HorizontalCoordinates extends Coordinates
      */
     public function __construct(float $azimuth, float $altitude)
     {
-        $this->setMinValue1(0.0);
-        $this->setMaxValue1(360.0);
-        $this->setMinValue2(-90.0);
-        $this->setMaxValue2(90.0);
-
         $this->setAzimuth($azimuth);
         $this->setAltitude($altitude);
     }
@@ -56,10 +51,7 @@ class HorizontalCoordinates extends Coordinates
      */
     public function setAzimuth(float $azimuth): void
     {
-        if ($azimuth < 0.0 || $azimuth > 360.0) {
-            $azimuth = $this->bringInInterval1($azimuth);
-        }
-        $this->_azimuth = $azimuth;
+        $this->_azimuth = new Coordinate($azimuth);
     }
 
     /**
@@ -71,18 +63,15 @@ class HorizontalCoordinates extends Coordinates
      */
     public function setAltitude(float $altitude): void
     {
-        if ($altitude < -90.0 || $altitude > 90.0) {
-            $altitude = $this->bringInInterval2($altitude);
-        }
-        $this->_h = $altitude;
+        $this->_h = new Coordinate($altitude, -90.0, 90.0);
     }
 
     /**
      * Gets the azimuth.
      *
-     * @return float the azimuth, measured westwards from the south
+     * @return Coordinate the azimuth, measured westwards from the south
      */
-    public function getAzimuth(): float
+    public function getAzimuth(): Coordinate
     {
         return $this->_azimuth;
     }
@@ -90,9 +79,9 @@ class HorizontalCoordinates extends Coordinates
     /**
      * Gets the altitude.
      *
-     * @return float The altitude above the horizon
+     * @return Coordinate The altitude above the horizon
      */
-    public function getAltitude(): float
+    public function getAltitude(): Coordinate
     {
         return $this->_h;
     }
@@ -105,7 +94,7 @@ class HorizontalCoordinates extends Coordinates
      */
     public function printAzimuth(): string
     {
-        return $this->convertToDegrees($this->getAzimuth());
+        return $this->getAzimuth()->convertToDegrees();
     }
 
     /**
@@ -116,7 +105,7 @@ class HorizontalCoordinates extends Coordinates
      */
     public function printAltitude(): string
     {
-        return $this->convertToDegrees($this->getAltitude());
+        return $this->getAltitude()->convertToDegrees();
     }
 
     /**
@@ -133,7 +122,7 @@ class HorizontalCoordinates extends Coordinates
         Carbon $siderial_time
     ): EquatorialCoordinates {
         // Latitude of the observer
-        $phi = $geo_coords->getLatitude();
+        $phi = $geo_coords->getLatitude()->getCoordinate();
 
         // Local hour angle = local siderial time - ra
         $sid = ((
@@ -142,31 +131,36 @@ class HorizontalCoordinates extends Coordinates
 
         $H = rad2deg(
             atan2(
-                sin(deg2rad($this->getAzimuth())),
-                cos(deg2rad($this->getAzimuth())) * cos(deg2rad($phi))
-                + tan(deg2rad($this->getAltitude())) * cos(deg2rad($phi))
+                sin(deg2rad($this->getAzimuth()->getCoordinate())),
+                cos(deg2rad($this->getAzimuth()->getCoordinate()))
+                * cos(deg2rad($phi))
+                + tan(deg2rad($this->getAltitude()->getCoordinate()))
+                * cos(deg2rad($phi))
             )
         );
 
         $declination = rad2deg(
             asin(
-                sin(deg2rad($phi)) * sin(deg2rad($this->getAltitude()))
-                - cos(deg2rad($phi)) * cos(deg2rad($this->getAltitude()))
-                * cos(deg2rad($this->getAzimuth()))
+                sin(deg2rad($phi))
+                * sin(deg2rad($this->getAltitude()->getCoordinate()))
+                - cos(deg2rad($phi))
+                * cos(deg2rad($this->getAltitude()->getCoordinate()))
+                * cos(deg2rad($this->getAzimuth()->getCoordinate()))
             )
         );
 
         // a = altitude, A = Azimuth
-        $x = cos(deg2rad($this->getAltitude())) * sin(deg2rad($this->getAzimuth()));
+        $x = cos(deg2rad($this->getAltitude()->getCoordinate()))
+            * sin(deg2rad($this->getAzimuth()->getCoordinate()));
 
         $y = (
             sin(deg2rad($phi))
-                * cos(deg2rad($this->getAltitude()))
+                * cos(deg2rad($this->getAltitude()->getCoordinate()))
                 * cos(
-                    deg2rad($this->getAzimuth())
+                    deg2rad($this->getAzimuth()->getCoordinate())
                 ) + cos(
                     deg2rad($phi)
-                ) * sin(deg2rad($this->getAltitude()))
+                ) * sin(deg2rad($this->getAltitude()->getCoordinate()))
         );
 
         $H = rad2deg(

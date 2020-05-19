@@ -52,38 +52,38 @@ class GalacticCoordinatesTest extends BaseTestCase
     public function testGetSetCoordinates()
     {
         $coords = new GalacticCoordinates(15.748, -5.42);
-        $this->assertEquals(15.748, $coords->getLongitude());
-        $this->assertEquals(-5.42, $coords->getLatitude());
+        $this->assertEquals(15.748, $coords->getLongitude()->getCoordinate());
+        $this->assertEquals(-5.42, $coords->getLatitude()->getCoordinate());
 
         $coords->setLatitude(15.2);
-        $this->assertEquals(15.2, $coords->getLatitude());
+        $this->assertEquals(15.2, $coords->getLatitude()->getCoordinate());
 
         $coords->setLongitude(4.2);
-        $this->assertEquals(4.2, $coords->getLongitude());
+        $this->assertEquals(4.2, $coords->getLongitude()->getCoordinate());
 
         $coords = new GalacticCoordinates(95.748, 95.42);
-        $this->assertEquals(-84.58, $coords->getLatitude());
+        $this->assertEquals(-84.58, $coords->getLatitude()->getCoordinate());
 
         $coords = new GalacticCoordinates(-19.748, -95.42);
-        $this->assertEquals(84.58, $coords->getLatitude());
+        $this->assertEquals(84.58, $coords->getLatitude()->getCoordinate());
 
         $coords = new GalacticCoordinates(365.748, -5.42);
-        $this->assertEquals(5.748, $coords->getLongitude());
+        $this->assertEquals(5.748, $coords->getLongitude()->getCoordinate());
 
         $coords = new GalacticCoordinates(-1.748, -5.42);
-        $this->assertEquals(358.252, $coords->getLongitude());
+        $this->assertEquals(358.252, $coords->getLongitude()->getCoordinate());
 
         $coords->setLatitude(-91.2);
-        $this->assertEquals(88.8, $coords->getLatitude());
+        $this->assertEquals(88.8, $coords->getLatitude()->getCoordinate());
 
         $coords->setLatitude(92.5);
-        $this->assertEquals(-87.5, $coords->getLatitude());
+        $this->assertEquals(-87.5, $coords->getLatitude()->getCoordinate());
 
         $coords->setLongitude(-1.2);
-        $this->assertEquals(358.8, $coords->getLongitude());
+        $this->assertEquals(358.8, $coords->getLongitude()->getCoordinate());
 
         $coords->setLongitude(361.2);
-        $this->assertEquals(1.2, $coords->getLongitude());
+        $this->assertEquals(1.2, $coords->getLongitude()->getCoordinate());
     }
 
     /**
@@ -96,7 +96,15 @@ class GalacticCoordinatesTest extends BaseTestCase
         $coords = new GalacticCoordinates(68.34653864, -58.30545704);
         $equa = $coords->convertToEquatorial();
 
-        $this->assertEqualsWithDelta(23.1546225, $equa->getRA(), 0.0001);
-        $this->assertEqualsWithDelta(-6.7198917, $equa->getDeclination(), 0.0001);
+        $this->assertEqualsWithDelta(
+            23.1546225,
+            $equa->getRA()->getCoordinate(),
+            0.0001
+        );
+        $this->assertEqualsWithDelta(
+            -6.7198917,
+            $equa->getDeclination()->getCoordinate(),
+            0.0001
+        );
     }
 }

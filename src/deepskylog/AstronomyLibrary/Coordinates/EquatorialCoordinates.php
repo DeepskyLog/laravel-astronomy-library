@@ -25,10 +25,10 @@ use Carbon\Carbon;
  * @license  GPL3 <https://opensource.org/licenses/GPL-3.0>
  * @link     http://www.deepskylog.org
  */
-class EquatorialCoordinates extends Coordinates
+class EquatorialCoordinates
 {
-    private float $_ra;
-    private float $_decl;
+    private Coordinate $_ra;
+    private Coordinate $_decl;
 
     /**
      * The constructor.
@@ -38,11 +38,6 @@ class EquatorialCoordinates extends Coordinates
      */
     public function __construct(float $ra, float $declination)
     {
-        $this->setMinValue1(0.0);
-        $this->setMaxValue1(24.0);
-        $this->setMinValue2(-90.0);
-        $this->setMaxValue2(90.0);
-
         $this->setRA($ra);
         $this->setDeclination($declination);
     }
@@ -56,10 +51,7 @@ class EquatorialCoordinates extends Coordinates
      */
     public function setRA(float $ra): void
     {
-        if ($ra < 0.0 || $ra > 24.0) {
-            $ra = $this->bringInInterval1($ra);
-        }
-        $this->_ra = $ra;
+        $this->_ra = new Coordinate($ra, 0.0, 24.0);
     }
 
     /**
@@ -71,18 +63,15 @@ class EquatorialCoordinates extends Coordinates
      */
     public function setDeclination(float $declination): void
     {
-        if ($declination < -90.0 || $declination > 90.0) {
-            $declination = $this->bringInInterval2($declination);
-        }
-        $this->_decl = $declination;
+        $this->_decl = new Coordinate($declination, -90.0, 90.0);
     }
 
     /**
      * Gets the Right Ascension.
      *
-     * @return float the Right Ascension in decimal hours
+     * @return Coordinate the Right Ascension in decimal hours
      */
-    public function getRA(): float
+    public function getRA(): Coordinate
     {
         return $this->_ra;
     }
@@ -90,9 +79,9 @@ class EquatorialCoordinates extends Coordinates
     /**
      * Gets the declination.
      *
-     * @return float The declination in degrees
+     * @return Coordinate The declination in degrees
      */
-    public function getDeclination(): float
+    public function getDeclination(): Coordinate
     {
         return $this->_decl;
     }
@@ -105,7 +94,7 @@ class EquatorialCoordinates extends Coordinates
      */
     public function printDeclination(): string
     {
-        return $this->convertToDegrees($this->getDeclination());
+        return $this->getDeclination()->convertToDegrees();
     }
 
     /**
@@ -116,7 +105,7 @@ class EquatorialCoordinates extends Coordinates
      */
     public function printRA(): string
     {
-        return $this->convertToHours($this->getRA());
+        return $this->getRA()->convertToHours;
     }
 
     /**
@@ -131,18 +120,21 @@ class EquatorialCoordinates extends Coordinates
     {
         $longitude = rad2deg(
             atan2(
-                sin(deg2rad($this->_ra * 15.0)) *
-                cos(deg2rad($nutObliquity)) + tan(deg2rad($this->_decl)) *
+                sin(deg2rad($this->_ra->getCoordinate() * 15.0)) *
+                cos(deg2rad($nutObliquity))
+                + tan(deg2rad($this->_decl->getCoordinate())) *
                 sin(deg2rad($nutObliquity)),
-                cos(deg2rad($this->_ra * 15.0))
+                cos(deg2rad($this->_ra->getCoordinate() * 15.0))
             )
         );
 
         $latitude = rad2deg(
             asin(
-                sin(deg2rad($this->_decl)) * cos(deg2rad($nutObliquity))
-                - cos(deg2rad($this->_decl)) * sin(deg2rad($nutObliquity)) *
-                sin(deg2rad($this->_ra * 15.0))
+                sin(deg2rad($this->_decl->getCoordinate()))
+                * cos(deg2rad($nutObliquity))
+                - cos(deg2rad($this->_decl->getCoordinate()))
+                * sin(deg2rad($nutObliquity)) *
+                sin(deg2rad($this->_ra->getCoordinate() * 15.0))
             )
         );
 
@@ -185,21 +177,24 @@ class EquatorialCoordinates extends Coordinates
         Carbon $siderial_time
     ): HorizontalCoordinates {
         // Latitude of the observer
-        $phi = $geo_coords->getLatitude();
+        $phi = $geo_coords->getLatitude()->getCoordinate();
         $H = $this->getHourAngle($siderial_time);
 
         $azimuth = rad2deg(
             atan2(
                 sin(deg2rad($H)),
                 cos(deg2rad($H)) * sin(deg2rad($phi))
-                - tan(deg2rad($this->getDeclination())) * cos(deg2rad($phi))
+                - tan(deg2rad($this->getDeclination()->getCoordinate()))
+                * cos(deg2rad($phi))
             )
         );
 
         $height = rad2deg(
             asin(
-                sin(deg2rad($phi)) * sin(deg2rad($this->getDeclination()))
-                + cos(deg2rad($phi)) * cos(deg2rad($this->getDeclination()))
+                sin(deg2rad($phi))
+                * sin(deg2rad($this->getDeclination()->getCoordinate()))
+                + cos(deg2rad($phi))
+                * cos(deg2rad($this->getDeclination()->getCoordinate()))
                 * cos(deg2rad($H))
             )
         );
@@ -214,8 +209,8 @@ class EquatorialCoordinates extends Coordinates
      */
     public function convertToGalactic(): GalacticCoordinates
     {
-        $ra = $this->getRA() * 15.0;
-        $decl = $this->getDeclination();
+        $ra = $this->getRA()->getCoordinate() * 15.0;
+        $decl = $this->getDeclination()->getCoordinate();
 
         $l = rad2deg(
             atan2(
@@ -253,14 +248,14 @@ class EquatorialCoordinates extends Coordinates
         GeographicalCoordinates $geo_coords,
         Carbon $siderial_time
     ): float {
-        $phi = $geo_coords->getLatitude();
+        $phi = $geo_coords->getLatitude()->getCoordinate();
         $H = $this->getHourAngle($siderial_time);
 
         $q = rad2deg(
             atan2(
                 sin(deg2rad($H)),
-                tan(deg2rad($phi)) * cos(deg2rad($this->getDeclination()))
-                - sin(deg2rad($this->getDeclination())) * cos(deg2rad($H))
+                tan(deg2rad($phi)) * cos(deg2rad($this->getDeclination()->getCoordinate()))
+                - sin(deg2rad($this->getDeclination()->getCoordinate())) * cos(deg2rad($H))
             )
         );
 
@@ -281,6 +276,6 @@ class EquatorialCoordinates extends Coordinates
             ($siderial_time->milliseconds / 1000.0) + $siderial_time->second
         ) / 60.0 + $siderial_time->minute) / 60 + $siderial_time->hour;
 
-        return ($sid - $this->getRA()) * 15.0;
+        return ($sid - $this->getRA()->getCoordinate()) * 15.0;
     }
 }

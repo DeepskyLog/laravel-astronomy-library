@@ -237,6 +237,67 @@ print ($coords->printLatitude());
 $equatorial = $coords->convertToEquatorial();
 ```
 
+## Target methods
+
+Target is a class to keep information about an object and perform calculations on it. Target is a base class and can be used for stars and deep-sky objects. There are three subclasses:
+
++ Moon
++ Planet
++ Sun
+
+Moving targets (like the sun, moon or planets) need the equatorial coordinates for the given date, for the day before and the next day.
+
+```php
+// Create a new target.
+$target = new Target();
+// Create equatorial coordinates.
+$equa = new EquatorialCoordinates(16.695, 36.460278);
+// Add equatorial coordinates to the target.
+$target->setEquatorialCoordinates($equa);
+
+$date = Carbon::create(2020, 5, 13, 12);
+$date->timezone('Europe/Brussels');
+$geo_coords = new GeographicalCoordinates(4.86463, 50.83220);
+
+$greenwichSiderialTime = Time::apparentSiderialTimeGreenwich($date);
+$deltaT = Time::deltaT($carbonDate);
+
+// Calculate the ephemerids for the target
+$target->calculateEphemerides($geo_coords, $greenwichSiderialTime, $deltaT);
+
+// Print the transit time of the target
+echo $target->getTransit();
+
+// Print the setting time of the target, in a specific timezone
+// If the getSetting method is Null, the object does not set.
+// This can be the case because the object is never visible at
+// this location, or because the target is circumpolar .
+echo $target->getSetting()->timezone('Europe/Brussels');
+
+// Print the rising time of the target
+// If the getRising method is Null, the object does not rise.
+// This can be the case because the object is never visible at
+// this location, or because the target is circumpolar .
+echo $target->getRising();
+
+// Print the maximum height of the target during the night
+// If there is no astronomical night at the location, the
+// maximum height is taken during nautical twilight.
+// If there is no nautical night at the location, Null is
+// returned.
+echo $target->getMaxHeightAtNight();
+
+// Print the maximum possible height
+echo $target->getMaxHeight();
+
+// Print the best time to observe the target
+// If there is no astronomical night at the location, the
+// best time is taken during nautical twilight.
+// If there is no nautical night at the location, Null is
+// returned.
+echo $target->getBestTimeToObserve();
+```
+
 ## Change log
 
 Please see the [changelog](changelog.md) for more information on what has changed recently.
@@ -257,8 +318,8 @@ If you discover any security related issues, please email developers@deepskylog.
 
 ## Credits
 
-- [The DeepskyLog Team][link-author]
-- [All Contributors][link-contributors]
++ [The DeepskyLog Team][link-author]
++ [All Contributors][link-contributors]
 
 ## License
 
@@ -274,4 +335,4 @@ GPLv3. Please see the [license file](LICENSE) for more information.
 [link-travis]: https://travis-ci.org/deepskylog/laravel-astronomy-library
 [link-styleci]: https://styleci.io/repos/255550499
 [link-author]: https://github.com/DeepskyLog
-[link-contributors]: ../../contributors
+[link-contributors]: https://github.com/DeepskyLog/laravel-astronomy-library/graphs/contributors

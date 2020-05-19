@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Abstract Coordinates class.
+ * Coordinates class.
  *
  * PHP Version 7
  *
@@ -14,7 +14,7 @@
 namespace deepskylog\AstronomyLibrary\Coordinates;
 
 /**
- * Abstract Coordinates class.
+ * Coordinates class.
  *
  * PHP Version 7
  *
@@ -23,27 +23,66 @@ namespace deepskylog\AstronomyLibrary\Coordinates;
  * @license  GPL3 <https://opensource.org/licenses/GPL-3.0>
  * @link     http://www.deepskylog.org
  */
-abstract class Coordinates
+class Coordinate
 {
-    private float $_minValue1 = 0.0;
-    private float $_maxValue1 = 360.0;
-    private float $_minValue2 = 0.0;
-    private float $_maxValue2 = 360.0;
+    private float $_minValue = 0.0;
+    private float $_maxValue = 360.0;
+    private float $_coordinate;
+
+    /**
+     * The constructor.
+     *
+     * @param float $coordinate The coordinate
+     * @param float $minValue   The minimum value for the coordinate
+     * @param float $maxValue   The maximum value for the coordinate
+     */
+    public function __construct(
+        float $coordinate,
+        float $minValue = 0.0,
+        float $maxValue = 360.0
+    ) {
+        $this->setMinValue($minValue);
+        $this->setMaxValue($maxValue);
+
+        $this->setCoordinate($coordinate);
+    }
+
+    /**
+     * Set the coordinate.
+     *
+     * @param float $coord the coordinate to set
+     *
+     * @return None
+     */
+    public function setCoordinate(float $coord): void
+    {
+        $this->_coordinate = $coord;
+        $this->bringInInterval();
+    }
+
+    /**
+     * Get the coordinate.
+     *
+     * @return float the coordinate
+     */
+    public function getCoordinate(): float
+    {
+        return $this->_coordinate;
+    }
 
     /**
      * Converts the coordinate to degrees°minutes'seconds''.
      *
-     * @param float $coords The coordinates to print
-     *
      * @return string A readable string of the coordinate in degrees,
      *                minutes, seconds
      */
-    protected function convertToDegrees($coords): string
+    public function convertToDegrees(): string
     {
         $sign = ' ';
+        $coords = $this->getCoordinate();
         if ($coords < 0) {
             $sign = '-';
-            $coords = -$coords;
+            $coords = -$this->getCoordinate();
         }
         $degrees = floor($coords);
         $subminutes = 60 * ($coords - $degrees);
@@ -67,13 +106,13 @@ abstract class Coordinates
     /**
      * Converts the coordinate to hourshminutes'seconds''.
      *
-     * @param float $coords The coordinates to print
-     *
      * @return string A readable string of the coordinate in hours,
      *                minutes, seconds
      */
-    protected function convertToHours($coords): string
+    public function convertToHours(): string
     {
+        $coords = $this->getCoordinate();
+
         $degrees = floor($coords);
         $subminutes = 60 * ($coords - $degrees);
         $minutes = floor($subminutes);
@@ -94,15 +133,15 @@ abstract class Coordinates
     }
 
     /**
-     * Sets the minimum valid value for the first coordinate.
+     * Sets the minimum valid value for the coordinate.
      *
      * @param float $minValue The minimum valid value
      *
      * @return None
      */
-    protected function setMinValue1(float $minValue): void
+    public function setMinValue(float $minValue): void
     {
-        $this->_minValue1 = $minValue;
+        $this->_minValue = $minValue;
     }
 
     /**
@@ -112,62 +151,24 @@ abstract class Coordinates
      *
      * @return None
      */
-    protected function setMaxValue1(float $maxValue): void
+    public function setMaxValue(float $maxValue): void
     {
-        $this->_maxValue1 = $maxValue;
+        $this->_maxValue = $maxValue;
     }
 
     /**
-     * Converts the coordinates to coordinates in the required interval.
-     *
-     * @return float the converted coordinate
-     */
-    protected function bringInInterval1(float $coord): float
-    {
-        $interval = $this->_maxValue1 - $this->_minValue1;
-
-        $coord = $coord - $this->_minValue1;
-
-        return $coord - floor($coord / $interval) * $interval + $this->_minValue1;
-    }
-
-    /**
-     * Sets the minimum valid value for the second coordinate.
-     *
-     * @param float $minValue The minimum valid value
+     * Converts the coordinates to a coordinate in the required interval.
      *
      * @return None
      */
-    protected function setMinValue2(float $minValue): void
+    public function bringInInterval(): void
     {
-        $this->_minValue2 = $minValue;
-    }
+        $coord = $this->getCoordinate();
+        $interval = $this->_maxValue - $this->_minValue;
 
-    /**
-     * Sets the maximum valid value for the second coordinate.
-     *
-     * @param float $maxValue The maximum valid value
-     *
-     * @return None
-     */
-    protected function setMaxValue2(float $maxValue): void
-    {
-        $this->_maxValue2 = $maxValue;
-    }
+        $coord = $coord - $this->_minValue;
 
-    /**
-     * Converts the coordinates to coordinates in the required interval.
-     *
-     * @param float $coord the coordinate to bring the in the interval
-     *
-     * @return float the converted coordinate
-     */
-    protected function bringInInterval2(float $coord): float
-    {
-        $interval = $this->_maxValue2 - $this->_minValue2;
-
-        $coord = $coord - $this->_minValue2;
-
-        return $coord - floor($coord / $interval) * $interval + $this->_minValue2;
+        $this->_coordinate = $coord
+            - floor($coord / $interval) * $interval + $this->_minValue;
     }
 }

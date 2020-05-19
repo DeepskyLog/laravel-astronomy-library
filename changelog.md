@@ -2,6 +2,20 @@
 
 All notable changes to `laravel-astronomy-library` will be documented in this file.
 
+## Version 4.0
+
+### Changed
+
+- Removed abstract Coordinates class.
+- Added Coordinate class and reworked all Coordinate Classes to use this new class.
+  
+### Added
+
+- Calculation of rising, transit and setting for targets.
+- Calculation of best time to observe a target.
+- Calculation of highest altitude of a target.
+- Added classes for Targets, Moon, Sun, and Planet.
+
 ## Version 3.1
 
 ### Added
