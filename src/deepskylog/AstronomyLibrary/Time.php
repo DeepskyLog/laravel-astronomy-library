@@ -278,6 +278,7 @@ class Time
         GeographicalCoordinates $coords,
         array $nutation = null
     ): Carbon {
+        $date = $date->copy()->timezone('UTC');
         $siderialTime = self::meanSiderialTime($date, $coords);
         if (!$nutation) {
             $jd = self::getJd($date);
@@ -304,7 +305,7 @@ class Time
     public static function apparentSiderialTimeGreenwich(
         Carbon $date
     ): Carbon {
-        $newDate = $date->copy();
+        $newDate = $date->copy()->timezone('UTC');
         $newDate->hour = 0;
         $newDate->minute = 0;
         $newDate->second = 0;

@@ -13,11 +13,11 @@
 namespace deepskylog\AstronomyLibrary;
 
 use Carbon\Carbon;
+use deepskylog\AstronomyLibrary\Coordinates\GalacticCoordinates;
 use deepskylog\AstronomyLibrary\Coordinates\EclipticalCoordinates;
 use deepskylog\AstronomyLibrary\Coordinates\EquatorialCoordinates;
-use deepskylog\AstronomyLibrary\Coordinates\GalacticCoordinates;
-use deepskylog\AstronomyLibrary\Coordinates\GeographicalCoordinates;
 use deepskylog\AstronomyLibrary\Coordinates\HorizontalCoordinates;
+use deepskylog\AstronomyLibrary\Coordinates\GeographicalCoordinates;
 
 /**
  * The main AstronomyLibrary class.
