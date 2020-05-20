@@ -184,6 +184,17 @@ class Target
     }
 
     /**
+     * Returns the equatorial coordinates of the target for today at 0:00 TD.
+     *
+     * @return EquatorialCoordinates the equatorial coordinates of today
+     */
+    public function getEquatorialCoordinates(): EquatorialCoordinates
+    {
+        // The equatorial coordinates of today
+        return $this->_equa2;
+    }
+
+    /**
      * Returns the equatorial coordinates of the target for tomorrow at 0:00 TD.
      *
      * @return EquatorialCoordinates the equatorial coordinates of tomorrow

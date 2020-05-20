@@ -260,7 +260,7 @@ $date->timezone('Europe/Brussels');
 $geo_coords = new GeographicalCoordinates(4.86463, 50.83220);
 
 $greenwichSiderialTime = Time::apparentSiderialTimeGreenwich($date);
-$deltaT = Time::deltaT($carbonDate);
+$deltaT = Time::deltaT($date);
 
 // Calculate the ephemerids for the target
 $target->calculateEphemerides($geo_coords, $greenwichSiderialTime, $deltaT);

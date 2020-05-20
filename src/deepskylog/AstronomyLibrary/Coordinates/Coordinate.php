@@ -128,8 +128,8 @@ class Coordinate
         }
 
         return sprintf('%02d', $degrees).'h'
-        .sprintf('%02d', $minutes)."'"
-        .sprintf('%02d', $seconds).'"';
+        .sprintf('%02d', $minutes).'m'
+        .sprintf('%02d', $seconds).'s';
     }
 
     /**
