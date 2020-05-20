@@ -2,6 +2,13 @@
 
 All notable changes to `laravel-astronomy-library` will be documented in this file.
 
+## Version 4.0.1
+
+### Changed
+
+- Corrected convertToDegrees method on Coordinates to return h m s, instead of h ' ".
+- Added getCoordinates method on Target.
+
 ## Version 4.0
 
 ### Changed
