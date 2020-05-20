@@ -212,7 +212,7 @@ class Target
      **/
     public function getTransit(): Carbon
     {
-        if (!$this->_transit) {
+        if (! $this->_transit) {
             throw new RuntimeException(
                 'First execute the calculateEphemerides method'
             );
@@ -229,7 +229,7 @@ class Target
      **/
     public function getRising(): ?Carbon
     {
-        if (!$this->_transit) {
+        if (! $this->_transit) {
             throw new RuntimeException(
                 'First execute the calculateEphemerides method'
             );
@@ -246,7 +246,7 @@ class Target
      **/
     public function getSetting(): ?Carbon
     {
-        if (!$this->_transit) {
+        if (! $this->_transit) {
             throw new RuntimeException(
                 'First execute the calculateEphemerides method'
             );
@@ -262,7 +262,7 @@ class Target
      **/
     public function getMaxHeight(): ?Coordinate
     {
-        if (!$this->_transit) {
+        if (! $this->_transit) {
             throw new RuntimeException(
                 'First execute the calculateEphemerides method'
             );
@@ -281,7 +281,7 @@ class Target
      **/
     public function getMaxHeightAtNight(): ?Coordinate
     {
-        if (!$this->_transit) {
+        if (! $this->_transit) {
             throw new RuntimeException(
                 'First execute the calculateEphemerides method'
             );
@@ -297,7 +297,7 @@ class Target
      **/
     public function getBestTimeToObserve(): ?Carbon
     {
-        if (!$this->_transit) {
+        if (! $this->_transit) {
             throw new RuntimeException(
                 'First execute the calculateEphemerides method'
             );
@@ -550,7 +550,7 @@ class Target
             }
         }
 
-        if (!$during_night) {
+        if (! $during_night) {
             $th = new Coordinate($transitHeight, -90.0, 90.0);
 
             // Calculate the height at the end of the night
@@ -686,7 +686,7 @@ class Target
         $theta = $this->_calculateTheta($theta0, $time);
         $n = $this->_calculateN($time, $deltaT);
 
-        if (!$targetDoesNotMove) {
+        if (! $targetDoesNotMove) {
             $alphaInterpol = $this->_interpolate(
                 $this->getEquatorialCoordinatesToday()->getRA()->getCoordinate(),
                 $n,
