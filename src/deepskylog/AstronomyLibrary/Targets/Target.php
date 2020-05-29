@@ -52,6 +52,8 @@ class Target
     // The best time to view the object
     private ?Carbon $_bestTime = null;
 
+    private ?string $_altitudeChart = null;
+
     /**
      * The constructor.
      */
@@ -212,7 +214,7 @@ class Target
      **/
     public function getTransit(): Carbon
     {
-        if (! $this->_transit) {
+        if (!$this->_transit) {
             throw new RuntimeException(
                 'First execute the calculateEphemerides method'
             );
@@ -229,7 +231,7 @@ class Target
      **/
     public function getRising(): ?Carbon
     {
-        if (! $this->_transit) {
+        if (!$this->_transit) {
             throw new RuntimeException(
                 'First execute the calculateEphemerides method'
             );
@@ -246,7 +248,7 @@ class Target
      **/
     public function getSetting(): ?Carbon
     {
-        if (! $this->_transit) {
+        if (!$this->_transit) {
             throw new RuntimeException(
                 'First execute the calculateEphemerides method'
             );
@@ -262,7 +264,7 @@ class Target
      **/
     public function getMaxHeight(): ?Coordinate
     {
-        if (! $this->_transit) {
+        if (!$this->_transit) {
             throw new RuntimeException(
                 'First execute the calculateEphemerides method'
             );
@@ -281,7 +283,7 @@ class Target
      **/
     public function getMaxHeightAtNight(): ?Coordinate
     {
-        if (! $this->_transit) {
+        if (!$this->_transit) {
             throw new RuntimeException(
                 'First execute the calculateEphemerides method'
             );
@@ -297,7 +299,7 @@ class Target
      **/
     public function getBestTimeToObserve(): ?Carbon
     {
-        if (! $this->_transit) {
+        if (!$this->_transit) {
             throw new RuntimeException(
                 'First execute the calculateEphemerides method'
             );
@@ -550,7 +552,7 @@ class Target
             }
         }
 
-        if (! $during_night) {
+        if (!$during_night) {
             $th = new Coordinate($transitHeight, -90.0, 90.0);
 
             // Calculate the height at the end of the night
@@ -632,7 +634,8 @@ class Target
                         $geo_coords
                     )[0];
 
-                    // Compare and use the hightest height as the best height for the target
+                    // Compare and use the hightest height as the best height
+                    // for the target
                     if ($height2 > $height) {
                         $th = new Coordinate($height2, -90.0, 90.0);
                         $this->_bestTime = $startOfNight;
@@ -686,7 +689,7 @@ class Target
         $theta = $this->_calculateTheta($theta0, $time);
         $n = $this->_calculateN($time, $deltaT);
 
-        if (! $targetDoesNotMove) {
+        if (!$targetDoesNotMove) {
             $alphaInterpol = $this->_interpolate(
                 $this->getEquatorialCoordinatesToday()->getRA()->getCoordinate(),
                 $n,
@@ -858,5 +861,197 @@ class Target
 
         return $carbonTime->copy()->hour($hour)->minute($minute)
             ->second($second)->microsecond(0);
+    }
+
+    /**
+     * Creates a chart with the altitude of the target.
+     *
+     * @param GeographicalCoordinates $geo_coords The geographical
+     *                                            coordinates of the observer
+     * @param Carbon                  $date       the date for which to make the
+     *                                            chart
+     *
+     * @return string The altitude chart
+     */
+    public function altitudeGraph(
+        GeographicalCoordinates $geo_coords,
+        Carbon $date
+    ): string {
+        if (!$this->_altitudeChart) {
+            $image = imagecreatetruecolor(1000, 400);
+
+            // Show the night
+            $sun_info = date_sun_info(
+                $date->timestamp,
+                $geo_coords->getLatitude()->getCoordinate(),
+                $geo_coords->getLongitude()->getCoordinate()
+            );
+            $sun_info2 = date_sun_info(
+                $date->addDay()->timestamp,
+                $geo_coords->getLatitude()->getCoordinate(),
+                $geo_coords->getLongitude()->getCoordinate()
+            );
+
+            // Check there is a nautical twilight
+            if ($sun_info2['nautical_twilight_begin']) {
+                $endOfNauticalNight = Carbon::createFromTimestamp(
+                    $sun_info2['nautical_twilight_begin']
+                )->timezone($date->timezone);
+
+                $endNautical = (
+                    $endOfNauticalNight->second / 60 + $endOfNauticalNight->minute
+                ) / 60 + $endOfNauticalNight->hour - 12;
+
+                if ($endNautical < 0) {
+                    $endNautical += 24;
+                }
+            } else {
+                $endNautical = 12;
+            }
+
+            if ($sun_info['nautical_twilight_end']) {
+                $startOfNauticalNight = Carbon::createFromTimestamp(
+                    $sun_info['nautical_twilight_end']
+                )->timezone($date->timezone);
+
+                $startNautical = (
+                    $startOfNauticalNight->second / 60 + $startOfNauticalNight->minute
+                ) / 60 + $startOfNauticalNight->hour - 12;
+
+                if ($startNautical < 0) {
+                    $startNautical += 24;
+                }
+            } else {
+                $startNautical = 12;
+            }
+
+            // Check if there is a real night
+            if ($sun_info2['astronomical_twilight_begin']) {
+                $endOfNight = Carbon::createFromTimestamp(
+                    $sun_info2['astronomical_twilight_begin']
+                )->timezone($date->timezone);
+
+                $endAstronomical = (
+                    $endOfNight->second / 60 + $endOfNight->minute
+                ) / 60 + $endOfNight->hour - 12;
+
+                if ($endAstronomical < 0) {
+                    $endAstronomical += 24;
+                }
+            } else {
+                $endAstronomical = 12;
+            }
+
+            if ($sun_info['astronomical_twilight_end']) {
+                $startOfNight = Carbon::createFromTimestamp(
+                    $sun_info['astronomical_twilight_end']
+                )->timezone($date->timezone);
+
+                $startAstronomical = (
+                    $startOfNight->second / 60 + $startOfNight->minute
+                ) / 60 + $startOfNight->hour - 12;
+
+                if ($startAstronomical < 0) {
+                    $startAstronomical += 24;
+                }
+            } else {
+                $startAstronomical = 12;
+            }
+
+            $daycolor = imagecolorallocate($image, 0, 0, 200);
+            $twilightcolor = imagecolorallocate($image, 100, 100, 200);
+
+            imagefilledrectangle($image, 70, 5, 70 + $startNautical * 37, 365, $daycolor);
+            imagefilledrectangle($image, 70 + $endNautical * 37, 5, 958, 365, $daycolor);
+
+            imagefilledrectangle($image, 70 + $startNautical * 37, 5, 70 + $startAstronomical * 37, 365, $twilightcolor);
+            imagefilledrectangle($image, 70 + $endAstronomical * 37, 5, 70 + $endNautical * 37, 365, $twilightcolor);
+
+            // Start at noon
+            $date->hour = 12;
+
+            $textcolor = imagecolorallocate($image, 255, 255, 255);
+            $axiscolor = imagecolorallocate($image, 150, 150, 150);
+
+            for ($i = 0; $i <= 24;$i++) {
+                // Calculate the apparent siderial time
+                $siderial_time = Time::apparentSiderialTime($date, $geo_coords);
+
+                imagestring($image, 2, 55 + $i * 37, 370, $date->isoFormat('HH:mm'), $textcolor);
+
+                // Use the correct coordinates for moving targets
+                if ($this->getEquatorialCoordinatesToday()->getRA() == $this->getEquatorialCoordinatesYesterday()->getRA()
+                    && $this->getEquatorialCoordinatesToday()->getDeclination() == $this->getEquatorialCoordinatesYesterday()->getDeclination()
+                ) {
+                    $coords = $this->getEquatorialCoordinates();
+                } else {
+                    // Coordinates are for 0:00 TD
+                    $raToday = $this->getEquatorialCoordinatesToday()->getRA();
+                    $declToday = $this->getEquatorialCoordinatesToday()
+                        ->getDeclination();
+                    $raTomorrow = $this->getEquatorialCoordinatesTomorrow()->getRA();
+                    $declTomorrow = $this->getEquatorialCoordinatesTomorrow()
+                        ->getDeclination();
+
+                    $raDiff = $raTomorrow - $raToday;
+                    if (abs($raDiff) > 12) {
+                        if ($raToday > $raTomorrow) {
+                            $raDiff = 24 + $raDiff;
+                        } else {
+                            $raDiff = $raDiff - 24;
+                        }
+                    }
+                    $raInterval = $raDiff / 24;
+                    $ra = $raToday + $raInterval * (12 + $i);
+                    $decl = $declToday
+                        + ($declTomorrow - $declToday) / 24 * (12 + $i);
+
+                    $coords = new EquatorialCoordinates($ra, $decl);
+                }
+                // Calculate the horizontal coordinates
+                $horizontal = $coords->convertToHorizontal(
+                    $geo_coords,
+                    $siderial_time
+                );
+
+                // Add an hour
+                $date->addHour();
+
+                imagefilledellipse($image, 70 + $i * 37, 185 - $horizontal->getAltitude()->getCoordinate() * 2, 5, 5, $textcolor);
+                imageline($image, 70 + $i * 37, 365, 70 + $i * 37, 355, $axiscolor);
+            }
+
+            imagestring($image, 2, 35, 360, '-90', $textcolor);
+            imageline($image, 70, 365, 958, 365, $axiscolor);
+            imagestring($image, 2, 35, 300, '-60', $textcolor);
+            imageline($image, 70, 305, 958, 305, $axiscolor);
+            imagestring($image, 2, 35, 240, '-30', $textcolor);
+            imageline($image, 70, 245, 958, 245, $axiscolor);
+            imagestring($image, 2, 35, 180, '0', $textcolor);
+            imageline($image, 70, 185, 958, 185, $axiscolor);
+            imagestring($image, 2, 35, 120, '30', $textcolor);
+            imageline($image, 70, 125, 958, 125, $axiscolor);
+            imagestring($image, 2, 35, 60, '60', $textcolor);
+            imageline($image, 70, 65, 958, 65, $axiscolor);
+            imagestring($image, 2, 35, 0, '90', $textcolor);
+            imageline($image, 70, 5, 958, 5, $axiscolor);
+
+            // Begin capturing the byte stream
+            ob_start();
+
+            // generate the byte stream
+            imagepng($image);
+
+            // and finally retrieve the byte stream
+            $rawImageBytes = ob_get_clean();
+
+            $this->_altitudeChart = "<img src='data:image/jpeg;base64,"
+                . base64_encode($rawImageBytes) . "' />";
+        }
+
+        return $this->_altitudeChart;
+        // TODO: Interpolate for moving bodies
+        // Location -> information in dark mode is not visible
+        // Location -> does not work if changing location by moving the pointer in the map.
     }
 }

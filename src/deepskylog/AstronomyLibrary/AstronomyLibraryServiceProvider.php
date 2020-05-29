@@ -19,16 +19,16 @@ class AstronomyLibraryServiceProvider extends ServiceProvider
         // Publish the migration
         $this->publishes(
             [
-                __DIR__.'/../../database/migrations/create_deltat_table.php.stub' => database_path(
-                    'migrations/'.date('Y_m_d_His', time())
-                    .'_create_deltat_table.php'
+                __DIR__ . '/../../database/migrations/create_deltat_table.php.stub' => database_path(
+                    'migrations/' . date('Y_m_d_His', time())
+                    . '_create_deltat_table.php'
                 ),
             ],
             'migrations'
         );
         $this->publishes(
             [
-                __DIR__.'/../../../data/deltat.csv' => database_path(
+                __DIR__ . '/../../../data/deltat.csv' => database_path(
                     'deltat.csv'
                 ),
             ],
@@ -87,18 +87,16 @@ class AstronomyLibraryServiceProvider extends ServiceProvider
         // );
 
         // Publishing the views.
-        /*$this->publishes([
-            __DIR__.'/../resources/views' => base_path('resources/views/vendor/deepskylog'),
-        ], 'laravel-astronomy-library.views');*/
+        /*$this->publishes(
+            [
+                __DIR__ . '/../resources/views' => base_path('resources/views/vendor/deepskylog'),
+            ],
+            'laravel-astronomy-library.views'
+        );*/
 
         // Publishing assets.
         /*$this->publishes([
             __DIR__.'/../resources/assets' => public_path('vendor/deepskylog'),
-        ], 'laravel-astronomy-library.views');*/
-
-        // Publishing the translation files.
-        /*$this->publishes([
-            __DIR__.'/../resources/lang' => resource_path('lang/vendor/deepskylog'),
         ], 'laravel-astronomy-library.views');*/
 
         // Registering package commands.

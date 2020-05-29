@@ -2,6 +2,13 @@
 
 All notable changes to `laravel-astronomy-library` will be documented in this file.
 
+## Version 4.1
+
+### Added
+
+- Added view with the altitude of the target during the night.
+![Altitude plot](./docs/Altitude.png "Altitude plot")
+
 ## Version 4.0.1
 
 ### Changed
