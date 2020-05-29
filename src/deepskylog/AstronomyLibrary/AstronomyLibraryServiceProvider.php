@@ -87,18 +87,16 @@ class AstronomyLibraryServiceProvider extends ServiceProvider
         // );
 
         // Publishing the views.
-        /*$this->publishes([
-            __DIR__.'/../resources/views' => base_path('resources/views/vendor/deepskylog'),
-        ], 'laravel-astronomy-library.views');*/
+        /*$this->publishes(
+            [
+                __DIR__ . '/../resources/views' => base_path('resources/views/vendor/deepskylog'),
+            ],
+            'laravel-astronomy-library.views'
+        );*/
 
         // Publishing assets.
         /*$this->publishes([
             __DIR__.'/../resources/assets' => public_path('vendor/deepskylog'),
-        ], 'laravel-astronomy-library.views');*/
-
-        // Publishing the translation files.
-        /*$this->publishes([
-            __DIR__.'/../resources/lang' => resource_path('lang/vendor/deepskylog'),
         ], 'laravel-astronomy-library.views');*/
 
         // Registering package commands.

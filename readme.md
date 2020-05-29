@@ -296,6 +296,10 @@ echo $target->getMaxHeight();
 // If there is no nautical night at the location, Null is
 // returned.
 echo $target->getBestTimeToObserve();
+
+// Return the altitude graph for the target for the given date
+// In blade:
+{!! $target->getAltitudeGraph() !!}
 ```
 
 ## Change log
