@@ -1050,8 +1050,5 @@ class Target
         }
 
         return $this->_altitudeChart;
-        // TODO: Interpolate for moving bodies
-        // Location -> information in dark mode is not visible
-        // Location -> does not work if changing location by moving the pointer in the map.
     }
 }

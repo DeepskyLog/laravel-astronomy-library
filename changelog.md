@@ -2,6 +2,13 @@
 
 All notable changes to `laravel-astronomy-library` will be documented in this file.
 
+## Version 4.2
+
+### Added
+
+- Added view with the length of the night at a given location.
+![Length of night plot](./docs/Night.png "Length of night")
+
 ## Version 4.1
 
 ### Added

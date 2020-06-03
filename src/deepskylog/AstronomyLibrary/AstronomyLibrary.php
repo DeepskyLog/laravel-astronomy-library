@@ -36,6 +36,7 @@ class AstronomyLibrary
     private array $_nutation;
     private float $_jd;
     private Carbon $_siderialTime;
+    private ?string $_lengthOfNightChart = null;
 
     /**
      * The constructor.
@@ -83,6 +84,7 @@ class AstronomyLibrary
             $this->_date,
             $this->_coordinates
         );
+        $this->_lengthOfNightChart = null;
     }
 
     /**
@@ -112,6 +114,7 @@ class AstronomyLibrary
             $this->_date,
             $this->_coordinates
         );
+        $this->_lengthOfNightChart = null;
     }
 
     /**
@@ -140,6 +143,7 @@ class AstronomyLibrary
             $this->_date,
             $this->_coordinates
         );
+        $this->_lengthOfNightChart = null;
     }
 
     /**
@@ -293,5 +297,395 @@ class AstronomyLibrary
         GalacticCoordinates $coords
     ): EquatorialCoordinates {
         return $coords->convertToEquatorial();
+    }
+
+    /**
+     * Creates a chart with the length of the year during the year.
+     *
+     * @param string $timezone the timezone to create the graph for
+     *
+     * @return string The chart with the length of the night
+     */
+    public function getLengthOfNightPlot($timezone): string
+    {
+        if (! $this->_lengthOfNightChart) {
+            $date = Carbon::now();
+            $date->year($this->getDate()->year);
+
+            $image = imagecreatetruecolor(900, 400);
+
+            $textcolor = imagecolorallocate($image, 255, 255, 255);
+            $axiscolor = imagecolorallocate($image, 150, 150, 150);
+
+            // Yellow = Day
+            $daycolor = imagecolorallocate($image, 150, 150, 0);
+
+            // Orange = Civil Twilight
+            $civilcolor = imagecolorallocate($image, 225, 150, 0);
+
+            // Blue = Nautical Twilight
+            $nautcolor = imagecolorallocate($image, 0, 0, 250);
+
+            // Dark blue = Astronomical Twilight
+            $astrocolor = imagecolorallocate($image, 0, 0, 150);
+
+            if ($date->isLeapYear()) {
+                $length = 366 * 2 + 70;
+            } else {
+                $length = 365 * 2 + 70;
+            }
+
+            $runningday = 0;
+
+            // TODO: Roosbeek!
+            // TODO: Seiland, enkele dagen fout!
+            for ($i = 0; $i < 12; $i++) {
+                // Calculate the apparent siderial time
+                imageline($image, 70 + $i * 61, 365, 70 + $i * 61, 355, $axiscolor);
+                $date->day(1);
+                $date->month($i + 1);
+
+                for ($day = 1; $day <= $date->daysInMonth; $day++) {
+                    $date->day($day);
+
+                    $sun_info = date_sun_info(
+                        $date->timestamp,
+                        $this->getGeographicalCoordinates()->getLatitude()->getCoordinate(),
+                        $this->getGeographicalCoordinates()->getLongitude()->getCoordinate()
+                    );
+
+                    if ($sun_info['sunrise'] === true) {
+                        $sunriseHour = 0;
+                        $sunriseMinute = 0;
+                    } elseif ($sun_info['sunrise'] === false) {
+                        $sunriseHour = 12;
+                        $sunriseMinute = 0;
+                    } else {
+                        $sunriseHour = Carbon::createFromTimestamp(
+                            $sun_info['sunrise']
+                        )->timezone($timezone)->hour;
+                        $sunriseMinute = Carbon::createFromTimestamp(
+                            $sun_info['sunrise']
+                        )->timezone($timezone)->minute;
+                    }
+                    if ($sun_info['civil_twilight_begin'] === true) {
+                        $civilriseHour = 0;
+                        $civilriseMinute = 0;
+                    } elseif ($sun_info['civil_twilight_begin'] === false) {
+                        $civilriseHour = 12;
+                        $civilriseMinute = 0;
+                    } else {
+                        $civilriseHour = Carbon::createFromTimestamp(
+                            $sun_info['civil_twilight_begin']
+                        )->timezone($timezone)->hour;
+                        $civilriseMinute = Carbon::createFromTimestamp(
+                            $sun_info['civil_twilight_begin']
+                        )->timezone($timezone)->minute;
+                    }
+                    if ($sun_info['nautical_twilight_begin'] === true) {
+                        $nautriseHour = 0;
+                        $nautriseMinute = 0;
+                    } elseif ($sun_info['nautical_twilight_begin'] === false) {
+                        $nautriseHour = 12;
+                        $nautriseMinute = 0;
+                    } else {
+                        $nautriseHour = Carbon::createFromTimestamp(
+                            $sun_info['nautical_twilight_begin']
+                        )->timezone($timezone)->hour;
+                        $nautriseMinute = Carbon::createFromTimestamp(
+                            $sun_info['nautical_twilight_begin']
+                        )->timezone($timezone)->minute;
+                    }
+                    if ($sun_info['astronomical_twilight_begin'] === true) {
+                        $astroriseHour = 0;
+                        $astroriseMinute = 0;
+                    } elseif ($sun_info['astronomical_twilight_begin'] === false) {
+                        $astroriseHour = 12;
+                        $astroriseMinute = 0;
+                    } else {
+                        $astroriseHour = Carbon::createFromTimestamp(
+                            $sun_info['astronomical_twilight_begin']
+                        )->timezone($timezone)->hour;
+                        $astroriseMinute = Carbon::createFromTimestamp(
+                            $sun_info['astronomical_twilight_begin']
+                        )->timezone($timezone)->minute;
+                    }
+                    if ($sun_info['sunset'] === true) {
+                        $sunsetHour = 24;
+                        $sunsetMinute = 0;
+                    } elseif ($sun_info['sunset'] === false) {
+                        $sunsetHour = 12;
+                        $sunsetMinute = 0;
+                    } else {
+                        $sunsetHour = Carbon::createFromTimestamp(
+                            $sun_info['sunset']
+                        )->timezone($timezone)->hour;
+                        $sunsetMinute = Carbon::createFromTimestamp(
+                            $sun_info['sunset']
+                        )->timezone($timezone)->minute;
+                    }
+                    if ($sun_info['civil_twilight_end'] === true) {
+                        $civilsetHour = 24;
+                        $civilsetMinute = 0;
+                    } elseif ($sun_info['civil_twilight_end'] === false) {
+                        $civilsetHour = 12;
+                        $civilsetMinute = 0;
+                    } else {
+                        $civilsetHour = Carbon::createFromTimestamp(
+                            $sun_info['civil_twilight_end']
+                        )->timezone($timezone)->hour;
+                        $civilsetMinute = Carbon::createFromTimestamp(
+                            $sun_info['civil_twilight_end']
+                        )->timezone($timezone)->minute;
+                    }
+                    if ($sun_info['nautical_twilight_end'] === true) {
+                        $nautsetHour = 24;
+                        $nautsetMinute = 0;
+                    } elseif ($sun_info['nautical_twilight_end'] === false) {
+                        $nautsetHour = 12;
+                        $nautsetMinute = 0;
+                    } else {
+                        $nautsetHour = Carbon::createFromTimestamp(
+                            $sun_info['nautical_twilight_end']
+                        )->timezone($timezone)->hour;
+                        $nautsetMinute = Carbon::createFromTimestamp(
+                            $sun_info['nautical_twilight_end']
+                        )->timezone($timezone)->minute;
+                    }
+                    if ($sun_info['astronomical_twilight_end'] === true) {
+                        $astrosetHour = 24;
+                        $astrosetMinute = 0;
+                    } elseif ($sun_info['astronomical_twilight_end'] === false) {
+                        $astrosetHour = 12;
+                        $astrosetMinute = 0;
+                    } else {
+                        $astrosetHour = Carbon::createFromTimestamp(
+                            $sun_info['astronomical_twilight_end']
+                        )->timezone($timezone)->hour;
+                        $astrosetMinute = Carbon::createFromTimestamp(
+                            $sun_info['astronomical_twilight_end']
+                        )->timezone($timezone)->minute;
+                    }
+                    if ($astrosetHour < 12) {
+                        $astrosetHour += 24;
+                    }
+                    if ($nautsetHour < 12) {
+                        $nautsetHour += 24;
+                    }
+                    if ($civilsetHour < 12) {
+                        $civilsetHour += 24;
+                    }
+                    if ($sunsetHour < 12) {
+                        $sunsetHour += 24;
+                    }
+
+                    if ($astroriseHour > 12) {
+                        $astroriseHour -= 12;
+                    }
+                    if ($nautriseHour > 12) {
+                        $nautriseHour -= 12;
+                    }
+                    if ($civilriseHour > 12) {
+                        $civilriseHour -= 12;
+                    }
+                    if ($sunriseHour > 12) {
+                        $sunriseHour = 12;
+                        $sunriseMinute = 0;
+                    }
+
+                    imageline(
+                        $image,
+                        70 + $runningday * 2,
+                        5 + ($nautsetHour + $nautsetMinute / 60 - 12) * 15,
+                        70 + $runningday * 2,
+                        5 + ($astrosetHour + $astrosetMinute / 60 - 12) * 15,
+                        $astrocolor
+                    );
+
+                    imageline(
+                        $image,
+                        71 + $runningday * 2,
+                        5 + ($nautsetHour + $nautsetMinute / 60 - 12) * 15,
+                        71 + $runningday * 2,
+                        5 + ($astrosetHour + $astrosetMinute / 60 - 12) * 15,
+                        $astrocolor
+                    );
+
+                    imageline(
+                        $image,
+                        70 + $runningday * 2,
+                        5 + ($civilsetHour + $civilsetMinute / 60 - 12) * 15,
+                        70 + $runningday * 2,
+                        5 + ($nautsetHour + $nautsetMinute / 60 - 12) * 15,
+                        $nautcolor
+                    );
+
+                    imageline(
+                        $image,
+                        71 + $runningday * 2,
+                        5 + ($civilsetHour + $civilsetMinute / 60 - 12) * 15,
+                        71 + $runningday * 2,
+                        5 + ($nautsetHour + $nautsetMinute / 60 - 12) * 15,
+                        $nautcolor
+                    );
+
+                    imageline(
+                        $image,
+                        70 + $runningday * 2,
+                        5 + ($sunsetHour + $sunsetMinute / 60 - 12) * 15,
+                        70 + $runningday * 2,
+                        5 + ($civilsetHour + $civilsetMinute / 60 - 12) * 15,
+                        $civilcolor
+                    );
+
+                    imageline(
+                        $image,
+                        71 + $runningday * 2,
+                        5 + ($sunsetHour + $sunsetMinute / 60 - 12) * 15,
+                        71 + $runningday * 2,
+                        5 + ($civilsetHour + $civilsetMinute / 60 - 12) * 15,
+                        $civilcolor
+                    );
+
+                    imageline(
+                        $image,
+                        70 + $runningday * 2,
+                        5,
+                        70 + $runningday * 2,
+                        5 + ($sunsetHour + $sunsetMinute / 60 - 12) * 15,
+                        $daycolor
+                    );
+
+                    imageline(
+                        $image,
+                        71 + $runningday * 2,
+                        5,
+                        71 + $runningday * 2,
+                        5 + ($sunsetHour + $sunsetMinute / 60 - 12) * 15,
+                        $daycolor
+                    );
+
+                    imageline(
+                        $image,
+                        70 + $runningday * 2,
+                        5 + ($nautriseHour + $nautriseMinute / 60 + 12) * 15,
+                        70 + $runningday * 2,
+                        5 + ($astroriseHour + $astroriseMinute / 60 + 12) * 15,
+                        $astrocolor
+                    );
+
+                    imageline(
+                        $image,
+                        71 + $runningday * 2,
+                        5 + ($nautriseHour + $nautriseMinute / 60 + 12) * 15,
+                        71 + $runningday * 2,
+                        5 + ($astroriseHour + $astroriseMinute / 60 + 12) * 15,
+                        $astrocolor
+                    );
+                    imageline(
+                        $image,
+                        71 + $runningday * 2,
+                        5 + ($civilriseHour + $civilriseMinute / 60 + 12) * 15,
+                        71 + $runningday * 2,
+                        5 + ($nautriseHour + $nautriseMinute / 60 + 12) * 15,
+                        $nautcolor
+                    );
+
+                    imageline(
+                        $image,
+                        70 + $runningday * 2,
+                        5 + ($civilriseHour + $civilriseMinute / 60 + 12) * 15,
+                        70 + $runningday * 2,
+                        5 + ($nautriseHour + $nautriseMinute / 60 + 12) * 15,
+                        $nautcolor
+                    );
+
+                    imageline(
+                        $image,
+                        70 + $runningday * 2,
+                        5 + ($sunriseHour + $sunriseMinute / 60 + 12) * 15,
+                        70 + $runningday * 2,
+                        5 + ($civilriseHour + $civilriseMinute / 60 + 12) * 15,
+                        $civilcolor
+                    );
+
+                    imageline(
+                        $image,
+                        71 + $runningday * 2,
+                        5 + ($sunriseHour + $sunriseMinute / 60 + 12) * 15,
+                        71 + $runningday * 2,
+                        5 + ($civilriseHour + $civilriseMinute / 60 + 12) * 15,
+                        $civilcolor
+                    );
+
+                    imageline(
+                        $image,
+                        70 + $runningday * 2,
+                        365,
+                        70 + $runningday * 2,
+                        5 + ($sunriseHour + $sunriseMinute / 60 + 12) * 15,
+                        $daycolor
+                    );
+
+                    imageline(
+                        $image,
+                        71 + $runningday * 2,
+                        365,
+                        71 + $runningday * 2,
+                        5 + ($sunriseHour + $sunriseMinute / 60 + 12) * 15,
+                        $daycolor
+                    );
+
+                    $runningday++;
+                }
+                imagestring(
+                    $image,
+                    2,
+                    90 + $i * 61,
+                    375,
+                    $date->isoFormat('MMM'),
+                    $textcolor
+                );
+            }
+            // Date line
+            $red = imagecolorallocate($image, 255, 0, 0);
+            $datelocation = 2 * ($this->getDate()->dayOfYear);
+            imageline($image, $datelocation + 70, 5, $datelocation + 70, 365, $red);
+
+            imageline($image, 802, 365, 802, 355, $axiscolor);
+
+            imagestring($image, 2, 35, 360, '12:00', $textcolor);
+            imageline($image, 70, 365, $length, 365, $axiscolor);
+            imagestring($image, 2, 35, 315, '09:00', $textcolor);
+            imageline($image, 70, 320, $length, 320, $axiscolor);
+            imagestring($image, 2, 35, 270, '06:00', $textcolor);
+            imageline($image, 70, 275, $length, 275, $axiscolor);
+            imagestring($image, 2, 35, 225, '03:00', $textcolor);
+            imageline($image, 70, 230, $length, 230, $axiscolor);
+            imagestring($image, 2, 35, 180, '00:00', $textcolor);
+            imageline($image, 70, 185, $length, 185, $axiscolor);
+            imagestring($image, 2, 35, 135, '21:00', $textcolor);
+            imageline($image, 70, 140, $length, 140, $axiscolor);
+            imagestring($image, 2, 35, 90, '18:00', $textcolor);
+            imageline($image, 70, 95, $length, 95, $axiscolor);
+            imagestring($image, 2, 35, 45, '15:00', $textcolor);
+            imageline($image, 70, 50, $length, 50, $axiscolor);
+            imagestring($image, 2, 35, 0, '12:00', $textcolor);
+            imageline($image, 70, 5, $length, 5, $axiscolor);
+
+            // Begin capturing the byte stream
+            ob_start();
+
+            // generate the byte stream
+            imagepng($image);
+
+            // and finally retrieve the byte stream
+            $rawImageBytes = ob_get_clean();
+
+            $this->_lengthOfNightChart = "<img src='data:image/jpeg;base64,"
+                .base64_encode($rawImageBytes)."' />";
+        }
+
+        return $this->_lengthOfNightChart;
     }
 }
