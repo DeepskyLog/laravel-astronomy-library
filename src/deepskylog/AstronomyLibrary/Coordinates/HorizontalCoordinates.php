@@ -176,17 +176,17 @@ class HorizontalCoordinates
     }
 
     /**
-     * Calculates the refaction (in minutes of arc) if the apparent 
+     * Calculates the refaction (in minutes of arc) if the apparent
      * height is given.
-     * 
+     *
      * @return float The refraction in minutes of arc.
      */
-    function calculateRefractionFromApparentAltitude(): float
+    public function calculateRefractionFromApparentAltitude(): float
     {
         return 1 / (
             tan(
                 deg2rad(
-                    $this->getAltitude()->getCoordinate() 
+                    $this->getAltitude()->getCoordinate()
                     + 7.31 / ($this->getAltitude()->getCoordinate() + 4.4)
                 )
             )
@@ -196,15 +196,15 @@ class HorizontalCoordinates
     /**
      * Calculates the refaction (in minutes of arc) if the true
      * height is given.
-     * 
+     *
      * @return float The refraction in minutes of arc.
      */
-    function calculateRefractionFromTrueAltitude(): float
+    public function calculateRefractionFromTrueAltitude(): float
     {
         return 1.02 / (
             tan(
                 deg2rad(
-                    $this->getAltitude()->getCoordinate() 
+                    $this->getAltitude()->getCoordinate()
                     + 10.3 / ($this->getAltitude()->getCoordinate() + 5.11)
                 )
             )
