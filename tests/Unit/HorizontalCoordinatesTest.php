@@ -35,7 +35,7 @@ class HorizontalCoordinatesTest extends BaseTestCase
      *
      * @var string
      */
-    protected $appPath = __DIR__.'/../../vendor/laravel/laravel/bootstrap/app.php';
+    protected $appPath = __DIR__ . '/../../vendor/laravel/laravel/bootstrap/app.php';
 
     /**
      * Setup the test environment.
@@ -112,6 +112,22 @@ class HorizontalCoordinatesTest extends BaseTestCase
             -6.7198917,
             $equa->getDeclination()->getCoordinate(),
             0.0001
+        );
+    }
+
+    /**
+     * Test calculating refraction from horizontal coordinates.
+     *
+     * @return None
+     */
+    public function testRefraction()
+    {
+        $coords = new HorizontalCoordinates(68.0336, 0.5);
+
+        $this->assertEqualsWithDelta(
+            28.754,
+            $coords->calculateRefractionFromApparentAltitude(),
+            0.001
         );
     }
 }
