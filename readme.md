@@ -222,6 +222,8 @@ $altitude = $coods->getAltitude();
 print ($coords->printAzimuth());
 print ($coords->printAltitude());
 $equatorial = $coords->convertToEquatorial($geo_coords, $siderial_time);
+$refraction = $coords->calculateRefractionFromApparentAltitude();
+$refraction = $coords->calculateRefractionFromTrueAltitude();
 ```
 
 ### Coordinate methods on galactic coordinates

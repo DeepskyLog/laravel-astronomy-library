@@ -2,6 +2,12 @@
 
 All notable changes to `laravel-astronomy-library` will be documented in this file.
 
+## Version 4.3
+
+### Added
+
+- Added methods to calculate the refraction for given horizontal coordinates.
+
 ## Version 4.2
 
 ### Added
