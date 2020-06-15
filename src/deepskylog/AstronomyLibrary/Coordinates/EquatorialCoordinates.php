@@ -288,7 +288,7 @@ class EquatorialCoordinates
      * @return Coordinate The angular separation between the two objects
      */
     public function angularSeparation(
-        EquatorialCoordinates $coords2
+        self $coords2
     ): Coordinate {
         $d = rad2deg(
             acos(
