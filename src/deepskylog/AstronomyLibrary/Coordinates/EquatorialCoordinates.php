@@ -105,7 +105,7 @@ class EquatorialCoordinates
      */
     public function printRA(): string
     {
-        return $this->getRA()->convertToHours;
+        return $this->getRA()->convertToHours();
     }
 
     /**
@@ -277,5 +277,54 @@ class EquatorialCoordinates
         ) / 60.0 + $siderial_time->minute) / 60 + $siderial_time->hour;
 
         return ($sid - $this->getRA()->getCoordinate()) * 15.0;
+    }
+
+    /**
+     * Returns the angular separation between these coordinates and other
+     * equatorial coordinates.
+     *
+     * @param EquatorialCoordinates $coords2 the coordinates of the second object
+     *
+     * @return Coordinate The angular separation between the two objects
+     */
+    public function angularSeparation(
+        self $coords2
+    ): Coordinate {
+        $d = rad2deg(
+            acos(
+                sin(deg2rad($this->getDeclination()->getCoordinate())) *
+                sin(deg2rad($coords2->getDeclination()->getCoordinate()))
+                + cos(deg2rad($this->getDeclination()->getCoordinate())) *
+                cos(deg2rad($coords2->getDeclination()->getCoordinate())) *
+                cos(
+                    deg2rad(
+                        $this->getRA()->getCoordinate() * 15.0
+                        - $coords2->getRA()->getCoordinate() * 15.0
+                    )
+                )
+            )
+        );
+
+        if ($d < 0.16) {
+            $d = sqrt(
+                (
+                    $this->getRA()->getCoordinate() * 15.0
+                    - $coords2->getRA()->getCoordinate() * 15.0
+                ) * cos(
+                    deg2rad(
+                        (
+                            $this->getDeclination()->getCoordinate()
+                            + $coords2->getDeclination()->getCoordinate()
+                        ) / 2
+                    )
+                ) ** 2 +
+                (
+                    $this->getDeclination()->getCoordinate()
+                    - $coords2->getDeclination()->getCoordinate()
+                )
+            );
+        }
+
+        return new Coordinate($d);
     }
 }

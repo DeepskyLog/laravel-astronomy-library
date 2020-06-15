@@ -194,6 +194,7 @@ $horizontal = $coords->convertToHorizontal($geo_coords, $siderial_time);
 $galactic = $coords->convertToGalactic();
 $parallacticAngle = $coords->getParallacticAngle($geo_coords, $siderial_time);
 $hour_angle = $coords->getHourAngle($siderial_time);
+$angular_separation = $coords->angularSeparation($coords2)->getCoordinate();
 ```
 
 ### Coordinate methods on ecliptical coordinates

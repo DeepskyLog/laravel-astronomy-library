@@ -188,4 +188,32 @@ class EquatorialCoordinatesTest extends BaseTestCase
             $equa->getParallacticAngle($geo, $astrolib->getApparentSiderialTime())
         );
     }
+
+    /**
+     * Test angular separation.
+     *
+     * @return None
+     */
+    public function testAngularSeparation()
+    {
+        // Arcturus and Spica
+        $equa1 = new EquatorialCoordinates(14.2610277778, 19.1825);
+        $equa2 = new EquatorialCoordinates(13.4198888, -11.1614);
+
+        $this->assertEqualsWithDelta(
+            $equa1->angularSeparation($equa2)->getCoordinate(),
+            32.7930,
+            0.0001
+        );
+
+        // Aldebaran and Antares
+        $equa1 = new EquatorialCoordinates(4.598677519444444, 16.509302361111111);
+        $equa2 = new EquatorialCoordinates(16.490127694444444, -26.432002611111111);
+
+        $this->assertEqualsWithDelta(
+            $equa1->angularSeparation($equa2)->getCoordinate(),
+            169.9627,
+            0.0001
+        );
+    }
 }

@@ -2,6 +2,12 @@
 
 All notable changes to `laravel-astronomy-library` will be documented in this file.
 
+## Version 4.4
+
+### Added
+
+- Added methods to calculate the angular separation between two objects.
+
 ## Version 4.3
 
 ### Added
