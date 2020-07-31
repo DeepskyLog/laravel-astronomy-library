@@ -280,7 +280,7 @@ class Time
     ): Carbon {
         $date = $date->copy()->timezone('UTC');
         $siderialTime = self::meanSiderialTime($date, $coords);
-        if (!$nutation) {
+        if (! $nutation) {
             $jd = self::getJd($date);
 
             $nutation = self::nutation($jd);
