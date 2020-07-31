@@ -201,6 +201,13 @@ $castor = new EquatorialCoordinates(7.571222, 31.89756);
 $pollux = new EquatorialCoordinates(7.750002778, 28.03681);
 $mars = new EquatorialCoordinates(8.022644129, 21.472188347);
 $isInStraightLine = $mars->isInStraightLine($castor, $pollux);
+
+// Calculate the deviation of a target from a straight line
+$mintaka = new EquatorialCoordinates(5.5334444, -0.29913888);
+$alnilam = new EquatorialCoordinates(5.60355833, -1.20194444);
+$alnitak = new EquatorialCoordinates(5.679311111, -1.94258333);
+// deviation is 0.089876 degrees, or 5'24''
+$deviation = $alnilam->deviationFromStraightLine($mintaka, $alnitak)->getCoordinate();  
 ```
 
 ### Coordinate methods on ecliptical coordinates
