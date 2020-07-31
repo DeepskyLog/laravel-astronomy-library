@@ -111,6 +111,7 @@ class EquatorialCoordinates
     /**
      * Converts the equatorial coordinates to ecliptical coordinates in
      * the current equinox.
+     * Chapter 13 of Astronomical Algorithms.
      *
      * @param float $nutObliquity The nutation in obliquity
      *
@@ -144,6 +145,7 @@ class EquatorialCoordinates
     /**
      * Converts the equatorial coordinates to ecliptical coordinates in
      * the J2000 equinox.
+     * Chapter 13 of Astronomical Algorithms.
      *
      * @return EclipticalCoordinates The ecliptical coordinates
      */
@@ -155,6 +157,7 @@ class EquatorialCoordinates
     /**
      * Converts the equatorial coordinates to ecliptical coordinates in
      * the B1950 equinox.
+     * Chapter 13 of Astronomical Algorithms.
      *
      * @return EclipticalCoordinates The ecliptical coordinates
      */
@@ -165,6 +168,7 @@ class EquatorialCoordinates
 
     /**
      * Converts the equatorial coordinates to local horizontal coordinates.
+     * Chapter 13 of Astronomical Algorithms.
      *
      * @param GeographicalCoordinates $geo_coords    the geographical
      *                                               coordinates
@@ -204,6 +208,7 @@ class EquatorialCoordinates
 
     /**
      * Converts the equatorial coordinates to galactic coordinates.
+     * Chapter 13 of Astronomical Algorithms.
      *
      * @return GalacticCoordinates The galactic coordinates
      */
@@ -236,7 +241,7 @@ class EquatorialCoordinates
      * Returns the parallactic angle of the object. The parallactic angle is
      * negative before and positive after the passage throught the southern
      * meridian. This is the effect of the moon that is lying down at moonrise.
-     * Astronomical Algorithms - chapter 13.
+     * Chapter 14 of Astronomical Algorithms.
      *
      * @param GeographicalCoordinates $geo_coords    the geographical
      *                                               coordinates
@@ -282,6 +287,7 @@ class EquatorialCoordinates
     /**
      * Returns the angular separation between these coordinates and other
      * equatorial coordinates.
+     * Chapter 17 of Astronomical Algorithms.
      *
      * @param EquatorialCoordinates $coords2 the coordinates of the second object
      *
@@ -326,5 +332,93 @@ class EquatorialCoordinates
         }
 
         return new Coordinate($d);
+    }
+
+    /**
+     * Returns true if the three bodies are in a straight line.
+     * Chapter 19 of Astronomical Algorithms.
+     *
+     * @param EquatorialCoordinates $coords2   The coordinates of the second object
+     * @param EquatorialCoordinates $coords3   The coordinates of the thirds object
+     * @param float                 $threshold The threshold for the method
+     *                                         (default value is 10e-06)
+     *
+     * @return bool True if the three bodies are in a straight line
+     */
+    public function isInStraightLine(
+        self $coords2,
+        self $coords3,
+        float $threshold = 1e-6
+    ): bool {
+        $result = tan(deg2rad($this->getDeclination()->getCoordinate())) *
+                sin(
+                    deg2rad(
+                        $coords2->getRA()->getCoordinate() * 15.0
+                        - $coords3->getRA()->getCoordinate() * 15.0
+                    )
+                ) + tan(deg2rad($coords2->getDeclination()->getCoordinate())) *
+                sin(
+                    deg2rad(
+                        $coords3->getRA()->getCoordinate() * 15.0
+                        - $this->getRA()->getCoordinate() * 15.0
+                    )
+                ) + tan(deg2rad($coords3->getDeclination()->getCoordinate())) *
+                sin(
+                    deg2rad(
+                        $this->getRA()->getCoordinate() * 15.0
+                        - $coords2->getRA()->getCoordinate() * 15.0
+                    )
+                );
+
+        if (abs($result) < $threshold) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Returns the deviation from a straight line.
+     * Chapter 19 of Astronomical Algorithms.
+     *
+     * @param EquatorialCoordinates $coords2 The coordinates of the first object
+     * @param EquatorialCoordinates $coords3 The coordinates of the second object
+     *
+     * @return Coordinate the deviation from the straight line
+     */
+    public function deviationFromStraightLine(
+        self $coords2,
+        self $coords3
+    ): Coordinate {
+        $X1 = cos(deg2rad($coords2->getDeclination()->getCoordinate())) *
+                    cos(deg2rad($coords2->getRA()->getCoordinate() * 15.0));
+        $Y1 = cos(deg2rad($coords2->getDeclination()->getCoordinate())) *
+                    sin(deg2rad($coords2->getRA()->getCoordinate() * 15.0));
+        $Z1 = sin(deg2rad($coords2->getDeclination()->getCoordinate()));
+
+        $X2 = cos(deg2rad($coords3->getDeclination()->getCoordinate())) *
+                    cos(deg2rad($coords3->getRA()->getCoordinate() * 15.0));
+        $Y2 = cos(deg2rad($coords3->getDeclination()->getCoordinate())) *
+                    sin(deg2rad($coords3->getRA()->getCoordinate() * 15.0));
+        $Z2 = sin(deg2rad($coords3->getDeclination()->getCoordinate()));
+
+        $A = $Y1 * $Z2 - $Z1 * $Y2;
+        $B = $Z1 * $X2 - $X1 * $Z2;
+        $C = $X1 * $Y2 - $Y1 * $X2;
+
+        $m = tan(deg2rad($this->getRA()->getCoordinate() * 15.0));
+        $n = tan(deg2rad($this->getDeclination()->getCoordinate()))
+                    / cos(deg2rad($this->getRA()->getCoordinate() * 15.0));
+
+        $omega = rad2deg(
+            abs(
+                asin(
+                    ($A + $B * $m + $C * $n) /
+                    (sqrt($A * $A + $B * $B + $C * $C) * sqrt(1 + $m * $m + $n * $n))
+                )
+            )
+        );
+
+        return new Coordinate($omega, 0.0, 90.0);
     }
 }

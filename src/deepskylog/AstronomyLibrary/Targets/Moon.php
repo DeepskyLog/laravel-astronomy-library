@@ -38,7 +38,7 @@ class Moon extends Target
     /**
      * Calculates the horizontal moon parallax.
      *
-     * To implement from chapter 29.
+     * To implement from chapter 30.
      *
      * @return float the horizontal moon parallax
      */
