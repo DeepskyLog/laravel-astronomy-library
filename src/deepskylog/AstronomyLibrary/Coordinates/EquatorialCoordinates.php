@@ -327,4 +327,46 @@ class EquatorialCoordinates
 
         return new Coordinate($d);
     }
+
+    /**
+     * Returns true if the three bodies are in a straight line.
+     *
+     * @param EquatorialCoordinates $coords2   The coordinates of the second object
+     * @param EquatorialCoordinates $coords3   The coordinates of the thirds object
+     * @param float                 $threshold The threshold for the method
+     *                                         (default value is 10e-06)
+     *
+     * @return bool True if the three bodies are in a straight line
+     */
+    public function isInStraightLine(
+        self $coords2,
+        self $coords3,
+        float $threshold = 1e-6
+    ): bool {
+        $result = tan(deg2rad($this->getDeclination()->getCoordinate())) *
+                sin(
+                    deg2rad(
+                        $coords2->getRA()->getCoordinate() * 15.0
+                        - $coords3->getRA()->getCoordinate() * 15.0
+                    )
+                ) + tan(deg2rad($coords2->getDeclination()->getCoordinate())) *
+                sin(
+                    deg2rad(
+                        $coords3->getRA()->getCoordinate() * 15.0
+                        - $this->getRA()->getCoordinate() * 15.0
+                    )
+                ) + tan(deg2rad($coords3->getDeclination()->getCoordinate())) *
+                sin(
+                    deg2rad(
+                        $this->getRA()->getCoordinate() * 15.0
+                        - $coords2->getRA()->getCoordinate() * 15.0
+                    )
+                );
+
+        if (abs($result) < $threshold) {
+            return true;
+        }
+
+        return false;
+    }
 }

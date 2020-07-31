@@ -195,6 +195,12 @@ $galactic = $coords->convertToGalactic();
 $parallacticAngle = $coords->getParallacticAngle($geo_coords, $siderial_time);
 $hour_angle = $coords->getHourAngle($siderial_time);
 $angular_separation = $coords->angularSeparation($coords2)->getCoordinate();
+
+// Check if three bodies are in a straight line
+$castor = new EquatorialCoordinates(7.571222, 31.89756);
+$pollux = new EquatorialCoordinates(7.750002778, 28.03681);
+$mars = new EquatorialCoordinates(8.022644129, 21.472188347);
+$isInStraightLine = $mars->isInStraightLine($castor, $pollux);
 ```
 
 ### Coordinate methods on ecliptical coordinates

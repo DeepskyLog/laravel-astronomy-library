@@ -2,6 +2,12 @@
 
 All notable changes to `laravel-astronomy-library` will be documented in this file.
 
+## Version 4.5
+
+### Added
+
+- Added methods to check if three bodies are in a straight line and to calculate the deviation from a straight line.
+
 ## Version 4.4
 
 ### Added

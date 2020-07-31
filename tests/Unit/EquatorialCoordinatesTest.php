@@ -36,7 +36,7 @@ class EquatorialCoordinatesTest extends BaseTestCase
      *
      * @var string
      */
-    protected $appPath = __DIR__.'/../../vendor/laravel/laravel/bootstrap/app.php';
+    protected $appPath = __DIR__ . '/../../vendor/laravel/laravel/bootstrap/app.php';
 
     /**
      * Setup the test environment.
@@ -215,5 +215,26 @@ class EquatorialCoordinatesTest extends BaseTestCase
             169.9627,
             0.0001
         );
+    }
+
+    /**
+     * Test bodies in straight line/**.
+     *
+     * @return None
+     */
+    public function testBodiesInStraightLine()
+    {
+        // Castor
+        $castor = new EquatorialCoordinates(7.571222, 31.89756);
+        // Pollux
+        $pollux = new EquatorialCoordinates(7.750002778, 28.03681);
+
+        // Mars on Sep 30, 1994
+        $mars = new EquatorialCoordinates(7.97293055, 21.58983);
+        $this->assertFalse($mars->isInStraightLine($castor, $pollux));
+
+        // Mars on Oct 1, 1994, 5h TD
+        $mars = new EquatorialCoordinates(8.022644129, 21.472188347);
+        $this->assertTrue($mars->isInStraightLine($castor, $pollux));
     }
 }
