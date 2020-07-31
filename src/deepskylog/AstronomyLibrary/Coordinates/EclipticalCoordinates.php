@@ -108,6 +108,7 @@ class EclipticalCoordinates
 
     /**
      * Converts the ecliptical coordinates to equatorial coordinates.
+     * Chapter 13 of Astronomical Algorithms.
      *
      * @param float $nutObliquity The nutation in obliquity
      *
@@ -141,6 +142,7 @@ class EclipticalCoordinates
     /**
      * Converts the ecliptical coordinates to equatorial coordinates in
      * the J2000 equinox.
+     * Chapter 13 of Astronomical Algorithms.
      *
      * @return EquatorialCoordinates The equatorial coordinates
      */
@@ -152,6 +154,7 @@ class EclipticalCoordinates
     /**
      * Converts the ecliptical coordinates to equatorial coordinates in
      * the B1950 equinox.
+     * Chapter 13 of Astronomical Algorithms.
      *
      * @return EquatorialCoordinates The equatorial coordinates
      */

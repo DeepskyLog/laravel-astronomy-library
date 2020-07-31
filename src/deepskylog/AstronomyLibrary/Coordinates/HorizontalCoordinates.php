@@ -110,6 +110,7 @@ class HorizontalCoordinates
 
     /**
      * Converts the local horizontal coordinates to equatorial coordinates.
+     * Chapter 13 of Astronomical Algorithms.
      *
      * @param GeographicalCoordinates $geo_coords    the geographical
      *                                               coordinates
@@ -178,8 +179,9 @@ class HorizontalCoordinates
     /**
      * Calculates the refaction (in minutes of arc) if the apparent
      * height is given.
+     * Chapter 16 of Astronomical Algorithms.
      *
-     * @return float The refraction in minutes of arc.
+     * @return float the refraction in minutes of arc
      */
     public function calculateRefractionFromApparentAltitude(): float
     {
@@ -196,8 +198,9 @@ class HorizontalCoordinates
     /**
      * Calculates the refaction (in minutes of arc) if the true
      * height is given.
+     * Chapter 16 of Astronomical Algorithms.
      *
-     * @return float The refraction in minutes of arc.
+     * @return float the refraction in minutes of arc
      */
     public function calculateRefractionFromTrueAltitude(): float
     {

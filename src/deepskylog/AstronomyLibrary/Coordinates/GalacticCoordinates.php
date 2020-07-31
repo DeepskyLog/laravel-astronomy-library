@@ -108,6 +108,7 @@ class GalacticCoordinates
 
     /**
      * Converts the galactic coordinates to equatorial coordinates.
+     * Chapter 13 of Astronomical Algorithms.
      *
      * @return EquatorialCoordinates The equatorial coordinates
      */

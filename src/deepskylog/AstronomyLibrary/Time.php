@@ -140,7 +140,7 @@ class Time
 
     /**
      * Returns the dynamical time as the time + delta t.
-     * Chapter 9 in Astronomical Algorithms.
+     * Chapter 10 in Astronomical Algorithms.
      *
      * @param Carbon $date The date
      *
@@ -153,7 +153,7 @@ class Time
 
     /**
      * Calculates delta t for the given date.
-     * Chapter 9 in Astronomical Algorithms.
+     * Chapter 10 in Astronomical Algorithms.
      *
      * @param Carbon $date The date
      *
@@ -221,7 +221,7 @@ class Time
 
     /**
      * Calculates the mean siderial time for the given date.
-     * Chapter 11 in Astronomical Algorithms.
+     * Chapter 12 in Astronomical Algorithms.
      *
      * @param Carbon                  $date   The date
      * @param GeographicalCoordinates $coords The geographical coordinates
@@ -265,7 +265,7 @@ class Time
 
     /**
      * Calculates the apparent siderial time for the given date.
-     * Chapter 11 in Astronomical Algorithms.
+     * Chapter 12 in Astronomical Algorithms.
      *
      * @param Carbon                  $date     The date
      * @param GeographicalCoordinates $coords   The geographical coordinates
@@ -280,7 +280,7 @@ class Time
     ): Carbon {
         $date = $date->copy()->timezone('UTC');
         $siderialTime = self::meanSiderialTime($date, $coords);
-        if (! $nutation) {
+        if (!$nutation) {
             $jd = self::getJd($date);
 
             $nutation = self::nutation($jd);
@@ -296,7 +296,7 @@ class Time
     /**
      * Calculates the apparent siderial time for the given date, at midnight,
      * in Greenwich.
-     * Chapter 11 in Astronomical Algorithms.
+     * Chapter 12 in Astronomical Algorithms.
      *
      * @param Carbon $date The date
      *
@@ -316,7 +316,7 @@ class Time
 
     /**
      * Calculates the nutation for the given julian day.
-     * Chapter 21 of Astronomical Algorithms.
+     * Chapter 22 of Astronomical Algorithms.
      *
      * @param float $jd The Julian day
      *

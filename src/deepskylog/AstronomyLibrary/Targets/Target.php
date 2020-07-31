@@ -209,12 +209,13 @@ class Target
 
     /**
      * Get the transit time of this object.
+     * Chapter 15 of Astronomical Algorithms.
      *
      * @return Carbon the transit time of the object
      **/
     public function getTransit(): Carbon
     {
-        if (! $this->_transit) {
+        if (!$this->_transit) {
             throw new RuntimeException(
                 'First execute the calculateEphemerides method'
             );
@@ -225,13 +226,14 @@ class Target
 
     /**
      * Get the rising time of this object.
+     * Chapter 15 of Astronomical Algorithms.
      *
      * @return Carbon The rising time of the object or null if the object does not
      *                set
      **/
     public function getRising(): ?Carbon
     {
-        if (! $this->_transit) {
+        if (!$this->_transit) {
             throw new RuntimeException(
                 'First execute the calculateEphemerides method'
             );
@@ -242,13 +244,14 @@ class Target
 
     /**
      * Get the setting time of this object.
+     * Chapter 15 of Astronomical Algorithms.
      *
      * @return Carbon The setting time of the object or null if the object does
      *                not set
      **/
     public function getSetting(): ?Carbon
     {
-        if (! $this->_transit) {
+        if (!$this->_transit) {
             throw new RuntimeException(
                 'First execute the calculateEphemerides method'
             );
@@ -259,12 +262,13 @@ class Target
 
     /**
      * Get the maximum height of the target during the year.
+     * Chapter 15 of Astronomical Algorithms.
      *
      * @return Coordinate the maximum height of the target during the year
      **/
     public function getMaxHeight(): ?Coordinate
     {
-        if (! $this->_transit) {
+        if (!$this->_transit) {
             throw new RuntimeException(
                 'First execute the calculateEphemerides method'
             );
@@ -278,12 +282,13 @@ class Target
      * no astronomical darkness during the night, the maximum height
      * during the nautical brightness is taken.  If there is also no
      * nautical brightness, null is returned.
+     * Chapter 15 of Astronomical Algorithms.
      *
      * @return Coordinate the maximum height of the target during the year
      **/
     public function getMaxHeightAtNight(): ?Coordinate
     {
-        if (! $this->_transit) {
+        if (!$this->_transit) {
             throw new RuntimeException(
                 'First execute the calculateEphemerides method'
             );
@@ -294,12 +299,13 @@ class Target
 
     /**
      * Get the best time to observe this target at the given date.
+     * Chapter 15 of Astronomical Algorithms.
      *
      * @return Carbon The best time to observe the target at the given date
      **/
     public function getBestTimeToObserve(): ?Carbon
     {
-        if (! $this->_transit) {
+        if (!$this->_transit) {
             throw new RuntimeException(
                 'First execute the calculateEphemerides method'
             );
@@ -310,6 +316,7 @@ class Target
 
     /**
      * Calculate rising and the setting of the object.
+     * Chapter 15 of Astronomical Algorithms.
      *
      * @param GeographicalCoordinates $geo_coords    The geographical
      *                                               coordinates of the observer
@@ -552,7 +559,7 @@ class Target
             }
         }
 
-        if (! $during_night) {
+        if (!$during_night) {
             $th = new Coordinate($transitHeight, -90.0, 90.0);
 
             // Calculate the height at the end of the night
@@ -654,6 +661,7 @@ class Target
 
     /**
      * Calculates the height of the object at a given moment.
+     * Chapter 15 of Astronomical Algorithms.
      *
      * @param float                   $theta0            Theta0 of the target
      * @param float                   $time              The time to calculate the
@@ -689,7 +697,7 @@ class Target
         $theta = $this->_calculateTheta($theta0, $time);
         $n = $this->_calculateN($time, $deltaT);
 
-        if (! $targetDoesNotMove) {
+        if (!$targetDoesNotMove) {
             $alphaInterpol = $this->_interpolate(
                 $this->getEquatorialCoordinatesToday()->getRA()->getCoordinate(),
                 $n,
@@ -877,7 +885,7 @@ class Target
         GeographicalCoordinates $geo_coords,
         Carbon $date
     ): string {
-        if (! $this->_altitudeChart) {
+        if (!$this->_altitudeChart) {
             $image = imagecreatetruecolor(1000, 400);
 
             // Show the night
@@ -1046,7 +1054,7 @@ class Target
             $rawImageBytes = ob_get_clean();
 
             $this->_altitudeChart = "<img src='data:image/jpeg;base64,"
-                .base64_encode($rawImageBytes)."' />";
+                . base64_encode($rawImageBytes) . "' />";
         }
 
         return $this->_altitudeChart;

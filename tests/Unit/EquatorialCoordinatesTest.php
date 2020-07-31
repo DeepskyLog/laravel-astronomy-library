@@ -218,7 +218,7 @@ class EquatorialCoordinatesTest extends BaseTestCase
     }
 
     /**
-     * Test bodies in straight line/**.
+     * Test bodies in straight line.
      *
      * @return None
      */
@@ -236,5 +236,40 @@ class EquatorialCoordinatesTest extends BaseTestCase
         // Mars on Oct 1, 1994, 5h TD
         $mars = new EquatorialCoordinates(8.022644129, 21.472188347);
         $this->assertTrue($mars->isInStraightLine($castor, $pollux));
+    }
+
+    /**
+     * Test deviation of three bodies from a straight line.
+     *
+     * @return None
+     */
+    public function testDeviationFromStraightLine()
+    {
+        // Delta Ori
+        $delta = new EquatorialCoordinates(5.5334444, -0.29913888);
+        // Epsilon Ori
+        $eps = new EquatorialCoordinates(5.60355833, -1.20194444);
+        // Ksi Ori
+        $ksi = new EquatorialCoordinates(5.679311111, -1.94258333);
+        $this->assertEqualsWithDelta(
+            $eps->deviationFromStraightLine($delta, $ksi)->getCoordinate(),
+            0.089876,
+            0.001
+        );
+
+        // Alpha Uma
+        $alpha = new EquatorialCoordinates(11.062129444, 61.750894444);
+
+        // Beta Uma
+        $beta = new EquatorialCoordinates(11.030689444, 56.3824027778);
+
+        // Polaris
+        $polaris = new EquatorialCoordinates(2.530195556, 89.26408889);
+
+        $this->assertEqualsWithDelta(
+            $polaris->deviationFromStraightLine($alpha, $beta)->getCoordinate(),
+            1.91853,
+            0.001
+        );
     }
 }
