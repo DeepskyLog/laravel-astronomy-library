@@ -272,4 +272,30 @@ class EquatorialCoordinatesTest extends BaseTestCase
             0.001
         );
     }
+
+    /**
+     * Test smallest circle containing three celestial bodies.
+     *
+     * @return None
+     */
+    public function testSmallestCircle()
+    {
+        $coords1 = new EquatorialCoordinates(12.6857305, -5.631722);
+        $coords2 = new EquatorialCoordinates(12.8681138, -4.373944);
+        $coords3 = new EquatorialCoordinates(12.6578083, -1.834361);
+        $this->assertEqualsWithDelta(
+            $coords1->smallestCircle($coords2, $coords3)->getCoordinate(),
+            4.26364,
+            0.0001
+        );
+
+        $coords1 = new EquatorialCoordinates(9.094844, 18.50833);
+        $coords2 = new EquatorialCoordinates(9.1580556, 17.732416);
+        $coords3 = new EquatorialCoordinates(8.9964278, 17.826889);
+        $this->assertEqualsWithDelta(
+            $coords1->smallestCircle($coords2, $coords3)->getCoordinate(),
+            2.31053754,
+            0.0001
+        );
+    }
 }
