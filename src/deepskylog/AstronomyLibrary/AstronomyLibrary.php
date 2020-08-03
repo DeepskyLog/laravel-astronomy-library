@@ -13,11 +13,12 @@
 namespace deepskylog\AstronomyLibrary;
 
 use Carbon\Carbon;
+use deepskylog\AstronomyLibrary\Coordinates\Coordinate;
+use deepskylog\AstronomyLibrary\Coordinates\GalacticCoordinates;
 use deepskylog\AstronomyLibrary\Coordinates\EclipticalCoordinates;
 use deepskylog\AstronomyLibrary\Coordinates\EquatorialCoordinates;
-use deepskylog\AstronomyLibrary\Coordinates\GalacticCoordinates;
-use deepskylog\AstronomyLibrary\Coordinates\GeographicalCoordinates;
 use deepskylog\AstronomyLibrary\Coordinates\HorizontalCoordinates;
+use deepskylog\AstronomyLibrary\Coordinates\GeographicalCoordinates;
 
 /**
  * The main AstronomyLibrary class.
@@ -308,7 +309,7 @@ class AstronomyLibrary
      */
     public function getLengthOfNightPlot($timezone): string
     {
-        if (! $this->_lengthOfNightChart) {
+        if (!$this->_lengthOfNightChart) {
             $date = Carbon::now();
             $date->year($this->getDate()->year);
 
@@ -683,9 +684,66 @@ class AstronomyLibrary
             $rawImageBytes = ob_get_clean();
 
             $this->_lengthOfNightChart = "<img src='data:image/jpeg;base64,"
-                .base64_encode($rawImageBytes)."' />";
+                . base64_encode($rawImageBytes) . "' />";
         }
 
         return $this->_lengthOfNightChart;
+    }
+
+    /**
+     * Returns true if the three bodies are in a straight line.
+     * Chapter 19 of Astronomical Algorithms.
+     *
+     * @param EquatorialCoordinates $coords1   The coordinates of the first object
+     * @param EquatorialCoordinates $coords2   The coordinates of the second object
+     * @param EquatorialCoordinates $coords3   The coordinates of the thirds object
+     * @param float                 $threshold The threshold for the method
+     *                                         (default value is 10e-06)
+     *
+     * @return bool True if the three bodies are in a straight line
+     */
+    public function isInStraightLine(
+        EquatorialCoordinates $coords1,
+        EquatorialCoordinates $coords2,
+        EquatorialCoordinates $coords3,
+        float $threshold = 1e-6
+    ): bool {
+        return $coords1->isInStraightLine($coords2, $coords2, $threshold);
+    }
+
+    /**
+     * Returns the deviation from a straight line.
+     * Chapter 19 of Astronomical Algorithms.
+     *
+     * @param EquatorialCoordinates $coords1 The coordinates of the first object
+     * @param EquatorialCoordinates $coords2 The coordinates of the first object
+     * @param EquatorialCoordinates $coords3 The coordinates of the second object
+     *
+     * @return Coordinate the deviation from the straight line
+     */
+    public function deviationFromStraightLine(
+        EquatorialCoordinates $coords1,
+        EquatorialCoordinates $coords2,
+        EquatorialCoordinates $coords3
+    ): Coordinate {
+        return $coords1->deviationFromStraightLine($coords2, $coords3);
+    }
+
+    /**
+     * Returns the smallest circle containing three celestial bodies.
+     * Chapter 20 of Astronomical Algorithms.
+     *
+     * @param EquatorialCoordinates $coords1 The coordinates of the first object
+     * @param EquatorialCoordinates $coords2 The coordinates of the second object
+     * @param EquatorialCoordinates $coords3 The coordinates of the third object
+     *
+     * @return Coordinate the diameter of the smallest circle
+     */
+    public function smallestCircle(
+        EquatorialCoordinates $coords1,
+        EquatorialCoordinates $coords2,
+        EquatorialCoordinates $coords3
+    ): Coordinate {
+        return $coords1->smallestCircle($coords2, $coords3);
     }
 }

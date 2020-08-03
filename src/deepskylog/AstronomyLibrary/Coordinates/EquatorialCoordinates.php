@@ -421,4 +421,40 @@ class EquatorialCoordinates
 
         return new Coordinate($omega, 0.0, 90.0);
     }
+
+    /**
+     * Returns the smallest circle containing three celestial bodies.
+     * Chapter 20 of Astronomical Algorithms.
+     *
+     * @param EquatorialCoordinates $coords2 The coordinates of the second object
+     * @param EquatorialCoordinates $coords3 The coordinates of the third object
+     *
+     * @return Coordinate the diameter of the smallest circle
+     */
+    public function smallestCircle(
+        self $coords2,
+        self $coords3
+    ): Coordinate {
+        $dist[0] = $this->angularSeparation($coords2)->getCoordinate();
+        $dist[1] = $this->angularSeparation($coords3)->getCoordinate();
+        $dist[2] = $coords2->angularSeparation($coords3)->getCoordinate();
+
+        rsort($dist);
+
+        $a = $dist[0];
+        $b = $dist[1];
+        $c = $dist[2];
+
+        if ($a > sqrt($b * $b + $c * $c)) {
+            return new Coordinate($a);
+        } else {
+            return new Coordinate(
+                2 * $a * $b * $c /
+                sqrt(
+                    ($a + $b + $c) * ($a + $b - $c)
+                    * ($b + $c - $a) * ($a + $c - $b)
+                )
+            );
+        }
+    }
 }

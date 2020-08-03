@@ -2,6 +2,12 @@
 
 All notable changes to `laravel-astronomy-library` will be documented in this file.
 
+## Version 4.6
+
+### Added
+
+- Added methods to calculate the smallest circle containing three celestial bodies.
+
 ## Version 4.5
 
 ### Added

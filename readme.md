@@ -175,6 +175,24 @@ $equatorial = astrolib->galacticToEquatorial($coords);
 $coords = new EquatorialCoordinates(5.24, 55.55);
 $parallacticAngle = $astrolib->parallacticAngle($coords);
 
+// Check if three bodies are in a straight line
+$castor = new EquatorialCoordinates(7.571222, 31.89756);
+$pollux = new EquatorialCoordinates(7.750002778, 28.03681);
+$mars = new EquatorialCoordinates(8.022644129, 21.472188347);
+$isInStraightLine = $astrolib->isInStraightLine($castor, $pollux, $mars);
+
+// Calculate the deviation of a target from a straight line
+$mintaka = new EquatorialCoordinates(5.5334444, -0.29913888);
+$alnilam = new EquatorialCoordinates(5.60355833, -1.20194444);
+$alnitak = new EquatorialCoordinates(5.679311111, -1.94258333);
+// deviation is 0.089876 degrees, or 5'24''
+$deviation = $astrolib->deviationFromStraightLine($mintaka, $alnilam, $alnitak)->getCoordinate();  
+
+// Calculate the smallest circle containing three celestial bodies.
+$coords1 = new EquatorialCoordinates(12.6857305, -5.631722);
+$coords2 = new EquatorialCoordinates(12.8681138, -4.373944);
+$coords3 = new EquatorialCoordinates(12.6578083, -1.834361);
+$diameter = $astrolib->smallestCircle($coords1, $coords2, $coords3);
 ```
 
 ### Coordinate methods on equatorial coordinates
@@ -208,6 +226,12 @@ $alnilam = new EquatorialCoordinates(5.60355833, -1.20194444);
 $alnitak = new EquatorialCoordinates(5.679311111, -1.94258333);
 // deviation is 0.089876 degrees, or 5'24''
 $deviation = $alnilam->deviationFromStraightLine($mintaka, $alnitak)->getCoordinate();  
+
+// Calculate the smallest circle containing three celestial bodies.
+$coords1 = new EquatorialCoordinates(12.6857305, -5.631722);
+$coords2 = new EquatorialCoordinates(12.8681138, -4.373944);
+$coords3 = new EquatorialCoordinates(12.6578083, -1.834361);
+$coords1->smallestCircle($coords2, $coords3);
 ```
 
 ### Coordinate methods on ecliptical coordinates
