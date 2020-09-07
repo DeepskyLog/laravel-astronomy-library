@@ -30,6 +30,8 @@ class EquatorialCoordinates
     private Coordinate $_ra;
     private Coordinate $_decl;
     private float $_epoch = 2000.0;
+    private float $_deltaRA = 0.0;
+    private float $_deltaDec = 0.0;
 
     /**
      * The constructor.
@@ -37,12 +39,21 @@ class EquatorialCoordinates
      * @param float $ra          The right ascension (0, 24)
      * @param float $declination The declination (-90, 90)
      * @param float $epoch       The epoch of the target (2000.0 is standard)
+     * @param float $deltaRA     The proper motion in Right Ascension in seconds/year
+     * @param float $deltaDec    The proper motion in declination in ''/year
      */
-    public function __construct(float $ra, float $declination, float $epoch = 2000.0)
-    {
+    public function __construct(
+        float $ra,
+        float $declination,
+        float $epoch = 2000.0,
+        float $deltaRA = 0.0,
+        float $deltaDec = 0.0
+    ) {
         $this->setRA($ra);
         $this->setDeclination($declination);
         $this->setEpoch($epoch);
+        $this->setDeltaRA($deltaRA);
+        $this->setDeltaDec($deltaDec);
     }
 
     /**
@@ -82,6 +93,30 @@ class EquatorialCoordinates
     }
 
     /**
+     * Sets the proper motion in RA.
+     *
+     * @param float $deltaRA the proper motion in RA is seconds/year
+     *
+     * @return None
+     */
+    public function setDeltaRA(float $deltaRA): void
+    {
+        $this->_deltaRA = $deltaRA;
+    }
+
+    /**
+     * Sets the proper motion in declination.
+     *
+     * @param float $deltaDec the proper motion in declination in ''/year
+     *
+     * @return None
+     */
+    public function setDeltaDec(float $deltaDec): void
+    {
+        $this->_deltaDec = $deltaDec;
+    }
+
+    /**
      * Gets the Right Ascension.
      *
      * @return Coordinate the Right Ascension in decimal hours
@@ -109,6 +144,26 @@ class EquatorialCoordinates
     public function getEpoch(): float
     {
         return $this->_epoch;
+    }
+
+    /**
+     * Gets the the proper motion in RA.
+     *
+     * @return float The proper motion in RA in seconds/year
+     */
+    public function getDeltaRA(): float
+    {
+        return $this->_deltaRA;
+    }
+
+    /**
+     * Gets the the proper motion in declination.
+     *
+     * @return float The proper motion in declination in ''/year
+     */
+    public function getDeltaDec(): float
+    {
+        return $this->_deltaDec;
     }
 
     /**

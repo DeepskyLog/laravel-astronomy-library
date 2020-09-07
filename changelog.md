@@ -8,7 +8,8 @@ All notable changes to `laravel-astronomy-library` will be documented in this fi
 
 ### Changed
 
-- The constructor of the EquatorialCoordinates class now also takes the epoch of the coordinate as argument.  IF the epoch is not given, the standard epoch of 2000.0 is taken. 
+- The constructor of the EquatorialCoordinates class now also takes the epoch of the coordinate as argument.  If the epoch is not given, the standard epoch of 2000.0 is taken.
+- The constructor of the EquatorialCoordinates class now also takes the proper motion (in RA and in dec) as arguments.  If the proper motion is not given, the value of 0.0 is taken.
 
 ## Version 4.6
 
