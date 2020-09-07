@@ -29,17 +29,20 @@ class EquatorialCoordinates
 {
     private Coordinate $_ra;
     private Coordinate $_decl;
+    private float $_epoch = 2000.0;
 
     /**
      * The constructor.
      *
      * @param float $ra          The right ascension (0, 24)
      * @param float $declination The declination (-90, 90)
+     * @param float $epoch       The epoch of the target (2000.0 is standard)
      */
-    public function __construct(float $ra, float $declination)
+    public function __construct(float $ra, float $declination, float $epoch = 2000.0)
     {
         $this->setRA($ra);
         $this->setDeclination($declination);
+        $this->setEpoch($epoch);
     }
 
     /**
@@ -67,6 +70,18 @@ class EquatorialCoordinates
     }
 
     /**
+     * Sets the epoch.
+     *
+     * @param float $epoch The epoch
+     *
+     * @return None
+     */
+    public function setEpoch(float $epoch): void
+    {
+        $this->_epoch = $epoch;
+    }
+
+    /**
      * Gets the Right Ascension.
      *
      * @return Coordinate the Right Ascension in decimal hours
@@ -84,6 +99,16 @@ class EquatorialCoordinates
     public function getDeclination(): Coordinate
     {
         return $this->_decl;
+    }
+
+    /**
+     * Gets the epoch.
+     *
+     * @return float The epoch
+     */
+    public function getEpoch(): float
+    {
+        return $this->_epoch;
     }
 
     /**

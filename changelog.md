@@ -2,6 +2,14 @@
 
 All notable changes to `laravel-astronomy-library` will be documented in this file.
 
+## Version 4.7
+
+### Added
+
+### Changed
+
+- The constructor of the EquatorialCoordinates class now also takes the epoch of the coordinate as argument.  IF the epoch is not given, the standard epoch of 2000.0 is taken. 
+
 ## Version 4.6
 
 ### Added
