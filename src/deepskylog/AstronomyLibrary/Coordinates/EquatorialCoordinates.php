@@ -537,4 +537,49 @@ class EquatorialCoordinates
             );
         }
     }
+
+    /**
+     * Returns the precession: the coordinates for another epoch and equinox.
+     * Chapter 21 of Astronomical Algorithms.
+     *
+     * @param Carbon $date The date for the new equinox
+     *
+     * @return EquatorialCoordinates the diameter of the smallest circle
+     */
+    public function precession(Carbon $date): EquatorialCoordinates
+    {
+        $precessed_coordinates = $this;
+
+        if ($date->isLeapYear()) {
+            $year = $date->year + ($date->dayOfYear - 1.0) / 366;
+        } else {
+            $year = $date->year + ($date->dayOfYear - 1.0) / 365;
+        }
+
+        $T = ($this->getEpoch() - $year) / 100.0;
+        $m = 3.07496 + 0.00186 * $T;
+        $n = 20.0431 - 0.0085 * $T;
+
+        $deltaRA = (
+            $this->getDeltaRA() + (
+                $m
+                + $n * sin(deg2rad($this->getRA()->getCoordinate() * 15.0))
+                * tan(deg2rad($this->getDeclination()->getCoordinate())) / 15.0
+            )
+        ) * ($year - $this->getEpoch());
+        $deltaDecl = (
+            $this->getDeltaDec() + $n
+            * cos(deg2rad($this->getRA()->getCoordinate() * 15.0))
+        ) * ($year - $this->getEpoch());
+
+        $precessed_coordinates->setRA(
+            $this->getRA()->getCoordinate() + $deltaRA / 3600.0
+        );
+        $precessed_coordinates->setDeclination(
+            $this->getDeclination()->getCoordinate() + $deltaDecl / 3600.0
+        );
+
+        return $precessed_coordinates;
+    }
+    }
 }

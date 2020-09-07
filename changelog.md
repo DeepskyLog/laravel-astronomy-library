@@ -6,6 +6,8 @@ All notable changes to `laravel-astronomy-library` will be documented in this fi
 
 ### Added
 
+- Add precession method to calculate the precession for a given date with low accuracy.
+
 ### Changed
 
 - The constructor of the EquatorialCoordinates class now also takes the epoch of the coordinate as argument.  If the epoch is not given, the standard epoch of 2000.0 is taken.

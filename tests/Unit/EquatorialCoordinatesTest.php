@@ -298,4 +298,33 @@ class EquatorialCoordinatesTest extends BaseTestCase
             0.0001
         );
     }
+
+    /**
+     * Test precession.
+     *
+     * @return None
+     */
+    public function testPrecessionLow()
+    {
+        $coords = new EquatorialCoordinates(
+            10.13952778,
+            11.967222,
+            2000.0,
+            -0.0169,
+            0.006
+        );
+        $date = Carbon::createMidnightDate(1978, 1, 1);
+
+        $precessed_coords = $coords->precession($date);
+        $this->assertEqualsWithDelta(
+            10.12002778,
+            $precessed_coords->getRA()->getCoordinate(),
+            0.00001
+        );
+        $this->assertEqualsWithDelta(
+            12.075416,
+            $precessed_coords->getDeclination()->getCoordinate(),
+            0.00001
+        );
+    }
 }
