@@ -232,6 +232,11 @@ $coords1 = new EquatorialCoordinates(12.6857305, -5.631722);
 $coords2 = new EquatorialCoordinates(12.8681138, -4.373944);
 $coords3 = new EquatorialCoordinates(12.6578083, -1.834361);
 $coords1->smallestCircle($coords2, $coords3);
+
+// Calculate the precession (with low precision)
+$coords = new EquatorialCoordinates(10.13952778, 11.967222, 2000.0, -0.0169, 0.006);
+$date = Carbon::createMidnightDate(1978, 1, 1);
+$precessed_coords = $coords->precession($date);
 ```
 
 ### Coordinate methods on ecliptical coordinates
