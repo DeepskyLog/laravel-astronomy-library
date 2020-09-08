@@ -7,6 +7,7 @@ All notable changes to `laravel-astronomy-library` will be documented in this fi
 ### Added
 
 - Add precession method to calculate the precession for a given date with low accuracy.
+- Add precessionHighAccuracy method to calculate the precession for a given date with high accuracy.
 
 ### Changed
 
