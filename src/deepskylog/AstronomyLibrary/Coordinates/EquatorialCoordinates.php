@@ -340,8 +340,10 @@ class EquatorialCoordinates
         $q = rad2deg(
             atan2(
                 sin(deg2rad($H)),
-                tan(deg2rad($phi)) * cos(deg2rad($this->getDeclination()->getCoordinate()))
-                - sin(deg2rad($this->getDeclination()->getCoordinate())) * cos(deg2rad($H))
+                tan(deg2rad($phi))
+                * cos(deg2rad($this->getDeclination()->getCoordinate()))
+                - sin(deg2rad($this->getDeclination()->getCoordinate()))
+                * cos(deg2rad($H))
             )
         );
 
@@ -545,7 +547,7 @@ class EquatorialCoordinates
      *
      * @param Carbon $date The date for the new equinox
      *
-     * @return EquatorialCoordinates the diameter of the smallest circle
+     * @return EquatorialCoordinates the precessed coordinates
      */
     public function precession(Carbon $date): EquatorialCoordinates
     {
@@ -589,7 +591,7 @@ class EquatorialCoordinates
      *
      * @param Carbon $date The date for the new equinox
      *
-     * @return EquatorialCoordinates the diameter of the smallest circle
+     * @return EquatorialCoordinates the precessed coordinates
      */
     public function precessionHighAccuracy(Carbon $date): EquatorialCoordinates
     {
@@ -612,21 +614,47 @@ class EquatorialCoordinates
         $dec_with_proper_motion = $this->getDeclination()->getCoordinate()
             + $this->getDeltaDec() * $time_interval_starting_final * 100.0 / 3600.0;
 
-        $ksi = ((2306.2181 + 1.39656 * $time_interval_J2000_starting - 0.000139 * $time_interval_J2000_starting ** 2) * $time_interval_starting_final
-            + (0.30188 - 0.000344 * $time_interval_J2000_starting) * $time_interval_starting_final ** 2
-            + 0.017998 * $time_interval_starting_final ** 3) / 3600.0;
+        $ksi = (
+            (2306.2181
+                + 1.39656 * $time_interval_J2000_starting
+                - 0.000139 * $time_interval_J2000_starting ** 2)
+                * $time_interval_starting_final
+            + (0.30188 - 0.000344 * $time_interval_J2000_starting)
+                * $time_interval_starting_final ** 2
+            + 0.017998
+                * $time_interval_starting_final ** 3
+        ) / 3600.0;
 
-        $zeta = ((2306.2181 + 1.39656 * $time_interval_J2000_starting - 0.000139 * $time_interval_J2000_starting ** 2) * $time_interval_starting_final
-            + (1.09468 + 0.000066 * $time_interval_J2000_starting) * $time_interval_starting_final ** 2
-            + 0.018203 * $time_interval_starting_final ** 3) / 3600.0;
+        $zeta = (
+            (2306.2181
+                + 1.39656 * $time_interval_J2000_starting
+                - 0.000139 * $time_interval_J2000_starting ** 2)
+                * $time_interval_starting_final
+            + (1.09468 + 0.000066 * $time_interval_J2000_starting)
+                * $time_interval_starting_final ** 2
+            + 0.018203
+                * $time_interval_starting_final ** 3
+        ) / 3600.0;
 
-        $theta = ((2004.3109 - 0.85330 * $time_interval_J2000_starting - 0.000217 * $time_interval_J2000_starting ** 2) * $time_interval_starting_final
-            - (0.42665 + 0.000217 * $time_interval_J2000_starting) * $time_interval_starting_final ** 2
-            - 0.041833 * $time_interval_starting_final ** 3) / 3600.0;
+        $theta = (
+            (2004.3109
+                - 0.85330 * $time_interval_J2000_starting
+                - 0.000217 * $time_interval_J2000_starting ** 2)
+                * $time_interval_starting_final
+            - (0.42665 + 0.000217 * $time_interval_J2000_starting)
+                * $time_interval_starting_final ** 2
+            - 0.041833
+                * $time_interval_starting_final ** 3
+        ) / 3600.0;
 
-        $A = cos(deg2rad($dec_with_proper_motion)) * sin(deg2rad($ra_with_proper_motion + $ksi));
-        $B = cos(deg2rad($theta)) * cos(deg2rad($dec_with_proper_motion)) * cos(deg2rad($ra_with_proper_motion + $ksi)) - sin(deg2rad($theta)) * sin(deg2rad($dec_with_proper_motion));
-        $C = sin(deg2rad($theta)) * cos(deg2rad($dec_with_proper_motion)) * cos(deg2rad($ra_with_proper_motion + $ksi)) + cos(deg2rad($theta)) * sin(deg2rad($dec_with_proper_motion));
+        $A = cos(deg2rad($dec_with_proper_motion))
+            * sin(deg2rad($ra_with_proper_motion + $ksi));
+        $B = cos(deg2rad($theta)) * cos(deg2rad($dec_with_proper_motion))
+            * cos(deg2rad($ra_with_proper_motion + $ksi))
+            - sin(deg2rad($theta)) * sin(deg2rad($dec_with_proper_motion));
+        $C = sin(deg2rad($theta)) * cos(deg2rad($dec_with_proper_motion))
+            * cos(deg2rad($ra_with_proper_motion + $ksi))
+            + cos(deg2rad($theta)) * sin(deg2rad($dec_with_proper_motion));
 
         $precessed_coordinates->setRA(
             (rad2deg(atan2($A, $B)) + $zeta) / 15.0

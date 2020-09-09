@@ -13,6 +13,9 @@
 
 namespace deepskylog\AstronomyLibrary\Coordinates;
 
+use Illuminate\Support\Carbon;
+use deepskylog\AstronomyLibrary\Time;
+
 /**
  * EclipticalCoordinates class.
  *
@@ -27,17 +30,33 @@ class EclipticalCoordinates
 {
     private Coordinate $_longitude;
     private Coordinate $_latitude;
+    private float $_epoch = 2000.0;
+    private float $_deltaRA = 0.0;
+    private float $_deltaDec = 0.0;
 
     /**
      * The constructor.
      *
      * @param float $longitude The ecliptical longitude (0, 360)
      * @param float $latitude  The ecliptical latitude (-90, 90)
+     * @param float $epoch     The epoch of the target (2000.0 is standard)
+     * @param float $deltaRA   The proper motion in Right Ascension in seconds/year
+     *                         (in equatorial coordinates!)
+     * @param float $deltaDec  The proper motion in declination in ''/year
+     *                         (in equatorial coordinates!)
      */
-    public function __construct(float $longitude, float $latitude)
-    {
-        $this->_longitude = new Coordinate($longitude);
-        $this->_latitude = new Coordinate($latitude, -90.0, 90.0);
+    public function __construct(
+        float $longitude,
+        float $latitude,
+        float $epoch = 2000.0,
+        float $deltaRA = 0.0,
+        float $deltaDec = 0.0
+    ) {
+        $this->setLongitude($longitude);
+        $this->setLatitude($latitude);
+        $this->setEpoch($epoch);
+        $this->setDeltaRA($deltaRA);
+        $this->setDeltaDec($deltaDec);
     }
 
     /**
@@ -49,7 +68,7 @@ class EclipticalCoordinates
      */
     public function setLongitude(float $longitude): void
     {
-        $this->_longitude->setCoordinate($longitude);
+        $this->_longitude = new Coordinate($longitude);
     }
 
     /**
@@ -61,7 +80,45 @@ class EclipticalCoordinates
      */
     public function setLatitude(float $latitude): void
     {
-        $this->_latitude->setCoordinate($latitude);
+        $this->_latitude = new Coordinate($latitude, -90.0, 90.0);
+    }
+
+    /**
+     * Sets the epoch.
+     *
+     * @param float $epoch The epoch
+     *
+     * @return None
+     */
+    public function setEpoch(float $epoch): void
+    {
+        $this->_epoch = $epoch;
+    }
+
+    /**
+     * Sets the proper motion in RA.
+     *
+     * @param float $deltaRA the proper motion in RA is seconds/year
+     *                       (in equatorial coordinates!)
+     *
+     * @return None
+     */
+    public function setDeltaRA(float $deltaRA): void
+    {
+        $this->_deltaRA = $deltaRA;
+    }
+
+    /**
+     * Sets the proper motion in declination.
+     *
+     * @param float $deltaDec the proper motion in declination in ''/year
+     *                        (in equatorial coordinates!)
+     *
+     * @return None
+     */
+    public function setDeltaDec(float $deltaDec): void
+    {
+        $this->_deltaDec = $deltaDec;
     }
 
     /**
@@ -82,6 +139,38 @@ class EclipticalCoordinates
     public function getLongitude(): Coordinate
     {
         return $this->_longitude;
+    }
+
+    /**
+     * Gets the epoch.
+     *
+     * @return float The epoch
+     */
+    public function getEpoch(): float
+    {
+        return $this->_epoch;
+    }
+
+    /**
+     * Gets the the proper motion in RA.
+     *
+     * @return float The proper motion in RA in seconds/year
+     *               (in equatorial coordinates!)
+     */
+    public function getDeltaRA(): float
+    {
+        return $this->_deltaRA;
+    }
+
+    /**
+     * Gets the the proper motion in declination.
+     *
+     * @return float The proper motion in declination in ''/year
+     *               (in equatorial coordinates!)
+     */
+    public function getDeltaDec(): float
+    {
+        return $this->_deltaDec;
     }
 
     /**
