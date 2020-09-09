@@ -14,6 +14,7 @@
 namespace deepskylog\AstronomyLibrary\Coordinates;
 
 use Carbon\Carbon;
+use deepskylog\AstronomyLibrary\Time;
 
 /**
  * EquatorialCoordinates class.
@@ -29,17 +30,31 @@ class EquatorialCoordinates
 {
     private Coordinate $_ra;
     private Coordinate $_decl;
+    private float $_epoch = 2000.0;
+    private float $_deltaRA = 0.0;
+    private float $_deltaDec = 0.0;
 
     /**
      * The constructor.
      *
      * @param float $ra          The right ascension (0, 24)
      * @param float $declination The declination (-90, 90)
+     * @param float $epoch       The epoch of the target (2000.0 is standard)
+     * @param float $deltaRA     The proper motion in Right Ascension in seconds/year
+     * @param float $deltaDec    The proper motion in declination in ''/year
      */
-    public function __construct(float $ra, float $declination)
-    {
+    public function __construct(
+        float $ra,
+        float $declination,
+        float $epoch = 2000.0,
+        float $deltaRA = 0.0,
+        float $deltaDec = 0.0
+    ) {
         $this->setRA($ra);
         $this->setDeclination($declination);
+        $this->setEpoch($epoch);
+        $this->setDeltaRA($deltaRA);
+        $this->setDeltaDec($deltaDec);
     }
 
     /**
@@ -67,6 +82,42 @@ class EquatorialCoordinates
     }
 
     /**
+     * Sets the epoch.
+     *
+     * @param float $epoch The epoch
+     *
+     * @return None
+     */
+    public function setEpoch(float $epoch): void
+    {
+        $this->_epoch = $epoch;
+    }
+
+    /**
+     * Sets the proper motion in RA.
+     *
+     * @param float $deltaRA the proper motion in RA is seconds/year
+     *
+     * @return None
+     */
+    public function setDeltaRA(float $deltaRA): void
+    {
+        $this->_deltaRA = $deltaRA;
+    }
+
+    /**
+     * Sets the proper motion in declination.
+     *
+     * @param float $deltaDec the proper motion in declination in ''/year
+     *
+     * @return None
+     */
+    public function setDeltaDec(float $deltaDec): void
+    {
+        $this->_deltaDec = $deltaDec;
+    }
+
+    /**
      * Gets the Right Ascension.
      *
      * @return Coordinate the Right Ascension in decimal hours
@@ -84,6 +135,36 @@ class EquatorialCoordinates
     public function getDeclination(): Coordinate
     {
         return $this->_decl;
+    }
+
+    /**
+     * Gets the epoch.
+     *
+     * @return float The epoch
+     */
+    public function getEpoch(): float
+    {
+        return $this->_epoch;
+    }
+
+    /**
+     * Gets the the proper motion in RA.
+     *
+     * @return float The proper motion in RA in seconds/year
+     */
+    public function getDeltaRA(): float
+    {
+        return $this->_deltaRA;
+    }
+
+    /**
+     * Gets the the proper motion in declination.
+     *
+     * @return float The proper motion in declination in ''/year
+     */
+    public function getDeltaDec(): float
+    {
+        return $this->_deltaDec;
     }
 
     /**
@@ -259,8 +340,10 @@ class EquatorialCoordinates
         $q = rad2deg(
             atan2(
                 sin(deg2rad($H)),
-                tan(deg2rad($phi)) * cos(deg2rad($this->getDeclination()->getCoordinate()))
-                - sin(deg2rad($this->getDeclination()->getCoordinate())) * cos(deg2rad($H))
+                tan(deg2rad($phi))
+                * cos(deg2rad($this->getDeclination()->getCoordinate()))
+                - sin(deg2rad($this->getDeclination()->getCoordinate()))
+                * cos(deg2rad($H))
             )
         );
 
@@ -456,5 +539,128 @@ class EquatorialCoordinates
                 )
             );
         }
+    }
+
+    /**
+     * Returns the precession: the coordinates for another epoch and equinox.
+     * Chapter 21 of Astronomical Algorithms.
+     *
+     * @param Carbon $date The date for the new equinox
+     *
+     * @return EquatorialCoordinates the precessed coordinates
+     */
+    public function precession(Carbon $date): EquatorialCoordinates
+    {
+        $precessed_coordinates = clone $this;
+
+        if ($date->isLeapYear()) {
+            $year = $date->year + ($date->dayOfYear - 1.0) / 366;
+        } else {
+            $year = $date->year + ($date->dayOfYear - 1.0) / 365;
+        }
+
+        $T = ($this->getEpoch() - $year) / 100.0;
+        $m = 3.07496 + 0.00186 * $T;
+        $n = 20.0431 - 0.0085 * $T;
+
+        $deltaRA = (
+            $this->getDeltaRA() + (
+                $m
+                + $n * sin(deg2rad($this->getRA()->getCoordinate() * 15.0))
+                * tan(deg2rad($this->getDeclination()->getCoordinate())) / 15.0
+            )
+        ) * ($year - $this->getEpoch());
+        $deltaDecl = (
+            $this->getDeltaDec() + $n
+            * cos(deg2rad($this->getRA()->getCoordinate() * 15.0))
+        ) * ($year - $this->getEpoch());
+
+        $precessed_coordinates->setRA(
+            $this->getRA()->getCoordinate() + $deltaRA / 3600.0
+        );
+        $precessed_coordinates->setDeclination(
+            $this->getDeclination()->getCoordinate() + $deltaDecl / 3600.0
+        );
+
+        return $precessed_coordinates;
+    }
+
+    /**
+     * Returns the precession: the coordinates for another epoch and equinox.
+     * Chapter 21 of Astronomical Algorithms.
+     *
+     * @param Carbon $date The date for the new equinox
+     *
+     * @return EquatorialCoordinates the precessed coordinates
+     */
+    public function precessionHighAccuracy(Carbon $date): EquatorialCoordinates
+    {
+        $precessed_coordinates = clone $this;
+
+        $epoch_in_JD = Time::getJd(
+            Carbon::create($this->getEpoch(), 1, 1, 12, 0, 0, 'UTC')
+        );
+
+        $time_interval_J2000_starting = ($epoch_in_JD - 2451545.0) / 36525.0;
+
+        $jd = Time::getJd($date);
+
+        $time_interval_starting_final = ($jd - $epoch_in_JD) / 36525.0;
+
+        $ra_with_proper_motion = (
+            $this->getRA()->getCoordinate()
+            + $this->getDeltaRA() * $time_interval_starting_final * 100.0 / 3600.0
+        ) * 15.0;
+        $dec_with_proper_motion = $this->getDeclination()->getCoordinate()
+            + $this->getDeltaDec() * $time_interval_starting_final * 100.0 / 3600.0;
+
+        $ksi = (
+            (2306.2181
+                + 1.39656 * $time_interval_J2000_starting
+                - 0.000139 * $time_interval_J2000_starting ** 2)
+                * $time_interval_starting_final
+            + (0.30188 - 0.000344 * $time_interval_J2000_starting)
+                * $time_interval_starting_final ** 2
+            + 0.017998
+                * $time_interval_starting_final ** 3
+        ) / 3600.0;
+
+        $zeta = (
+            (2306.2181
+                + 1.39656 * $time_interval_J2000_starting
+                - 0.000139 * $time_interval_J2000_starting ** 2)
+                * $time_interval_starting_final
+            + (1.09468 + 0.000066 * $time_interval_J2000_starting)
+                * $time_interval_starting_final ** 2
+            + 0.018203
+                * $time_interval_starting_final ** 3
+        ) / 3600.0;
+
+        $theta = (
+            (2004.3109
+                - 0.85330 * $time_interval_J2000_starting
+                - 0.000217 * $time_interval_J2000_starting ** 2)
+                * $time_interval_starting_final
+            - (0.42665 + 0.000217 * $time_interval_J2000_starting)
+                * $time_interval_starting_final ** 2
+            - 0.041833
+                * $time_interval_starting_final ** 3
+        ) / 3600.0;
+
+        $A = cos(deg2rad($dec_with_proper_motion))
+            * sin(deg2rad($ra_with_proper_motion + $ksi));
+        $B = cos(deg2rad($theta)) * cos(deg2rad($dec_with_proper_motion))
+            * cos(deg2rad($ra_with_proper_motion + $ksi))
+            - sin(deg2rad($theta)) * sin(deg2rad($dec_with_proper_motion));
+        $C = sin(deg2rad($theta)) * cos(deg2rad($dec_with_proper_motion))
+            * cos(deg2rad($ra_with_proper_motion + $ksi))
+            + cos(deg2rad($theta)) * sin(deg2rad($dec_with_proper_motion));
+
+        $precessed_coordinates->setRA(
+            (rad2deg(atan2($A, $B)) + $zeta) / 15.0
+        );
+        $precessed_coordinates->setDeclination(rad2deg(asin($C)));
+
+        return $precessed_coordinates;
     }
 }

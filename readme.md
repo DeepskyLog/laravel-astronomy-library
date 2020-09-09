@@ -232,6 +232,16 @@ $coords1 = new EquatorialCoordinates(12.6857305, -5.631722);
 $coords2 = new EquatorialCoordinates(12.8681138, -4.373944);
 $coords3 = new EquatorialCoordinates(12.6578083, -1.834361);
 $coords1->smallestCircle($coords2, $coords3);
+
+// Calculate the precession (with low precision)
+$coords = new EquatorialCoordinates(10.13952778, 11.967222, 2000.0, -0.0169, 0.006);
+$date = Carbon::createMidnightDate(1978, 1, 1);
+$precessed_coords = $coords->precession($date);
+
+// Calculate the precession (with high precision)
+$coords = new EquatorialCoordinates(10.13952778, 11.967222, 2000.0, -0.0169, 0.006);
+$date = Carbon::createMidnightDate(1978, 1, 1);
+$precessed_coords = $coords->precessionHighAccuracy($date);
 ```
 
 ### Coordinate methods on ecliptical coordinates
@@ -247,6 +257,11 @@ print ($coords->printLatitude());
 $equatorial = $coords->convertToEquatorial($nutObliquity);
 $equatorial = $coords->convertToEquatorialJ2000();
 $equatorial = $coords->convertToEquatorialB1950();
+
+// Calculate the precession (with high precision)
+$coords = new EclipticalCoordinates(149.48194, 1.76549, 2000.0);
+$date = Carbon::create(-214, 6, 30, 0, 0, 0, 'UTC');
+$precessed_coords = $coords->precessionHighAccuracy($date);
 ```
 
 ### Coordinate methods on horizontal coordinates

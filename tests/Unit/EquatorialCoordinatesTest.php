@@ -298,4 +298,111 @@ class EquatorialCoordinatesTest extends BaseTestCase
             0.0001
         );
     }
+
+    /**
+     * Test precession.
+     *
+     * @return None
+     */
+    public function testPrecessionLow()
+    {
+        $coords = new EquatorialCoordinates(
+            10.13952778,
+            11.967222,
+            2000.0,
+            -0.0169,
+            0.006
+        );
+        $date = Carbon::createMidnightDate(1978, 1, 1);
+
+        $precessed_coords = $coords->precession($date);
+        $this->assertEqualsWithDelta(
+            10.12002778,
+            $precessed_coords->getRA()->getCoordinate(),
+            0.00001
+        );
+        $this->assertEqualsWithDelta(
+            12.075416,
+            $precessed_coords->getDeclination()->getCoordinate(),
+            0.00001
+        );
+    }
+
+    /**
+     * Test precession.
+     *
+     * @return None
+     */
+    public function testPrecessionHigh()
+    {
+        // Test for theta Persei
+        $coords = new EquatorialCoordinates(
+            2.736662778,
+            49.22846667,
+            2000.0,
+            0.03425,
+            -0.0895
+        );
+
+        $date = Carbon::create(2028, 11, 13, 4, 33, 36, 'UTC');
+
+        $precessed_coords = $coords->precessionHighAccuracy($date);
+        $this->assertEqualsWithDelta(
+            2.7698141667,
+            $precessed_coords->getRA()->getCoordinate(),
+            0.00001
+        );
+        $this->assertEqualsWithDelta(
+            49.34848333,
+            $precessed_coords->getDeclination()->getCoordinate(),
+            0.00001
+        );
+
+        // Test for polaris
+        $coords = new EquatorialCoordinates(
+            2.530195556,
+            89.26408889,
+            2000.0,
+            0.19877,
+            -0.0152
+        );
+        $date = Carbon::create(1900, 1, 1, 0, 0, 0, 'UTC');
+        $precessed_coords = $coords->precessionHighAccuracy($date);
+        $this->assertEqualsWithDelta(
+            1.376083333,
+            $precessed_coords->getRA()->getCoordinate(),
+            0.00001
+        );
+        $this->assertEqualsWithDelta(
+            88.77393889,
+            $precessed_coords->getDeclination()->getCoordinate(),
+            0.00001
+        );
+
+        $date = Carbon::create(2050, 1, 1, 12, 0, 0, 'UTC');
+        $precessed_coords = $coords->precessionHighAccuracy($date);
+        $this->assertEqualsWithDelta(
+            3.8046089,
+            $precessed_coords->getRA()->getCoordinate(),
+            0.00001
+        );
+        $this->assertEqualsWithDelta(
+            89.45427222,
+            $precessed_coords->getDeclination()->getCoordinate(),
+            0.00001
+        );
+
+        $date = Carbon::create(2100, 1, 1, 12, 0, 0, 'UTC');
+        $precessed_coords = $coords->precessionHighAccuracy($date);
+        $this->assertEqualsWithDelta(
+            5.891436111,
+            $precessed_coords->getRA()->getCoordinate(),
+            0.00001
+        );
+        $this->assertEqualsWithDelta(
+            89.539494444,
+            $precessed_coords->getDeclination()->getCoordinate(),
+            0.00001
+        );
+    }
 }
