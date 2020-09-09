@@ -12,9 +12,9 @@
 
 namespace Tests\Unit;
 
-use Illuminate\Support\Carbon;
-use deepskylog\AstronomyLibrary\Testing\BaseTestCase;
 use deepskylog\AstronomyLibrary\Coordinates\EclipticalCoordinates;
+use deepskylog\AstronomyLibrary\Testing\BaseTestCase;
+use Illuminate\Support\Carbon;
 
 /**
  * Tests for the EclipticalCoordinates class.
@@ -33,7 +33,7 @@ class EclipticalCoordinatesTest extends BaseTestCase
      *
      * @var string
      */
-    protected $appPath = __DIR__ . '/../../vendor/laravel/laravel/bootstrap/app.php';
+    protected $appPath = __DIR__.'/../../vendor/laravel/laravel/bootstrap/app.php';
 
     /**
      * Setup the test environment.
