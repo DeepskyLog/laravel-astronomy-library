@@ -42,7 +42,7 @@ class EclipticalCoordinates
     public function __construct(
         float $longitude,
         float $latitude,
-        float $epoch = 2000.0,
+        float $epoch = 2000.0
     ) {
         $this->setLongitude($longitude);
         $this->setLatitude($latitude);
