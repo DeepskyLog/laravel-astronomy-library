@@ -6,13 +6,14 @@ All notable changes to `laravel-astronomy-library` will be documented in this fi
 
 ### Added
 
-- Add precession method to calculate the precession for a given date with low accuracy.
-- Add precessionHighAccuracy method to calculate the precession for a given date with high accuracy.
+- Add precession method for EquatorialCoordinates to calculate the precession for a given date with low accuracy.  The proper motion of the star is taken into account for the calculation of the precession.
+- Add precessionHighAccuracy for EquatorialCoordinates method to calculate the precession for a given date with high accuracy.  The proper motion of the star is taken into account for the calculation of the precession.
+- Add precessionHighAccuracy for EclipticalCoordinates method to calculate the precession for a given date with high accuracy.  The proper motion of the star is not taken into account for the calculation of the precession.
 
 ### Changed
 
-- The constructor of the EquatorialCoordinates and the EclipticalCoordinates class now also takes the epoch of the coordinate as argument.  If the epoch is not given, the standard epoch of 2000.0 is taken.
-- The constructor of the EquatorialCoordinates and the EclipticalCoordinates class now also takes the proper motion (in RA and in dec) as arguments.  If the proper motion is not given, the value of 0.0 is taken.
+- The constructor of the EquatorialCoordinates class now also takes the epoch of the coordinate as argument.  If the epoch is not given, the standard epoch of 2000.0 is taken.
+- The constructor of the EquatorialCoordinates class now also takes the proper motion (in RA and in dec) as arguments.  If the proper motion is not given, the value of 0.0 is taken.
 
 ## Version 4.6
 

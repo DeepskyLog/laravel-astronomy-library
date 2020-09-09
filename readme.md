@@ -257,6 +257,11 @@ print ($coords->printLatitude());
 $equatorial = $coords->convertToEquatorial($nutObliquity);
 $equatorial = $coords->convertToEquatorialJ2000();
 $equatorial = $coords->convertToEquatorialB1950();
+
+// Calculate the precession (with high precision)
+$coords = new EclipticalCoordinates(149.48194, 1.76549, 2000.0);
+$date = Carbon::create(-214, 6, 30, 0, 0, 0, 'UTC');
+$precessed_coords = $coords->precessionHighAccuracy($date);
 ```
 
 ### Coordinate methods on horizontal coordinates

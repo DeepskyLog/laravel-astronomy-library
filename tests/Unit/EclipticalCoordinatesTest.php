@@ -12,8 +12,9 @@
 
 namespace Tests\Unit;
 
-use deepskylog\AstronomyLibrary\Coordinates\EclipticalCoordinates;
+use Illuminate\Support\Carbon;
 use deepskylog\AstronomyLibrary\Testing\BaseTestCase;
+use deepskylog\AstronomyLibrary\Coordinates\EclipticalCoordinates;
 
 /**
  * Tests for the EclipticalCoordinates class.
@@ -32,7 +33,7 @@ class EclipticalCoordinatesTest extends BaseTestCase
      *
      * @var string
      */
-    protected $appPath = __DIR__.'/../../vendor/laravel/laravel/bootstrap/app.php';
+    protected $appPath = __DIR__ . '/../../vendor/laravel/laravel/bootstrap/app.php';
 
     /**
      * Setup the test environment.
@@ -104,6 +105,35 @@ class EclipticalCoordinatesTest extends BaseTestCase
             28.026183,
             $equa->getDeclination()->getCoordinate(),
             0.00001
+        );
+    }
+
+    /**
+     * Test precession.
+     *
+     * @return None
+     */
+    public function testPrecessionHigh()
+    {
+        // Test for Venus
+        $coords = new EclipticalCoordinates(
+            149.48194,
+            1.76549,
+            2000.0
+        );
+
+        $date = Carbon::create(-214, 6, 30, 0, 0, 0, 'UTC');
+
+        $precessed_coords = $coords->precessionHighAccuracy($date);
+        $this->assertEqualsWithDelta(
+            118.704,
+            $precessed_coords->getLongitude()->getCoordinate(),
+            0.001
+        );
+        $this->assertEqualsWithDelta(
+            1.615,
+            $precessed_coords->getLatitude()->getCoordinate(),
+            0.001
         );
     }
 }

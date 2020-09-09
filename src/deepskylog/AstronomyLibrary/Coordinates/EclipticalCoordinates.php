@@ -31,8 +31,6 @@ class EclipticalCoordinates
     private Coordinate $_longitude;
     private Coordinate $_latitude;
     private float $_epoch = 2000.0;
-    private float $_deltaRA = 0.0;
-    private float $_deltaDec = 0.0;
 
     /**
      * The constructor.
@@ -40,23 +38,15 @@ class EclipticalCoordinates
      * @param float $longitude The ecliptical longitude (0, 360)
      * @param float $latitude  The ecliptical latitude (-90, 90)
      * @param float $epoch     The epoch of the target (2000.0 is standard)
-     * @param float $deltaRA   The proper motion in Right Ascension in seconds/year
-     *                         (in equatorial coordinates!)
-     * @param float $deltaDec  The proper motion in declination in ''/year
-     *                         (in equatorial coordinates!)
      */
     public function __construct(
         float $longitude,
         float $latitude,
         float $epoch = 2000.0,
-        float $deltaRA = 0.0,
-        float $deltaDec = 0.0
     ) {
         $this->setLongitude($longitude);
         $this->setLatitude($latitude);
         $this->setEpoch($epoch);
-        $this->setDeltaRA($deltaRA);
-        $this->setDeltaDec($deltaDec);
     }
 
     /**
@@ -96,32 +86,6 @@ class EclipticalCoordinates
     }
 
     /**
-     * Sets the proper motion in RA.
-     *
-     * @param float $deltaRA the proper motion in RA is seconds/year
-     *                       (in equatorial coordinates!)
-     *
-     * @return None
-     */
-    public function setDeltaRA(float $deltaRA): void
-    {
-        $this->_deltaRA = $deltaRA;
-    }
-
-    /**
-     * Sets the proper motion in declination.
-     *
-     * @param float $deltaDec the proper motion in declination in ''/year
-     *                        (in equatorial coordinates!)
-     *
-     * @return None
-     */
-    public function setDeltaDec(float $deltaDec): void
-    {
-        $this->_deltaDec = $deltaDec;
-    }
-
-    /**
      * Gets the ecliptical latitude.
      *
      * @return Coordinate the ecliptical latitude
@@ -149,28 +113,6 @@ class EclipticalCoordinates
     public function getEpoch(): float
     {
         return $this->_epoch;
-    }
-
-    /**
-     * Gets the the proper motion in RA.
-     *
-     * @return float The proper motion in RA in seconds/year
-     *               (in equatorial coordinates!)
-     */
-    public function getDeltaRA(): float
-    {
-        return $this->_deltaRA;
-    }
-
-    /**
-     * Gets the the proper motion in declination.
-     *
-     * @return float The proper motion in declination in ''/year
-     *               (in equatorial coordinates!)
-     */
-    public function getDeltaDec(): float
-    {
-        return $this->_deltaDec;
     }
 
     /**
@@ -250,5 +192,83 @@ class EclipticalCoordinates
     public function convertToEquatorialB1950(): EquatorialCoordinates
     {
         return $this->convertToEquatorial(23.4457889);
+    }
+
+    /**
+     * Returns the precession: the coordinates for another epoch and equinox.
+     * Chapter 21 of Astronomical Algorithms.
+     *
+     * @param Carbon $date The date for the new equinox
+     *
+     * @return EclipticalCoordinates the precessed coordinates
+     */
+    public function precessionHighAccuracy(Carbon $date): EclipticalCoordinates
+    {
+        $precessed_coordinates = clone $this;
+
+        $epoch_in_JD = Time::getJd(
+            Carbon::create($this->getEpoch(), 1, 1, 12, 0, 0, 'UTC')
+        );
+
+        $time_interval_J2000_starting = ($epoch_in_JD - 2451545.0) / 36525.0;
+
+        $jd = Time::getJd($date);
+
+        $time_interval_starting_final = ($jd - $epoch_in_JD) / 36525.0;
+
+        $eta = (
+            (
+                47.0029
+                - 0.06603 * $time_interval_J2000_starting
+                + 0.000598 * $time_interval_J2000_starting ** 2
+            ) * $time_interval_starting_final
+            + (-0.03302 + 0.000598 * $time_interval_J2000_starting)
+                * $time_interval_starting_final ** 2
+            + 0.000060 * $time_interval_starting_final ** 3
+        ) / 3600.0;
+
+        $pi = (
+            (
+                174.876384 * 3600.0
+                + 3289.4789 * $time_interval_J2000_starting
+                + 0.60622 * $time_interval_J2000_starting ** 2
+            )
+            - (869.8089 + 0.50491 * $time_interval_J2000_starting)
+                * $time_interval_starting_final
+            + 0.03536 * $time_interval_starting_final ** 2
+        ) / 3600.0;
+
+        $rho = (
+            (
+                5029.0966
+                + 2.22226 * $time_interval_J2000_starting
+                - 0.000042 * $time_interval_J2000_starting ** 2
+            ) * $time_interval_starting_final
+            + (1.11113 - 0.000042 * $time_interval_J2000_starting)
+                 * $time_interval_starting_final ** 2
+            - 0.000006 * $time_interval_starting_final ** 3
+        ) / 3600.0;
+
+        $A_accent = cos(deg2rad($eta))
+            * cos(deg2rad($this->getLatitude()->getCoordinate()))
+            * sin(deg2rad($pi - $this->getLongitude()->getCoordinate()))
+            - sin(deg2rad($eta))
+            * sin(deg2rad($this->getLatitude()->getCoordinate()));
+
+        $B_accent = cos(deg2rad($this->getLatitude()->getCoordinate()))
+            * cos(deg2rad($pi - $this->getLongitude()->getCoordinate()));
+
+        $C_accent = cos(deg2rad($eta))
+            * sin(deg2rad($this->getLatitude()->getCoordinate()))
+            + sin(deg2rad($eta))
+            * cos(deg2rad($this->getLatitude()->getCoordinate()))
+            * sin(deg2rad($pi - $this->getLongitude()->getCoordinate()));
+
+        $precessed_coordinates->setLongitude(
+            $rho + $pi - rad2deg(atan2($A_accent, $B_accent))
+        );
+        $precessed_coordinates->setLatitude(rad2deg(asin($C_accent)));
+
+        return $precessed_coordinates;
     }
 }
