@@ -309,7 +309,7 @@ class AstronomyLibrary
      */
     public function getLengthOfNightPlot($timezone): string
     {
-        if (!$this->_lengthOfNightChart) {
+        if (! $this->_lengthOfNightChart) {
             $date = Carbon::now();
             $date->year($this->getDate()->year);
 
@@ -684,7 +684,7 @@ class AstronomyLibrary
             $rawImageBytes = ob_get_clean();
 
             $this->_lengthOfNightChart = "<img src='data:image/jpeg;base64,"
-                . base64_encode($rawImageBytes) . "' />";
+                .base64_encode($rawImageBytes)."' />";
         }
 
         return $this->_lengthOfNightChart;
