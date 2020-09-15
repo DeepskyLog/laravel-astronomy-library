@@ -2,6 +2,12 @@
 
 All notable changes to `laravel-astronomy-library` will be documented in this file.
 
+## Version 4.8
+
+### Added
+
+- Add methods to calculate the apparent place of a star, using the Ron-Vondrák expression. The calculations take into account the perturbations caused by the planets, the precession and the nutation.
+
 ## Version 4.7
 
 ### Added

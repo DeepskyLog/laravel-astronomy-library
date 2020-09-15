@@ -586,6 +586,40 @@ class EquatorialCoordinates
     }
 
     /**
+     * Calculate the coordinates including the proper motion.
+     *
+     * @param Carbon $date The Carbon data
+     *
+     * @return EquatorialCoordinates the coordinates including the proper motion for
+     *                               the given date
+     */
+    private function _coordinatesWithProperMotion(
+        Carbon $date
+    ): EquatorialCoordinates {
+        $coordinates = clone $this;
+
+        $epoch_in_JD = Time::getJd(
+            Carbon::create($this->getEpoch(), 1, 1, 12, 0, 0, 'UTC')
+        );
+
+        $jd = Time::getJd($date);
+
+        $time_interval_starting_final = ($jd - $epoch_in_JD) / 36525.0;
+
+        $ra_with_proper_motion = (
+            $this->getRA()->getCoordinate()
+            + $this->getDeltaRA() * $time_interval_starting_final * 100.0 / 3600.0
+        );
+        $dec_with_proper_motion = $this->getDeclination()->getCoordinate()
+            + $this->getDeltaDec() * $time_interval_starting_final * 100.0 / 3600.0;
+
+        $coordinates->setRA($ra_with_proper_motion);
+        $coordinates->setDeclination($dec_with_proper_motion);
+
+        return $coordinates;
+    }
+
+    /**
      * Returns the precession: the coordinates for another epoch and equinox.
      * Chapter 21 of Astronomical Algorithms.
      *
@@ -593,10 +627,9 @@ class EquatorialCoordinates
      *
      * @return EquatorialCoordinates the precessed coordinates
      */
-    public function precessionHighAccuracy(Carbon $date): EquatorialCoordinates
-    {
-        $precessed_coordinates = clone $this;
-
+    public function precessionHighAccuracy(
+        Carbon $date
+    ): EquatorialCoordinates {
         $epoch_in_JD = Time::getJd(
             Carbon::create($this->getEpoch(), 1, 1, 12, 0, 0, 'UTC')
         );
@@ -607,12 +640,14 @@ class EquatorialCoordinates
 
         $time_interval_starting_final = ($jd - $epoch_in_JD) / 36525.0;
 
-        $ra_with_proper_motion = (
-            $this->getRA()->getCoordinate()
-            + $this->getDeltaRA() * $time_interval_starting_final * 100.0 / 3600.0
-        ) * 15.0;
-        $dec_with_proper_motion = $this->getDeclination()->getCoordinate()
-            + $this->getDeltaDec() * $time_interval_starting_final * 100.0 / 3600.0;
+        $precessed_coordinates = clone $this;
+
+        $proper_motion_coordinates = $this->_coordinatesWithProperMotion($date);
+
+        $ra_with_proper_motion = $proper_motion_coordinates
+            ->getRA()->getCoordinate() * 15.0;
+        $dec_with_proper_motion = $proper_motion_coordinates
+            ->getDeclination()->getCoordinate();
 
         $ksi = (
             (2306.2181
@@ -662,5 +697,279 @@ class EquatorialCoordinates
         $precessed_coordinates->setDeclination(rad2deg(asin($C)));
 
         return $precessed_coordinates;
+    }
+
+    /**
+     * Returns the apparent place of a star.
+     * Chapter 23 of Astronomical Algorithms.
+     *
+     * @param Carbon $date     The date for the new equinox
+     * @param array  $nutation The nutation for the given data
+     *
+     * @return EquatorialCoordinates the precessed coordinates
+     */
+    public function apparentPlace(
+        Carbon $date,
+        array $nutation
+    ): EquatorialCoordinates {
+        $epoch_in_JD = Time::getJd(
+            Carbon::create($this->getEpoch(), 1, 1, 12, 0, 0, 'UTC')
+        );
+
+        $jd = Time::getJd($date);
+
+        $time_interval_starting_final = ($jd - $epoch_in_JD) / 36525.0;
+
+        $coordinates = $this->_coordinatesWithProperMotion($date);
+
+        // Calculate the perturbations caused by the sun and the planets
+        $L2 = 3.1761467 + 1021.3285546 * $time_interval_starting_final;
+        $L3 = 1.7534703 + 628.3075849 * $time_interval_starting_final;
+        $L4 = 6.2034809 + 334.0612431 * $time_interval_starting_final;
+        $L5 = 0.5995465 + 52.9690965 * $time_interval_starting_final;
+        $L6 = 0.8740168 + 21.3299095 * $time_interval_starting_final;
+        $L7 = 5.4812939 + 7.4781599 * $time_interval_starting_final;
+        $L8 = 5.3118863 + 3.8133036 * $time_interval_starting_final;
+        $L_accent = 3.8103444 + 8399.6847337 * $time_interval_starting_final;
+        $D = 5.1984667 + 7771.3771486 * $time_interval_starting_final;
+        $M_accent = 2.3555559 + 8328.6914289 * $time_interval_starting_final;
+        $F = 1.6279052 + 8433.4661601 * $time_interval_starting_final;
+
+        $X_accent = (-1719914 - 2 * $time_interval_starting_final) * sin($L3)
+            - 25 * cos($L3)
+            + (6434 + 141 * $time_interval_starting_final) * sin(2 * $L3)
+            + (28007 - 107 * $time_interval_starting_final) * cos(2 * $L3)
+            + (715) * sin($L5)
+            + (715) * sin($L_accent)
+            + (486 - 5 * $time_interval_starting_final) * sin(3 * $L3)
+            + (-236 - 4 * $time_interval_starting_final) * cos(3 * $L3)
+            + (159) * sin($L6)
+            + (39) * sin($L_accent + $M_accent)
+            + (33) * sin(2 * $L5)
+            + (-10) * cos(2 * $L5)
+            + (31) * sin(2 * $L3 - $L5)
+            + (1) * cos(2 * $L3 - $L5)
+            + (8) * sin(3 * $L3 - 8 * $L4 + 3 * $L5)
+            + (-28) * cos(3 * $L3 - 8 * $L4 + 3 * $L5)
+            + (8) * sin(5 * $L3 - 8 * $L4 + 3 * $L5)
+            + (-28) * cos(5 * $L3 - 8 * $L4 + 3 * $L5)
+            + (21) * sin(2 * $L2 - $L3)
+            + (-19) * sin($L2)
+            + (17) * sin($L7)
+            + (16) * sin($L3 - 2 * $L5)
+            + (16) * sin($L8)
+            + (11) * sin($L3 + $L5)
+            + (-1) * cos($L3 + $L5)
+            + (-11) * cos(2 * $L2 - 2 * $L3)
+            + (-11) * sin($L3 - $L5)
+            + (-2) * cos($L3 - $L5)
+            + (-7) * sin(4 * $L3)
+            + (-8) * cos(4 * $L3)
+            + (-10) * sin(3 * $L3 - 2 * $L5)
+            + (-9) * sin($L2 - 2 * $L3)
+            + (-9) * sin(2 * $L2 - 3 * $L3)
+            + (-9) * cos(2 * $L6)
+            + (-9) * cos(2 * $L2 - 4 * $L3)
+            + (8) * sin(3 * $L3 - 2 * $L4)
+            + (8) * sin($L_accent + 2 * $D - $M_accent)
+            + (-4) * sin(8 * $L2 - 12 * $L3)
+            + (-7) * cos(8 * $L2 - 12 * $L3)
+            + (-4) * sin(8 * $L2 - 14 * $L3)
+            + (-7) * cos(8 * $L2 - 14 * $L3)
+            + (-6) * sin(2 * $L4)
+            + (-5) * cos(2 * $L4)
+            + (-1) * sin(3 * $L2 - 4 * $L3)
+            + (-1) * cos(3 * $L2 - 4 * $L3)
+            + (4) * sin(2 * $L3 - 2 * $L5)
+            + (-6) * cos(2 * $L3 - 2 * $L5)
+            + (-7) * cos(3 * $L2 - 3 * $L3)
+            + (5) * sin(2 * $L3 - 2 * $L4)
+            + (-5) * cos(2 * $L3 - 2 * $L4)
+            + (5) * sin($L_accent - 2 * $D);
+
+        $Y_accent = (25 - 13 * $time_interval_starting_final) * sin($L3)
+            + (1578089 + 156 * $time_interval_starting_final) * cos($L3)
+            + (25697 - 95 * $time_interval_starting_final) * sin(2 * $L3)
+            + (-5904 - 130 * $time_interval_starting_final) * cos(2 * $L3)
+            + (6) * sin($L5)
+            + (-657) * cos($L5)
+            + (-656) * cos($L_accent)
+            + (-216 - 4 * $time_interval_starting_final) * sin(3 * $L3)
+            + (-446 - 5 * $time_interval_starting_final) * cos(3 * $L3)
+            + (2) * sin($L6)
+            + (-147) * cos($L6)
+            + (26) * cos($F)
+            + (-36) * cos($L_accent + $M_accent)
+            + (-9) * sin(2 * $L5)
+            + (-30) * cos(2 * $L5)
+            + (1) * sin(2 * $L3 - $L5)
+            + (-28) * cos(2 * $L3 - $L5)
+            + (25) * sin(3 * $L3 - 8 * $L4 + 3 * $L5)
+            + (8) * cos(3 * $L3 - 8 * $L4 + 3 * $L5)
+            + (-25) * sin(5 * $L3 - 8 * $L4 + 3 * $L5)
+            + (-8) * cos(5 * $L3 - 8 * $L4 + 3 * $L5)
+            + (-19) * cos(2 * $L2 - $L3)
+            + (17) * cos($L2)
+            + (-16) * cos($L7)
+            + (15) * cos($L3 - 2 * $L5)
+            + (1) * sin($L8)
+            + (-15) * cos($L8)
+            + (-1) * sin($L3 + $L5)
+            + (-10) * cos($L3 + $L5)
+            + (-10) * sin(2 * $L2 - 2 * $L3)
+            + (-2) * sin($L3 - $L5)
+            + (9) * cos($L3 - $L5)
+            + (-8) * sin(4 * $L3)
+            + (6) * cos(4 * $L3)
+            + (9) * cos(3 * $L3 - 2 * $L5)
+            + (-9) * cos($L2 - 2 * $L3)
+            + (-8) * cos(2 * $L2 - 3 * $L3)
+            + (-8) * sin(2 * $L6)
+            + (8) * sin(2 * $L2 - 4 * $L3)
+            + (-8) * cos(3 * $L3 - 2 * $L4)
+            + (-7) * cos($L_accent + 2 * $D - $M_accent)
+            + (-6) * sin(8 * $L2 - 12 * $L3)
+            + (4) * cos(8 * $L2 - 12 * $L3)
+            + (6) * sin(8 * $L2 - 14 * $L3)
+            + (-4) * cos(8 * $L2 - 14 * $L3)
+            + (-4) * sin(2 * $L4)
+            + (5) * cos(2 * $L4)
+            + (-2) * sin(3 * $L2 - 4 * $L3)
+            + (-7) * cos(3 * $L2 - 4 * $L3)
+            + (-5) * sin(2 * $L3 - 2 * $L5)
+            + (-4) * cos(2 * $L3 - 2 * $L5)
+            + (-6) * sin(3 * $L2 - 3 * $L3)
+            + (-4) * sin(2 * $L3 - 2 * $L4)
+            + (-5) * cos(2 * $L3 - 2 * $L4)
+            + (-5) * cos($L_accent - 2 * $D);
+
+        $Z_accent = (10 + 32 * $time_interval_starting_final) * sin($L3)
+            + (684185 - 358 * $time_interval_starting_final) * cos($L3)
+            + (11141 - 48 * $time_interval_starting_final) * sin(2 * $L3)
+            + (-2559 - 55 * $time_interval_starting_final) * cos(2 * $L3)
+            + (-15) * sin($L5)
+            + (-282) * cos($L5)
+            + (-285) * cos($L_accent)
+            + (-94) * sin(3 * $L3)
+            + (-193) * cos(3 * $L3)
+            + (-6) * sin($L6)
+            + (-61) * cos($L6)
+            + (-59) * cos($F)
+            + (-16) * cos($L_accent + $M_accent)
+            + (-5) * sin(2 * $L5)
+            + (-13) * cos(2 * $L5)
+            + (-12) * cos(2 * $L3 - $L5)
+            + (11) * sin(3 * $L3 - 8 * $L4 + 3 * $L5)
+            + (3) * cos(3 * $L3 - 8 * $L4 + 3 * $L5)
+            + (-11) * sin(5 * $L3 - 8 * $L4 + 3 * $L5)
+            + (-3) * cos(5 * $L3 - 8 * $L4 + 3 * $L5)
+            + (-8) * cos(2 * $L2 - $L3)
+            + (8) * cos($L2)
+            + (-7) * cos($L7)
+            + (1) * sin($L3 - 2 * $L5)
+            + (7) * cos($L3 - 2 * $L5)
+            + (-3) * sin($L8)
+            + (-6) * cos($L8)
+            + (-1) * sin($L3 + $L5)
+            + (-5) * cos($L3 + $L5)
+            + (-4) * sin(2 * $L2 - 2 * $L3)
+            + (-1) * sin($L3 - $L5)
+            + (4) * cos($L3 - $L5)
+            + (-3) * sin(4 * $L3)
+            + (3) * cos(4 * $L3)
+            + (4) * cos(3 * $L3 - 2 * $L5)
+            + (-4) * cos($L2 - 2 * $L3)
+            + (-4) * cos(2 * $L2 - 3 * $L3)
+            + (-3) * sin(2 * $L6)
+            + (3) * sin(2 * $L2 - 4 * $L3)
+            + (-3) * cos(3 * $L3 - 2 * $L4)
+            + (-3) * cos($L_accent + 2 * $D - $M_accent)
+            + (-3) * sin(8 * $L2 - 12 * $L3)
+            + (2) * cos(8 * $L2 - 12 * $L3)
+            + (3) * sin(8 * $L2 - 14 * $L3)
+            + (-2) * cos(8 * $L2 - 14 * $L3)
+            + (-2) * sin(2 * $L4)
+            + (-2) * cos(2 * $L4)
+            + (1) * sin(3 * $L2 - 4 * $L3)
+            + (-4) * cos(3 * $L2 - 4 * $L3)
+            + (-2) * sin(2 * $L3 - 2 * $L5)
+            + (-2) * cos(2 * $L3 - 2 * $L5)
+            + (-3) * sin(3 * $L2 - 3 * $L3)
+            + (-2) * sin(2 * $L3 - 2 * $L4)
+            + (-2) * cos(2 * $L3 - 2 * $L4)
+            + (-2) * cos($L_accent - 2 * $D);
+
+        $delta_ra = rad2deg(
+            (
+                $Y_accent
+                * cos(deg2rad($coordinates->getRA()->getCoordinate() * 15.0))
+                - $X_accent
+                * sin(deg2rad($coordinates->getRA()->getCoordinate() * 15.0))
+            )
+            / (
+                17314463350
+            * cos(deg2rad($coordinates->getDeclination()->getCoordinate()))
+            )
+        );
+
+        $delta_dec = -rad2deg(
+            (
+                (
+                    $X_accent
+                    * cos(deg2rad($coordinates->getRA()->getCoordinate() * 15.0))
+            + $Y_accent * sin(deg2rad($coordinates->getRA()->getCoordinate() * 15.0))
+                ) * sin(deg2rad($coordinates->getDeclination()->getCoordinate()))
+            - $Z_accent
+            * cos(deg2rad($coordinates->getDeclination()->getCoordinate()))
+            ) / 17314463350
+        );
+
+        // Add to coordinates
+        $coordinates->setRA(
+            ($coordinates->getRA()->getCoordinate() * 15.0 + $delta_ra) / 15.0
+        );
+
+        $coordinates->setDeclination(
+            $coordinates->getDeclination()->getCoordinate() + $delta_dec
+        );
+
+        // Calculate the precession (but don't take into account the proper motion,
+        // we already did this)
+        $precessed_coordinates = new EquatorialCoordinates(
+            $coordinates->getRA()->getCoordinate(),
+            $coordinates->getDeclination()->getCoordinate(),
+            $coordinates->getEpoch(),
+            0.0,
+            0.0
+        );
+
+        $coordinates = $precessed_coordinates->precessionHighAccuracy($date, false);
+
+        // Add effect of nutation
+        $delta_ra = (
+            cos(deg2rad($nutation[3])) + sin(deg2rad($nutation[3])) * sin(
+                deg2rad($coordinates->getRA()->getCoordinate() * 15.0)
+            ) * tan(deg2rad($coordinates->getDeclination()->getCoordinate()))
+        ) * $nutation[0]
+            - (cos(deg2rad($coordinates->getRA()->getCoordinate() * 15.0))
+            * tan(deg2rad($coordinates->getDeclination()->getCoordinate())))
+            * $nutation[1];
+
+        $delta_dec = sin(deg2rad($nutation[3]))
+            * cos(deg2rad($coordinates->getRA()->getCoordinate() * 15.0))
+            * $nutation[0]
+            + sin(deg2rad($coordinates->getRA()->getCoordinate() * 15.0))
+            * $nutation[1];
+
+        $coordinates->setRA(
+            ($coordinates->getRA()->getCoordinate() * 15.0 + $delta_ra / 3600.0)
+             / 15.0
+        );
+
+        $coordinates->setDeclination(
+            $coordinates->getDeclination()->getCoordinate() + $delta_dec / 3600.0
+        );
+
+        return $coordinates;
     }
 }
