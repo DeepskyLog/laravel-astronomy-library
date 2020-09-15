@@ -746,4 +746,17 @@ class AstronomyLibrary
     ): Coordinate {
         return $coords1->smallestCircle($coords2, $coords3);
     }
+
+    /**
+     * Returns the apparent place of a star.
+     *
+     * @param EquatorialCoordinates $coords The coordinates to start with
+     *
+     * @return EquatorialCoordinates The apparent place for the star
+     */
+    public function apparentPlace(
+        EquatorialCoordinates $coords
+    ): EquatorialCoordinates {
+        return $coords->apparentPlace($this->getDate(), $this->getNutation());
+    }
 }

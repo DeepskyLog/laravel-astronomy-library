@@ -18,6 +18,7 @@ use deepskylog\AstronomyLibrary\Coordinates\EquatorialCoordinates;
 use deepskylog\AstronomyLibrary\Coordinates\GeographicalCoordinates;
 use deepskylog\AstronomyLibrary\Coordinates\HorizontalCoordinates;
 use deepskylog\AstronomyLibrary\Testing\BaseTestCase;
+use deepskylog\AstronomyLibrary\Time;
 
 /**
  * Tests for the EquatorialCoordinates class.
@@ -402,6 +403,41 @@ class EquatorialCoordinatesTest extends BaseTestCase
         $this->assertEqualsWithDelta(
             89.539494444,
             $precessed_coords->getDeclination()->getCoordinate(),
+            0.00001
+        );
+    }
+
+    /**
+     * Test apparent place of a star.
+     *
+     * @return None
+     */
+    public function testApparentPlace()
+    {
+        // Test for theta Persei
+        $coords = new EquatorialCoordinates(
+            2.736662778,
+            49.22846667,
+            2000.0,
+            0.03425,
+            -0.0895
+        );
+
+        $date = Carbon::create(2028, 11, 13, 4, 33, 36, 'UTC');
+        $jd = Time::getJd($date);
+
+        $nutation = Time::nutation($jd);
+
+        $apparentPlace = $coords->apparentPlace($date, $nutation);
+
+        $this->assertEqualsWithDelta(
+            2.7706643,
+            $apparentPlace->getRA()->getCoordinate(),
+            0.00001
+        );
+        $this->assertEqualsWithDelta(
+            49.3520685,
+            $apparentPlace->getDeclination()->getCoordinate(),
             0.00001
         );
     }

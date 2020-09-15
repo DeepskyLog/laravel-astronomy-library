@@ -193,6 +193,9 @@ $coords1 = new EquatorialCoordinates(12.6857305, -5.631722);
 $coords2 = new EquatorialCoordinates(12.8681138, -4.373944);
 $coords3 = new EquatorialCoordinates(12.6578083, -1.834361);
 $diameter = $astrolib->smallestCircle($coords1, $coords2, $coords3);
+
+$coords1 = new EquatorialCoordinates(2.736662778, 49.22846667, 2000.0, 0.03425, -0.0895);
+$appararentPlace = $astrolib->apparentPlace($coords1);
 ```
 
 ### Coordinate methods on equatorial coordinates
