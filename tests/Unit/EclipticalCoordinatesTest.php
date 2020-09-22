@@ -13,8 +13,8 @@
 namespace Tests\Unit;
 
 use Carbon\Carbon;
-use deepskylog\AstronomyLibrary\Testing\BaseTestCase;
 use deepskylog\AstronomyLibrary\Coordinates\EclipticalCoordinates;
+use deepskylog\AstronomyLibrary\Testing\BaseTestCase;
 
 /**
  * Tests for the EclipticalCoordinates class.
