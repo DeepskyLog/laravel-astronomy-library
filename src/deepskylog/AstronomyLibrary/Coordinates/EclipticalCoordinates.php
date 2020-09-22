@@ -13,8 +13,8 @@
 
 namespace deepskylog\AstronomyLibrary\Coordinates;
 
+use Carbon\Carbon;
 use deepskylog\AstronomyLibrary\Time;
-use Illuminate\Support\Carbon;
 
 /**
  * EclipticalCoordinates class.

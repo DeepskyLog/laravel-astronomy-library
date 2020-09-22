@@ -12,9 +12,9 @@
 
 namespace Tests\Unit;
 
+use Carbon\Carbon;
 use deepskylog\AstronomyLibrary\Coordinates\EclipticalCoordinates;
 use deepskylog\AstronomyLibrary\Testing\BaseTestCase;
-use Illuminate\Support\Carbon;
 
 /**
  * Tests for the EclipticalCoordinates class.

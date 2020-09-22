@@ -13,11 +13,11 @@
 
 namespace deepskylog\AstronomyLibrary\Targets;
 
+use Carbon\Carbon;
 use deepskylog\AstronomyLibrary\Coordinates\Coordinate;
 use deepskylog\AstronomyLibrary\Coordinates\EclipticalCoordinates;
 use deepskylog\AstronomyLibrary\Coordinates\EquatorialCoordinates;
 use deepskylog\AstronomyLibrary\Time;
-use Illuminate\Support\Carbon;
 
 /**
  * The target class describing the sun.
