@@ -2,6 +2,12 @@
 
 All notable changes to `laravel-astronomy-library` will be documented in this file.
 
+## Version 4.9
+
+### Added 
+
+- Add methods to calculate the equatorial coordinates of the sun.
+
 ## Version 4.8
 
 ### Added

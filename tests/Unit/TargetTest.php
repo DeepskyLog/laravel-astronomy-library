@@ -18,7 +18,6 @@ use deepskylog\AstronomyLibrary\Coordinates\EquatorialCoordinates;
 use deepskylog\AstronomyLibrary\Coordinates\GeographicalCoordinates;
 use deepskylog\AstronomyLibrary\Targets\Moon;
 use deepskylog\AstronomyLibrary\Targets\Planet;
-use deepskylog\AstronomyLibrary\Targets\Sun;
 use deepskylog\AstronomyLibrary\Targets\Target;
 use deepskylog\AstronomyLibrary\Testing\BaseTestCase;
 use deepskylog\AstronomyLibrary\Time;
@@ -40,7 +39,7 @@ class TargetTest extends BaseTestCase
      *
      * @var string
      */
-    protected $appPath = __DIR__.'/../../vendor/laravel/laravel/bootstrap/app.php';
+    protected $appPath = __DIR__ . '/../../vendor/laravel/laravel/bootstrap/app.php';
 
     /**
      * Setup the test environment.
@@ -50,17 +49,6 @@ class TargetTest extends BaseTestCase
     protected function setUp(): void
     {
         parent::setUp();
-    }
-
-    /**
-     * Test sun class.
-     *
-     * @return None
-     */
-    public function testSunClass()
-    {
-        $sun = new Sun();
-        $this->assertEquals(-0.8333, $sun->getH0());
     }
 
     /**

@@ -362,6 +362,18 @@ echo $target->getBestTimeToObserve();
 // Return the altitude graph for the target for the given date
 // In blade:
 {!! $target->getAltitudeGraph() !!}
+
+// Calculate the equatorial coordinates of the sun in low accuracy
+$sun = new Sun();
+$nutation = Time::nutation(Time::getJd($date));
+$sun->calculateEquatorialCoordinates($date, $nutation[3]);
+$coordinates = $sun->getEquatorialCoordinates();
+
+// Calculate the equatorial coordinates of the sun in high accuracy
+$sun = new Sun();
+$nutation = Time::nutation(Time::getJd($date));
+$sun->calculateEquatorialCoordinatesHighAccuracy($date, $nutation);
+$coordinates = $sun->getEquatorialCoordinates();
 ```
 
 ## Change log
