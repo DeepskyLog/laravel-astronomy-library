@@ -2,9 +2,13 @@
 
 All notable changes to `laravel-astronomy-library` will be documented in this file.
 
+## Version 4.9.1
+
+- Use \Carbon\Carbon everywhere in the code
+
 ## Version 4.9
 
-### Added 
+### Added
 
 - Add methods to calculate the equatorial coordinates of the sun.
 
