@@ -245,6 +245,10 @@ $precessed_coords = $coords->precession($date);
 $coords = new EquatorialCoordinates(10.13952778, 11.967222, 2000.0, -0.0169, 0.006);
 $date = Carbon::createMidnightDate(1978, 1, 1);
 $precessed_coords = $coords->precessionHighAccuracy($date);
+
+// Calculate the apparent place of an object
+$coords = new EquatorialCoordinates(2.736662778, 49.22846667, 2000.0, 0.03425, -0.0895);
+$appararentPlace = $coords->apparentPlace($date, $nutation);
 ```
 
 ### Coordinate methods on ecliptical coordinates
@@ -358,6 +362,18 @@ echo $target->getBestTimeToObserve();
 // Return the altitude graph for the target for the given date
 // In blade:
 {!! $target->getAltitudeGraph() !!}
+
+// Calculate the equatorial coordinates of the sun in low accuracy
+$sun = new Sun();
+$nutation = Time::nutation(Time::getJd($date));
+$sun->calculateEquatorialCoordinates($date, $nutation[3]);
+$coordinates = $sun->getEquatorialCoordinates();
+
+// Calculate the equatorial coordinates of the sun in high accuracy
+$sun = new Sun();
+$nutation = Time::nutation(Time::getJd($date));
+$sun->calculateEquatorialCoordinatesHighAccuracy($date, $nutation);
+$coordinates = $sun->getEquatorialCoordinates();
 ```
 
 ## Change log
