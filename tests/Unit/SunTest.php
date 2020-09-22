@@ -73,10 +73,6 @@ class SunTest extends BaseTestCase
 
         $this->assertEqualsWithDelta(13.225445021, $coordinates->getRA()->getCoordinate(), 0.00001);
         $this->assertEqualsWithDelta(-7.785469, $coordinates->getDeclination()->getCoordinate(), 0.00001);
-
-        dump($sun->getEquatorialCoordinatesYesterday());
-        dump($sun->getEquatorialCoordinatesToday());
-        dump($sun->getEquatorialCoordinatesTomorrow());
     }
 
     public function testEquatorialCoordinatesHighAccuracy()
