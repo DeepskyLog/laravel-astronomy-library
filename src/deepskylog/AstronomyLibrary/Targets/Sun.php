@@ -6,9 +6,11 @@
  * PHP Version 7
  *
  * @category Target
+ *
  * @author   Deepsky Developers <developers@deepskylog.be>
  * @license  GPL3 <https://opensource.org/licenses/GPL-3.0>
- * @link     http://www.deepskylog.org
+ *
+ * @see     http://www.deepskylog.org
  */
 
 namespace deepskylog\AstronomyLibrary\Targets;
@@ -25,9 +27,11 @@ use deepskylog\AstronomyLibrary\Time;
  * PHP Version 7
  *
  * @category Target
+ *
  * @author   Deepsky Developers <developers@deepskylog.be>
  * @license  GPL3 <https://opensource.org/licenses/GPL-3.0>
- * @link     http://www.deepskylog.org
+ *
+ * @see     http://www.deepskylog.org
  */
 class Sun extends Target
 {
@@ -48,6 +52,29 @@ class Sun extends Target
      * See chapter 25 of Astronomical Algorithms
      */
     public function calculateEquatorialCoordinates(Carbon $date, float $obliquity): void
+    {
+        $this->setEquatorialCoordinatesToday(
+            $this->_calculateEquatorialCoordinates($date, $obliquity)
+        );
+        $this->setEquatorialCoordinatesTomorrow(
+            $this->_calculateEquatorialCoordinates($date->addDay(), $obliquity)
+        );
+        $this->setEquatorialCoordinatesYesterday(
+            $this->_calculateEquatorialCoordinates($date->subDays(2), $obliquity)
+        );
+    }
+
+    /**
+     * Calculates the equatorial coordinates of the sun with a low accuracy (0.01 degree).
+     *
+     * @param Carbon $date      The date for which to calculate the coordinates
+     * @param float  $obliquity The obliquity of the ecliptic for the given date
+     *
+     * @return EquatorialCoordinates The equatorial coordinates for the given date.
+     *
+     * See chapter 25 of Astronomical Algorithms
+     */
+    private function _calculateEquatorialCoordinates(Carbon $date, float $obliquity): EquatorialCoordinates
     {
         // T = julian centuries since epoch J2000.0
         $julian_centuries = (Time::getJd($date) - 2451545.0) / 36525.0;
@@ -91,8 +118,7 @@ class Sun extends Target
             )
         );
 
-        $equa = new EquatorialCoordinates($ra, $decl);
-        $this->setEquatorialCoordinates($equa);
+        return new EquatorialCoordinates($ra, $decl);
     }
 
     /**
@@ -104,6 +130,29 @@ class Sun extends Target
      * See chapter 25 of Astronomical Algorithms
      */
     public function calculateEquatorialCoordinatesHighAccuracy(Carbon $date, array $nutation): void
+    {
+        $this->setEquatorialCoordinatesToday(
+            $this->_calculateEquatorialCoordinatesHighAccuracy($date, $nutation)
+        );
+        $this->setEquatorialCoordinatesTomorrow(
+            $this->_calculateEquatorialCoordinatesHighAccuracy($date->addDay(), $nutation)
+        );
+        $this->setEquatorialCoordinatesYesterday(
+            $this->_calculateEquatorialCoordinatesHighAccuracy($date->subDays(2), $nutation)
+        );
+    }
+
+    /**
+     * Calculates the equatorial coordinates of the sun with a high accuracy.
+     *
+     * @param Carbon $date     The date for which to calculate the coordinates
+     * @param array  $nutation The nutation
+     *
+     * @return EquatorialCoordinates The coordinates for the given date
+     *
+     * See chapter 25 of Astronomical Algorithms
+     */
+    private function _calculateEquatorialCoordinatesHighAccuracy(Carbon $date, array $nutation): EquatorialCoordinates
     {
         // tau = julian millenia since epoch J2000.0
         $tau = (Time::getJd($date) - 2451545.0) / 365250.0;
@@ -334,6 +383,7 @@ class Sun extends Target
 
         $lambda = $Odot + ($nutation[0] - 20.4898 / $R) / 3600.0;
         $ecl = new EclipticalCoordinates($lambda, $beta);
-        $this->setEquatorialCoordinates($ecl->convertToEquatorial($nutation[3]));
+
+        return $ecl->convertToEquatorial($nutation[3]);
     }
 }
