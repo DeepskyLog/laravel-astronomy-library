@@ -14,9 +14,9 @@
 namespace Tests\Unit;
 
 use Carbon\Carbon;
-use deepskylog\AstronomyLibrary\Time;
 use deepskylog\AstronomyLibrary\Targets\Sun;
 use deepskylog\AstronomyLibrary\Testing\BaseTestCase;
+use deepskylog\AstronomyLibrary\Time;
 
 /**
  * Tests for the sun class.
