@@ -13,10 +13,10 @@
 
 namespace Tests\Unit;
 
-use Illuminate\Support\Carbon;
-use deepskylog\AstronomyLibrary\Time;
 use deepskylog\AstronomyLibrary\Targets\Sun;
 use deepskylog\AstronomyLibrary\Testing\BaseTestCase;
+use deepskylog\AstronomyLibrary\Time;
+use Illuminate\Support\Carbon;
 
 /**
  * Tests for the sun class.
@@ -35,7 +35,7 @@ class SunTest extends BaseTestCase
      *
      * @var string
      */
-    protected $appPath = __DIR__ . '/../../vendor/laravel/laravel/bootstrap/app.php';
+    protected $appPath = __DIR__.'/../../vendor/laravel/laravel/bootstrap/app.php';
 
     /**
      * Setup the test environment.
