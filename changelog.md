@@ -2,7 +2,15 @@
 
 All notable changes to `laravel-astronomy-library` will be documented in this file.
 
+## Version 4.9.2
+
+### Changed
+
+- Add the equatorial coordinates of yesterday and tomorrow to the target (sun).
+
 ## Version 4.9.1
+
+### Changed
 
 - Use \Carbon\Carbon everywhere in the code
 
