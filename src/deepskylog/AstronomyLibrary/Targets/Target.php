@@ -6,9 +6,11 @@
  * PHP Version 7
  *
  * @category Target
+ *
  * @author   Deepsky Developers <developers@deepskylog.be>
  * @license  GPL3 <https://opensource.org/licenses/GPL-3.0>
- * @link     http://www.deepskylog.org
+ *
+ * @see     http://www.deepskylog.org
  */
 
 namespace deepskylog\AstronomyLibrary\Targets;
@@ -26,9 +28,11 @@ use RuntimeException;
  * PHP Version 7
  *
  * @category Target
+ *
  * @author   Deepsky Developers <developers@deepskylog.be>
  * @license  GPL3 <https://opensource.org/licenses/GPL-3.0>
- * @link     http://www.deepskylog.org
+ *
+ * @see     http://www.deepskylog.org
  */
 class Target
 {
@@ -216,9 +220,7 @@ class Target
     public function getTransit(): Carbon
     {
         if (! $this->_transit) {
-            throw new RuntimeException(
-                'First execute the calculateEphemerides method'
-            );
+            throw new RuntimeException('First execute the calculateEphemerides method');
         }
 
         return $this->_transit;
@@ -234,9 +236,7 @@ class Target
     public function getRising(): ?Carbon
     {
         if (! $this->_transit) {
-            throw new RuntimeException(
-                'First execute the calculateEphemerides method'
-            );
+            throw new RuntimeException('First execute the calculateEphemerides method');
         }
 
         return $this->_rising;
@@ -252,9 +252,7 @@ class Target
     public function getSetting(): ?Carbon
     {
         if (! $this->_transit) {
-            throw new RuntimeException(
-                'First execute the calculateEphemerides method'
-            );
+            throw new RuntimeException('First execute the calculateEphemerides method');
         }
 
         return $this->_setting;
@@ -269,9 +267,7 @@ class Target
     public function getMaxHeight(): ?Coordinate
     {
         if (! $this->_transit) {
-            throw new RuntimeException(
-                'First execute the calculateEphemerides method'
-            );
+            throw new RuntimeException('First execute the calculateEphemerides method');
         }
 
         return $this->_maxHeight;
@@ -289,9 +285,7 @@ class Target
     public function getMaxHeightAtNight(): ?Coordinate
     {
         if (! $this->_transit) {
-            throw new RuntimeException(
-                'First execute the calculateEphemerides method'
-            );
+            throw new RuntimeException('First execute the calculateEphemerides method');
         }
 
         return $this->_maxHeightAtNight;
@@ -306,9 +300,7 @@ class Target
     public function getBestTimeToObserve(): ?Carbon
     {
         if (! $this->_transit) {
-            throw new RuntimeException(
-                'First execute the calculateEphemerides method'
-            );
+            throw new RuntimeException('First execute the calculateEphemerides method');
         }
 
         return $this->_bestTime;
@@ -994,12 +986,12 @@ class Target
                     $coords = $this->getEquatorialCoordinates();
                 } else {
                     // Coordinates are for 0:00 TD
-                    $raToday = $this->getEquatorialCoordinatesToday()->getRA();
+                    $raToday = $this->getEquatorialCoordinatesToday()->getRA()->getCoordinate();
                     $declToday = $this->getEquatorialCoordinatesToday()
-                        ->getDeclination();
-                    $raTomorrow = $this->getEquatorialCoordinatesTomorrow()->getRA();
+                        ->getDeclination()->getCoordinate();
+                    $raTomorrow = $this->getEquatorialCoordinatesTomorrow()->getRA()->getCoordinate();
                     $declTomorrow = $this->getEquatorialCoordinatesTomorrow()
-                        ->getDeclination();
+                        ->getDeclination()->getCoordinate();
 
                     $raDiff = $raTomorrow - $raToday;
                     if (abs($raDiff) > 12) {
