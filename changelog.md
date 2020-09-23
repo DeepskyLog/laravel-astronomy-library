@@ -2,6 +2,12 @@
 
 All notable changes to `laravel-astronomy-library` will be documented in this file.
 
+## Version 4.9.3
+
+### Changed
+
+- Fix the calculation of the altitude graph if the equatorial coordinates of yesterday and tomorrow are also given.
+
 ## Version 4.9.2
 
 ### Changed
