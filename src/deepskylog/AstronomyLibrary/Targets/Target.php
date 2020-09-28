@@ -1051,4 +1051,14 @@ class Target
 
         return $this->_altitudeChart;
     }
+
+    /**
+     * Returns the constellation from the given coordinates.
+     *
+     * @return string The constellation (3-character code in Latin for example: ERI, LEO, LMI, ...)
+     */
+    public function getConstellation(): string
+    {
+        return $this->getEquatorialCoordinates()->getConstellation();
+    }
 }
