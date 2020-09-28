@@ -2,6 +2,12 @@
 
 All notable changes to `laravel-astronomy-library` will be documented in this file.
 
+## Version 4.10
+
+### Changed
+
+- Add method to calculate the constellation when the coordinates are given.  The constellation is returned as 3 characters (Latin name).  The migration should be re-exported and run to be able to run this method.
+
 ## Version 4.9.3
 
 ### Changed

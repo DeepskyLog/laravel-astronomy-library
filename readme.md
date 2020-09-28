@@ -249,6 +249,10 @@ $precessed_coords = $coords->precessionHighAccuracy($date);
 // Calculate the apparent place of an object
 $coords = new EquatorialCoordinates(2.736662778, 49.22846667, 2000.0, 0.03425, -0.0895);
 $appararentPlace = $coords->apparentPlace($date, $nutation);
+
+// Get the constellation with the given coordinates
+$coords = new EquatorialCoordinates(2.736662778, 49.22846667, 2000.0, 0.03425, -0.0895);
+$constellation = $coords->getConstellation();
 ```
 
 ### Coordinate methods on ecliptical coordinates
@@ -374,6 +378,10 @@ $sun = new Sun();
 $nutation = Time::nutation(Time::getJd($date));
 $sun->calculateEquatorialCoordinatesHighAccuracy($date, $nutation);
 $coordinates = $sun->getEquatorialCoordinates();
+
+// Get the constellation with the given coordinates
+$constellation = $sun->getConstellation();
+
 ```
 
 ## Change log

@@ -6,14 +6,17 @@
  * PHP Version 7
  *
  * @category Coordinates
+ *
  * @author   Deepsky Developers <developers@deepskylog.be>
  * @license  GPL3 <https://opensource.org/licenses/GPL-3.0>
- * @link     http://www.deepskylog.org
+ *
+ * @see     http://www.deepskylog.org
  */
 
 namespace deepskylog\AstronomyLibrary\Coordinates;
 
 use Carbon\Carbon;
+use deepskylog\AstronomyLibrary\Models\ConstellationBoundaries;
 use deepskylog\AstronomyLibrary\Time;
 
 /**
@@ -22,9 +25,11 @@ use deepskylog\AstronomyLibrary\Time;
  * PHP Version 7
  *
  * @category Coordinates
+ *
  * @author   Deepsky Developers <developers@deepskylog.be>
  * @license  GPL3 <https://opensource.org/licenses/GPL-3.0>
- * @link     http://www.deepskylog.org
+ *
+ * @see     http://www.deepskylog.org
  */
 class EquatorialCoordinates
 {
@@ -971,5 +976,78 @@ class EquatorialCoordinates
         );
 
         return $coordinates;
+    }
+
+    /**
+     * Returns the constellation from the given coordinates.
+     *
+     * @return string The constellation (3-character code in Latin for example: ERI, LEO, LMI, ...)
+     */
+    public function getConstellation(): string
+    {
+        $tempdecl = -90;
+        $tempcon = 'OCT';
+        $thera0 = 0.0;
+        $thera1 = 0.0;
+        $thedecl0 = 0.0;
+        $thedecl1 = 0.0;
+
+        foreach (ConstellationBoundaries::all() as $boundaries) {
+            $thera0 = $boundaries->ra0;
+            $thera1 = $boundaries->ra1;
+            $thedecl0 = $boundaries->decl0;
+            $thedecl1 = $boundaries->decl1;
+
+            if (abs($thera0 - $thera1) > 12) {
+                if (abs($this->getRA()->getCoordinate() - $thera0) > 12) {
+                    $thera0 += (($thera0 < 12) ? 24.0 : -24.0);
+                } else {
+                    $thera1 += (($thera1 < 12) ? 24.0 : -24.0);
+                }
+            }
+
+            if (abs($thera1 - $thera0) > 0) {
+                $thedecl01 = $thedecl0 + (($this->getRA()->getCoordinate() - $thera0) / ($thera1 - $thera0) * ($thedecl1 - $thedecl0));
+            } else {
+                $thedecl01 = ($thedecl0 + $thedecl1) / 2;
+            }
+            if (
+                (
+                    $thera0 <= $this->getRA()->getCoordinate()
+                        && ($thera1 >= $this->getRA()->getCoordinate())
+                        || ($thera1 <= $this->getRA()->getCoordinate())
+                        && ($thera0 >= $this->getRA()->getCoordinate())
+                ) && (
+                    $thedecl01 < $this->getDeclination()->getCoordinate()
+                ) && ($thedecl01 > $tempdecl)
+            ) {
+                $tempdecl = $thedecl01;
+                if ($boundaries->con0pos == 'A') {
+                    $tempcon = $boundaries->con0;
+                }
+                if ($boundaries->con0pos == 'B') {
+                    $tempcon = $boundaries->con1;
+                }
+                if ($boundaries->con0pos == 'L') {
+                    if ((($thedecl1 - $thedecl0) / ($thera1 - $thera0)) > 0) {
+                        $tempcon = $boundaries->con1;
+                    } else {
+                        $tempcon = $boundaries->con0;
+                    }
+                }
+                if ($boundaries->con0pos == 'R') {
+                    if ((($thedecl1 - $thedecl0) / ($thera1 - $thera0)) > 0) {
+                        $tempcon = $boundaries->con0;
+                    } else {
+                        $tempcon = $boundaries->con1;
+                    }
+                }
+            }
+        }
+
+        return $tempcon;
+
+        // TODO: Write documentation
+        // TODO: Release
     }
 }
