@@ -5,9 +5,11 @@
  * PHP Version 7
  *
  * @category Tests
+ *
  * @author   Deepsky Developers <developers@deepskylog.be>
  * @license  GPL3 <https://opensource.org/licenses/GPL-3.0>
- * @link     http://www.deepskylog.org
+ *
+ * @see     http://www.deepskylog.org
  */
 
 namespace Tests\Unit;
@@ -26,9 +28,11 @@ use deepskylog\AstronomyLibrary\Time;
  * PHP Version 7
  *
  * @category Tests
+ *
  * @author   Deepsky Developers <developers@deepskylog.be>
  * @license  GPL3 <https://opensource.org/licenses/GPL-3.0>
- * @link     http://www.deepskylog.org
+ *
+ * @see     http://www.deepskylog.org
  */
 class EquatorialCoordinatesTest extends BaseTestCase
 {
@@ -440,5 +444,53 @@ class EquatorialCoordinatesTest extends BaseTestCase
             $apparentPlace->getDeclination()->getCoordinate(),
             0.00001
         );
+    }
+
+    /**
+     * Test the atlas functions.
+     *
+     * @return None
+     */
+    public function testAtlases()
+    {
+        $M45 = new EquatorialCoordinates(3.7833, 24.1167);
+
+        $this->assertEquals(132, $M45->calculateAtlasPage('urano'));
+        $this->assertEquals(78, $M45->calculateAtlasPage('urano_new'));
+        $this->assertEquals(4, $M45->calculateAtlasPage('sky'));
+        $this->assertEquals(163, $M45->calculateAtlasPage('milleniumbase'));
+        $this->assertEquals(58, $M45->calculateAtlasPage('taki'));
+        $this->assertEquals(15, $M45->calculateAtlasPage('psa'));
+        $this->assertEquals(42, $M45->calculateAtlasPage('torresB'));
+        $this->assertEquals(77, $M45->calculateAtlasPage('torresBC'));
+        $this->assertEquals(208, $M45->calculateAtlasPage('torresC'));
+        $this->assertEquals(790, $M45->calculateAtlasPage('DSLDL'));
+        $this->assertEquals(867, $M45->calculateAtlasPage('DSLDP'));
+        $this->assertEquals(209, $M45->calculateAtlasPage('DSLLL'));
+        $this->assertEquals(232, $M45->calculateAtlasPage('DSLLP'));
+        $this->assertEquals(81, $M45->calculateAtlasPage('DSLOL'));
+        $this->assertEquals(84, $M45->calculateAtlasPage('DSLOP'));
+        $this->assertEquals(34, $M45->calculateAtlasPage('DeepskyHunter'));
+        $this->assertEquals(38, $M45->calculateAtlasPage('Interstellarum'));
+
+        $omegaCen = new EquatorialCoordinates(13.4464, -47.4814);
+
+        $this->assertEquals(403, $omegaCen->calculateAtlasPage('urano'));
+        $this->assertEquals(184, $omegaCen->calculateAtlasPage('urano_new'));
+        $this->assertEquals(21, $omegaCen->calculateAtlasPage('sky'));
+        $this->assertEquals(953, $omegaCen->calculateAtlasPage('milleniumbase'));
+        $this->assertEquals(120, $omegaCen->calculateAtlasPage('taki'));
+        $this->assertEquals(49, $omegaCen->calculateAtlasPage('psa'));
+        $this->assertEquals(90, $omegaCen->calculateAtlasPage('torresB'));
+        $this->assertEquals(178, $omegaCen->calculateAtlasPage('torresBC'));
+        $this->assertEquals(499, $omegaCen->calculateAtlasPage('torresC'));
+        $this->assertEquals(2160, $omegaCen->calculateAtlasPage('DSLDL'));
+        $this->assertEquals(2229, $omegaCen->calculateAtlasPage('DSLDP'));
+        $this->assertEquals(572, $omegaCen->calculateAtlasPage('DSLLL'));
+        $this->assertEquals(521, $omegaCen->calculateAtlasPage('DSLLP'));
+        $this->assertEquals(194, $omegaCen->calculateAtlasPage('DSLOL'));
+        $this->assertEquals(194, $omegaCen->calculateAtlasPage('DSLOP'));
+        $this->assertEquals(84, $omegaCen->calculateAtlasPage('DeepskyHunter'));
+        $this->assertEquals(93, $omegaCen->calculateAtlasPage('Interstellarum'));
     }
 }

@@ -253,6 +253,13 @@ $appararentPlace = $coords->apparentPlace($date, $nutation);
 // Get the constellation with the given coordinates
 $coords = new EquatorialCoordinates(2.736662778, 49.22846667, 2000.0, 0.03425, -0.0895);
 $constellation = $coords->getConstellation();
+
+// Get the atlas page in popular amateur atlases
+$M45 = new EquatorialCoordinates(3.7833, 24.1167);
+
+$M45->calculateAtlasPage('urano');
+$M45->calculateAtlasPage('Interstellarum');
+
 ```
 
 ### Coordinate methods on ecliptical coordinates

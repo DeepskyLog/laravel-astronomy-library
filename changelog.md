@@ -2,6 +2,12 @@
 
 All notable changes to `laravel-astronomy-library` will be documented in this file.
 
+## version 4.11
+
+### Changed
+
+- Add method to calculate the atlas page corresponding to equatorial coordinates.
+
 ## Version 4.10
 
 ### Changed
