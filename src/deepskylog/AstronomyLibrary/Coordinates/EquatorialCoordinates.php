@@ -1134,14 +1134,14 @@ class EquatorialCoordinates
     private function calculateDSL($atlastype)
     {
         $atlaspages = [[12, 20, 26, 30, 32, 32, 30, 26, 20, 12],                          // overview
-                                [12, 20, 30, 36, 42, 48, 52, 54, 54, 54, 52, 48, 42, 36, 30, 20, 12],     // lookup
-                            [12, 21, 31, 40, 48, 55, 63, 70, 77, 83, 89, 94, 98, 101, 104, 106, 107, 107, 107, 107, 106, 104, 101, 98, 94, 89, 83, 77, 70, 63, 55, 48, 40, 31, 21, 12], // Detail
-                            [6, 10, 13, 16, 19, 20, 21, 21, 21, 20, 19, 16, 13, 10, 6],             // overview landscape
-                            [6, 10, 13, 17, 21, 24, 27, 30, 32, 34, 35, 36, 36, 36, 36, 36, 35, 34, 32, 30, 27, 24, 21, 17, 13, 10, 6], // lookup landscape
-                            [6, 10, 14, 18, 22, 26, 30, 33, 37, 41, 44, 47, 50, 53, 56, 58, 61, 63, 65, 66, 68, 70, 70, 71, 71, 72, 72, 72, 71, 71, 70, 70, 68, 66, 65, 63, 61, 58, 56, 53, 50, 47, 44, 41, 37, 33, 30, 26, 22, 18, 14, 10, 6], // detail landscape
-                           ];
+            [12, 20, 30, 36, 42, 48, 52, 54, 54, 54, 52, 48, 42, 36, 30, 20, 12],     // lookup
+            [12, 21, 31, 40, 48, 55, 63, 70, 77, 83, 89, 94, 98, 101, 104, 106, 107, 107, 107, 107, 106, 104, 101, 98, 94, 89, 83, 77, 70, 63, 55, 48, 40, 31, 21, 12], // Detail
+            [6, 10, 13, 16, 19, 20, 21, 21, 21, 20, 19, 16, 13, 10, 6],             // overview landscape
+            [6, 10, 13, 17, 21, 24, 27, 30, 32, 34, 35, 36, 36, 36, 36, 36, 35, 34, 32, 30, 27, 24, 21, 17, 13, 10, 6], // lookup landscape
+            [6, 10, 14, 18, 22, 26, 30, 33, 37, 41, 44, 47, 50, 53, 56, 58, 61, 63, 65, 66, 68, 70, 70, 71, 71, 72, 72, 72, 71, 71, 70, 70, 68, 66, 65, 63, 61, 58, 56, 53, 50, 47, 44, 41, 37, 33, 30, 26, 22, 18, 14, 10, 6], // detail landscape
+        ];
         $page = 1;
-        for ($i = 0; $i < count($atlaspages[$atlastype]); ++$i) {
+        for ($i = 0; $i < count($atlaspages[$atlastype]); $i++) {
             if (
                 ($this->getDeclination()->getCoordinate() < (90 + ((-$i) * (180 / (count($atlaspages[$atlastype]))))))
                 && ($this->getDeclination()->getCoordinate() >= (90 + ((-1 - $i) * (180 / (count($atlaspages[$atlastype]))))))
@@ -1286,24 +1286,24 @@ class EquatorialCoordinates
     private function calculateNewUranometriaPage()
     {
         $data = [[84.5,   1,  1],  // 1st tier, chart 1
-                [73.5,   7,  6],   // 2nd tier, charts 2->7
-                [62.5,  17, 10],   // 3rd tier, charts 8->17
-                [51.5,  29, 12],   // 4th tier, charts 18->29
-                [40.5,  44, 15],   // 5th tier, charts 30->44
-                [29.5,  62, 18],   // 6th tier, charts 45->62
-                [17.5,  80, 18],   // 7th tier, charts 63->80
-                [5.5, 100, 20],    // 8th tier, charts 81->100
-                [-5.5, 120, 20],   // 9th tier, charts 101->120
-                [-17.5, 140, 20],  // 10th tier, charts 121->140
-                [-29.5, 158, 18],  // 11th tier, charts 141->158
-                [-40.5, 176, 18],  // 12th tier, charts 159->176
-                [-51.5, 191, 15],  // 13th tier, charts 177->191
-                [-62.5, 203, 12],  // 14th tier, charts 192->203
-                [-73.5, 213, 10],  // 15th tier, charts 204->213
-                [-84.5, 219,  6],  // 16th tier, charts 214->219
-                [-90.0, 220,  1], ]; // 17th tier, chart 220
+            [73.5,   7,  6],   // 2nd tier, charts 2->7
+            [62.5,  17, 10],   // 3rd tier, charts 8->17
+            [51.5,  29, 12],   // 4th tier, charts 18->29
+            [40.5,  44, 15],   // 5th tier, charts 30->44
+            [29.5,  62, 18],   // 6th tier, charts 45->62
+            [17.5,  80, 18],   // 7th tier, charts 63->80
+            [5.5, 100, 20],    // 8th tier, charts 81->100
+            [-5.5, 120, 20],   // 9th tier, charts 101->120
+            [-17.5, 140, 20],  // 10th tier, charts 121->140
+            [-29.5, 158, 18],  // 11th tier, charts 141->158
+            [-40.5, 176, 18],  // 12th tier, charts 159->176
+            [-51.5, 191, 15],  // 13th tier, charts 177->191
+            [-62.5, 203, 12],  // 14th tier, charts 192->203
+            [-73.5, 213, 10],  // 15th tier, charts 204->213
+            [-84.5, 219,  6],  // 16th tier, charts 214->219
+            [-90.0, 220,  1], ]; // 17th tier, chart 220
         // find proper tier
-        for ($Tier = 0; $this->getDeclination()->getCoordinate() < $data[$Tier][0]; ++$Tier);
+        for ($Tier = 0; $this->getDeclination()->getCoordinate() < $data[$Tier][0]; $Tier++);
 
         $HoursPerChart = 24.0 / $data[$Tier][2];
         $ra = $this->getRA()->getCoordinate() - ($HoursPerChart / 2);
@@ -1567,12 +1567,12 @@ class EquatorialCoordinates
     private function calculateSkyAtlasPage()
     {
         $data = [[50.0,   1,  3],  // 1st tier, charts 1->3
-                      [20.0,   4,  6],  // 2nd tier, charts 4->9
-                      [-20.0,  10,  8],  // 3rd tier, charts 10->17
-                      [-50.0,  18,  6],  // 4th tier, charts 18->23
-                      [-90.0,  24,  3], ]; // 5th tier, charts 24->26
+            [20.0,   4,  6],  // 2nd tier, charts 4->9
+            [-20.0,  10,  8],  // 3rd tier, charts 10->17
+            [-50.0,  18,  6],  // 4th tier, charts 18->23
+            [-90.0,  24,  3], ]; // 5th tier, charts 24->26
         // find proper tier
-        for ($Tier = 0; $this->getDeclination()->getCoordinate() < $data[$Tier][0]; ++$Tier);
+        for ($Tier = 0; $this->getDeclination()->getCoordinate() < $data[$Tier][0]; $Tier++);
         $HoursPerChart = 24.0 / $data[$Tier][2];
         // Offset; middle of 1st map is in the middle of 0 hours RA
         $MapOffset = (int) ($this->getRA()->getCoordinate() / $HoursPerChart);
@@ -1638,20 +1638,20 @@ class EquatorialCoordinates
     private function calculateInterstellarum()
     {
         $data = [[82.0,   1,  1],  // 1st tier, chart 1
-                      [67.0,   2,  6],  // 2nd tier, charts 2->7
-                      [52.0,   8,  8],  // 3rd tier, charts 8->15
-                      [37.0,  16,  12], // 4th tier, charts 16->27
-                      [22.0,  28,  12], // 5th tier, charts 28->39
-                      [7.0,  40,  12], // 6th tier, charts 40->51
-                      [-7.0,  52,  12], // 7th tier, charts 52->63
-                      [-22.0,  64,  12], // 8th tier, charts 64->75
-                      [-37.0,  76,  12], // 9th tier, charts 76->87
-                      [-52.0,  88,  12], // 10th tier, charts 88->99
-                      [-67.0, 100,  8],  // 11th tier, charts 100->107
-                      [-82.0, 108,  6],  // 12th tier, charts 108->113
-                      [-90.0, 114,  1], ]; // 13th tier, chart 114
+            [67.0,   2,  6],  // 2nd tier, charts 2->7
+            [52.0,   8,  8],  // 3rd tier, charts 8->15
+            [37.0,  16,  12], // 4th tier, charts 16->27
+            [22.0,  28,  12], // 5th tier, charts 28->39
+            [7.0,  40,  12], // 6th tier, charts 40->51
+            [-7.0,  52,  12], // 7th tier, charts 52->63
+            [-22.0,  64,  12], // 8th tier, charts 64->75
+            [-37.0,  76,  12], // 9th tier, charts 76->87
+            [-52.0,  88,  12], // 10th tier, charts 88->99
+            [-67.0, 100,  8],  // 11th tier, charts 100->107
+            [-82.0, 108,  6],  // 12th tier, charts 108->113
+            [-90.0, 114,  1], ]; // 13th tier, chart 114
         // find proper tier
-        for ($Tier = 0; $this->getDeclination()->getCoordinate() < $data[$Tier][0]; ++$Tier);
+        for ($Tier = 0; $this->getDeclination()->getCoordinate() < $data[$Tier][0]; $Tier++);
         $HoursPerChart = 24.0 / $data[$Tier][2];
         // Offset; middle of 1st map is in the middle of 0 hours RA
         $MapOffset = (int) ((24.0 - $this->getRA()->getCoordinate()) / $HoursPerChart);
