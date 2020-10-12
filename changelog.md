@@ -2,15 +2,22 @@
 
 All notable changes to `laravel-astronomy-library` will be documented in this file.
 
-## version 4.11
+## Version 4.12
 
-### Changed
+### Added
+
+- Add method to calculate the rectangular coordinates of the sun
+- Add RectangularCoordinates class
+
+## Version 4.11
+
+### Added
 
 - Add method to calculate the atlas page corresponding to equatorial coordinates.
 
 ## Version 4.10
 
-### Changed
+### Added
 
 - Add method to calculate the constellation when the coordinates are given.  The constellation is returned as 3 characters (Latin name).  The migration should be re-exported and run to be able to run this method.
 
@@ -108,7 +115,7 @@ All notable changes to `laravel-astronomy-library` will be documented in this fi
 
 - Removed abstract Coordinates class.
 - Added Coordinate class and reworked all Coordinate Classes to use this new class.
-  
+
 ### Added
 
 - Calculation of rising, transit and setting for targets.

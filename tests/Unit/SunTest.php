@@ -87,4 +87,28 @@ class SunTest extends BaseTestCase
         $this->assertEqualsWithDelta(13.22521187, $coordinates->getRA()->getCoordinate(), 0.000001);
         $this->assertEqualsWithDelta(-7.783871, $coordinates->getDeclination()->getCoordinate(), 0.000001);
     }
+
+    public function testRectangularCoordinates()
+    {
+        $sun = new Sun();
+        $date = Carbon::create(1992, 10, 13, 0, 0, 0, 'UTC');
+
+        $rect_coords = $sun->calculateGeometricCoordinates($date);
+
+        $this->assertEqualsWithDelta(-0.9379952, $rect_coords->getX()->getCoordinate(), 0.0000001);
+        $this->assertEqualsWithDelta(-0.3116544, $rect_coords->getY()->getCoordinate(), 0.0000001);
+        $this->assertEqualsWithDelta(-0.1351215, $rect_coords->getZ()->getCoordinate(), 0.0000001);
+    }
+
+    public function testRectangularCoordinatesJ2000()
+    {
+        $sun = new Sun();
+        $date = Carbon::create(1992, 10, 13, 0, 0, 0, 'UTC');
+
+        $rect_coords = $sun->calculateGeometricCoordinatesJ2000($date);
+
+        $this->assertEqualsWithDelta(-0.93739590, $rect_coords->getX()->getCoordinate(), 0.0000001);
+        $this->assertEqualsWithDelta(-0.31316793, $rect_coords->getY()->getCoordinate(), 0.0000001);
+        $this->assertEqualsWithDelta(-0.13577924, $rect_coords->getZ()->getCoordinate(), 0.0000001);
+    }
 }
