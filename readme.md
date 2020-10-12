@@ -186,7 +186,7 @@ $mintaka = new EquatorialCoordinates(5.5334444, -0.29913888);
 $alnilam = new EquatorialCoordinates(5.60355833, -1.20194444);
 $alnitak = new EquatorialCoordinates(5.679311111, -1.94258333);
 // deviation is 0.089876 degrees, or 5'24''
-$deviation = $astrolib->deviationFromStraightLine($mintaka, $alnilam, $alnitak)->getCoordinate();  
+$deviation = $astrolib->deviationFromStraightLine($mintaka, $alnilam, $alnitak)->getCoordinate();
 
 // Calculate the smallest circle containing three celestial bodies.
 $coords1 = new EquatorialCoordinates(12.6857305, -5.631722);
@@ -228,7 +228,7 @@ $mintaka = new EquatorialCoordinates(5.5334444, -0.29913888);
 $alnilam = new EquatorialCoordinates(5.60355833, -1.20194444);
 $alnitak = new EquatorialCoordinates(5.679311111, -1.94258333);
 // deviation is 0.089876 degrees, or 5'24''
-$deviation = $alnilam->deviationFromStraightLine($mintaka, $alnitak)->getCoordinate();  
+$deviation = $alnilam->deviationFromStraightLine($mintaka, $alnitak)->getCoordinate();
 
 // Calculate the smallest circle containing three celestial bodies.
 $coords1 = new EquatorialCoordinates(12.6857305, -5.631722);
@@ -389,6 +389,11 @@ $coordinates = $sun->getEquatorialCoordinates();
 // Get the constellation with the given coordinates
 $constellation = $sun->getConstellation();
 
+// Calculate the rectangular coordinates of the sun for the current equinox
+$rect_coords = $sun->calculateGeometricCoordinates($date);
+
+// Calculate the rectangular coordinates of the sun in J2000.
+$rect_coords = $sun->calculateGeometricCoordinatesJ2000($date);
 ```
 
 ## Change log
