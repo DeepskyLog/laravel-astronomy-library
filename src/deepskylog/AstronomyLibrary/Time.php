@@ -484,4 +484,133 @@ class Time
             $nutLongitude, $nutObliquity, $meanObliquity, $trueObliquity,
         ];
     }
+
+    /**
+     * Returns the date of spring for the given year
+     * Chapter 27 of Astronomical Algorithms.
+     *
+     * @param Carbon $date The date, with the year for which to calculate spring.
+     *
+     * @return Carbon The correct time and date for spring
+     */
+    public static function getSpring(Carbon $date): Carbon
+    {
+        $year = $date->year;
+
+        if ($year < 1000) {
+            $Y = $year / 1000;
+            $JDE0 = 1721139.29189 + 365242.13740 * $Y + 0.06134 * $Y ** 2 + 0.00111 * $Y ** 3 - 0.00071 * $Y ** 4;
+        } else {
+            $Y = ($year - 2000) / 1000;
+            $JDE0 = 2451623.80984 + 365242.37404 * $Y + 0.05169 * $Y ** 2 - 0.00411 * $Y ** 3 - 0.00057 * $Y ** 4;
+        }
+
+        return Time::fromJd(Time::calculateSeasonTime($JDE0));
+    }
+
+    /**
+     * Returns the date of summer for the given year
+     * Chapter 27 of Astronomical Algorithms.
+     *
+     * @param Carbon $date The date, with the year for which to calculate summer.
+     *
+     * @return Carbon The correct time and date for summer
+     */
+    public static function getSummer(Carbon $date): Carbon
+    {
+        $year = $date->year;
+
+        if ($year < 1000) {
+            $Y = $year / 1000;
+            $JDE0 = 1721233.25401 + 365241.72562 * $Y - 0.05323 * $Y ** 2 + 0.00907 * $Y ** 3 + 0.00025 * $Y ** 4;
+        } else {
+            $Y = ($year - 2000) / 1000;
+            $JDE0 = 2451716.56767 + 365241.62603 * $Y + 0.00325 * $Y ** 2 + 0.00888 * $Y ** 3 - 0.00030 * $Y ** 4;
+        }
+
+        return Time::fromJd(Time::calculateSeasonTime($JDE0));
+    }
+
+    /**
+     * Returns the date of autumn for the given year
+     * Chapter 27 of Astronomical Algorithms.
+     *
+     * @param Carbon $date The date, with the year for which to calculate autumn.
+     *
+     * @return Carbon The correct time and date for autumn
+     */
+    public static function getAutumn(Carbon $date): Carbon
+    {
+        $year = $date->year;
+
+        if ($year < 1000) {
+            $Y = $year / 1000;
+            $JDE0 = 1721325.70455 + 365242.49558 * $Y - 0.11677 * $Y ** 2 - 0.00297 * $Y ** 3 + 0.00074 * $Y ** 4;
+        } else {
+            $Y = ($year - 2000) / 1000;
+            $JDE0 = 2451810.21715 + 365242.01767 * $Y - 0.11575 * $Y ** 2 + 0.00337 * $Y ** 3 + 0.00078 * $Y ** 4;
+        }
+
+        return Time::fromJd(Time::calculateSeasonTime($JDE0));
+    }
+
+    /**
+     * Returns the date of winter for the given year
+     * Chapter 27 of Astronomical Algorithms.
+     *
+     * @param Carbon $date The date, with the year for which to calculate winter.
+     *
+     * @return Carbon The correct time and date for winter
+     */
+    public static function getWinter(Carbon $date): Carbon
+    {
+        $year = $date->year;
+
+        if ($year < 1000) {
+            $Y = $year / 1000;
+            $JDE0 = 1721414.39987 + 365242.88257 * $Y - 0.00769 * $Y ** 2 - 0.00933 * $Y ** 3 + 0.00006 * $Y ** 4;
+        } else {
+            $Y = ($year - 2000) / 1000;
+            $JDE0 = 2451900.05952 + 365242.74049 * $Y - 0.06223 * $Y ** 2 - 0.00823 * $Y ** 3 + 0.00032 * $Y ** 4;
+        }
+
+        return Time::fromJd(Time::calculateSeasonTime($JDE0));
+    }
+
+    /**
+     * Calculate the start of the season, given JDE0.
+     */
+    private static function calculateSeasonTime(float $JDE0): float
+    {
+        $T = ($JDE0 - 2451545.0) / 36525.0;
+        $W = 35999.373 * $T - 2.47;
+        $deltaLambda = 1 + 0.0334 * cos(deg2rad($W)) + 0.0007 * cos(deg2rad(2 * $W));
+
+        $S = 485 * cos(deg2rad(324.96 + 1934.136 * $T))
+        + 203 * cos(deg2rad(337.23 + 32964.467 * $T))
+        + 199 * cos(deg2rad(342.08 + 20.186 * $T))
+        + 182 * cos(deg2rad(27.85 + 445267.112 * $T))
+        + 156 * cos(deg2rad(73.14 + 45036.886 * $T))
+        + 136 * cos(deg2rad(171.52 + 22518.443 * $T))
+        + 77 * cos(deg2rad(222.54 + 65928.934 * $T))
+        + 74 * cos(deg2rad(296.72 + 3034.906 * $T))
+        + 70 * cos(deg2rad(243.58 + 9037.513 * $T))
+        + 58 * cos(deg2rad(119.81 + 33718.147 * $T))
+        + 52 * cos(deg2rad(297.17 + 150.678 * $T))
+        + 50 * cos(deg2rad(21.02 + 2281.226 * $T))
+        + 45 * cos(deg2rad(247.54 + 29929.562 * $T))
+        + 44 * cos(deg2rad(325.15 + 31555.956 * $T))
+        + 29 * cos(deg2rad(60.93 + 4443.417 * $T))
+        + 18 * cos(deg2rad(155.12 + 67555.328 * $T))
+        + 17 * cos(deg2rad(288.79 + 4562.452 * $T))
+        + 16 * cos(deg2rad(198.04 + 62894.029 * $T))
+        + 14 * cos(deg2rad(199.76 + 31436.921 * $T))
+        + 12 * cos(deg2rad(95.39 + 14577.848 * $T))
+        + 12 * cos(deg2rad(287.11 + 31931.756 * $T))
+        + 12 * cos(deg2rad(320.81 + 34777.259 * $T))
+        + 9 * cos(deg2rad(227.73 + 1222.114 * $T))
+        + 8 * cos(deg2rad(15.45 + 16859.074 * $T));
+
+        return $JDE0 + 0.00001 * $S / $deltaLambda;
+    }
 }

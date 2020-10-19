@@ -93,6 +93,19 @@ $meanSiderialTime = $astrolib->getApparentSiderialTime();
 
 // Get the nutation for the AstronomyLibrary instance.
 $nutation = $astrolib->getNutation();
+
+// Get the date of the start of spring
+$date = Carbon::create(2003, 9, 8, 0, 0, 0, 'UTC');
+Time::getSpring($date);   // Returns the start of spring in 2003
+
+// Get the date of the start of summer
+Time::getSummer($date);   // Returns the start of summer in 2003
+
+// Get the date of the start of spring
+Time::getAutumn($date);   // Returns the start of autumn in 2003
+
+// Get the date of the start of spring
+Time::getSummer($date);   // Returns the start of winter in 2003
 ```
 
 ### Static Time methods
