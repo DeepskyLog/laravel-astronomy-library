@@ -2,6 +2,16 @@
 
 All notable changes to `laravel-astronomy-library` will be documented in this file.
 
+## Version 4.13
+
+### Added
+
+- Added methods to get the start of the seasons:
+  - Time::getWinter()
+  - Time::getSpring()
+  - Time::getSummer()
+  - Time::getAutumn()
+
 ## Version 4.12
 
 ### Added

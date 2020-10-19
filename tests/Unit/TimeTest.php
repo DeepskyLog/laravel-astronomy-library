@@ -12,12 +12,12 @@
 
 namespace Tests\Unit;
 
-use Carbon\Carbon;
 use DateTimeZone;
-use deepskylog\AstronomyLibrary\AstronomyLibrary;
-use deepskylog\AstronomyLibrary\Coordinates\GeographicalCoordinates;
-use deepskylog\AstronomyLibrary\Testing\BaseTestCase;
+use Carbon\Carbon;
 use deepskylog\AstronomyLibrary\Time;
+use deepskylog\AstronomyLibrary\AstronomyLibrary;
+use deepskylog\AstronomyLibrary\Testing\BaseTestCase;
+use deepskylog\AstronomyLibrary\Coordinates\GeographicalCoordinates;
 
 /**
  * Tests for the time methods.
@@ -36,7 +36,7 @@ class TimeTest extends BaseTestCase
      *
      * @var string
      */
-    protected $appPath = __DIR__.'/../../vendor/laravel/laravel/bootstrap/app.php';
+    protected $appPath = __DIR__ . '/../../vendor/laravel/laravel/bootstrap/app.php';
 
     /**
      * Setup the test environment.
@@ -55,14 +55,14 @@ class TimeTest extends BaseTestCase
      */
     public function testConvertToJd()
     {
-        $date = Carbon::create(1970, 10, 11, 0, 0, 0, 'UTC');
-        $coords = new GeographicalCoordinates(12.345, 32.1);
+        $date     = Carbon::create(1970, 10, 11, 0, 0, 0, 'UTC');
+        $coords   = new GeographicalCoordinates(12.345, 32.1);
         $astrolib = new AstronomyLibrary($date, $coords);
 
         $this->assertEquals($date, $astrolib->getDate());
         $this->assertEquals(2440870.5, $astrolib->getJd());
 
-        $now = Carbon::now(new DateTimeZone('Europe/Brussels'));
+        $now      = Carbon::now(new DateTimeZone('Europe/Brussels'));
         $astrolib = new AstronomyLibrary($now, $coords);
 
         $this->assertEquals($now, $astrolib->getDate());
@@ -80,8 +80,8 @@ class TimeTest extends BaseTestCase
      */
     public function testUpdateJd()
     {
-        $date = Carbon::create(1970, 10, 11, 0, 0, 0, 'UTC');
-        $coords = new GeographicalCoordinates(12.345, 32.1);
+        $date     = Carbon::create(1970, 10, 11, 0, 0, 0, 'UTC');
+        $coords   = new GeographicalCoordinates(12.345, 32.1);
         $astrolib = new AstronomyLibrary($date, $coords);
 
         $this->assertEquals($date, $astrolib->getDate());
@@ -350,8 +350,8 @@ class TimeTest extends BaseTestCase
      */
     public function testGetDynamicalTime()
     {
-        $date = Carbon::create(333, 2, 6, 6, 0, 0, 'UTC');
-        $coords = new GeographicalCoordinates(12.345, 32.1);
+        $date         = Carbon::create(333, 2, 6, 6, 0, 0, 'UTC');
+        $coords       = new GeographicalCoordinates(12.345, 32.1);
         $astronomylib = new AstronomyLibrary($date, $coords);
         $this->assertEquals(
             $astronomylib->getDynamicalTime(),
@@ -366,7 +366,7 @@ class TimeTest extends BaseTestCase
      */
     public function testGetMeanSiderialTimeStatic()
     {
-        $date = Carbon::create(1987, 4, 10, 19, 21, 0, 'UTC');
+        $date   = Carbon::create(1987, 4, 10, 19, 21, 0, 'UTC');
         $coords = new GeographicalCoordinates(0.0, 32.1);
 
         $this->assertEquals(
@@ -397,7 +397,7 @@ class TimeTest extends BaseTestCase
      */
     public function testGetApparentSiderialTimeStatic()
     {
-        $date = Carbon::create(1987, 4, 10, 0, 0, 0, 'UTC');
+        $date   = Carbon::create(1987, 4, 10, 0, 0, 0, 'UTC');
         $coords = new GeographicalCoordinates(0.0, 32.1);
 
         $this->assertEquals(
@@ -442,5 +442,76 @@ class TimeTest extends BaseTestCase
             $nutat[3],
             0.00000001
         );
+    }
+
+    /**
+     * Test getting start of seasons.
+     *
+     * @return None
+     */
+    public function testGetSeasons()
+    {
+        $date = Carbon::create(1996, 4, 1, 0, 0, 0, 'UTC');
+        $this->assertEquals(Carbon::create(1996, 3, 20, 8, 4, 14, 'UTC'), Time::getSpring($date));
+        $this->assertEquals(Carbon::create(1996, 6, 21, 2, 24, 38, 'UTC'), Time::getSummer($date));
+        $this->assertEquals(Carbon::create(1996, 9, 22, 18, 1, 23, 'UTC'), Time::getAutumn($date));
+        $this->assertEquals(Carbon::create(1996, 12, 21, 14, 7, 18, 'UTC'), Time::getWinter($date));
+
+        $date = Carbon::create(1997, 4, 12, 0, 0, 0, 'UTC');
+        $this->assertEquals(Carbon::create(1997, 3, 20, 13, 56, 9, 'UTC'), Time::getSpring($date));
+        $this->assertEquals(Carbon::create(1997, 6, 21, 8, 21, 9, 'UTC'), Time::getSummer($date));
+        $this->assertEquals(Carbon::create(1997, 9, 22, 23, 56, 36, 'UTC'), Time::getAutumn($date));
+        $this->assertEquals(Carbon::create(1997, 12, 21, 20, 8, 19, 'UTC'), Time::getWinter($date));
+
+        $date = Carbon::create(1998, 3, 24, 0, 0, 0, 'UTC');
+        $this->assertEquals(Carbon::create(1998, 3, 20, 19, 55, 30, 'UTC'), Time::getSpring($date));
+        $this->assertEquals(Carbon::create(1998, 6, 21, 14, 3, 30, 'UTC'), Time::getSummer($date));
+        $this->assertEquals(Carbon::create(1998, 9, 23, 5, 38, 36, 'UTC'), Time::getAutumn($date));
+        $this->assertEquals(Carbon::create(1998, 12, 22, 1, 57, 33, 'UTC'), Time::getWinter($date));
+
+        $date = Carbon::create(1999, 5, 4, 0, 0, 0, 'UTC');
+        $this->assertEquals(Carbon::create(1999, 3, 21, 1, 46, 59, 'UTC'), Time::getSpring($date));
+        $this->assertEquals(Carbon::create(1999, 6, 21, 19, 50, 13, 'UTC'), Time::getSummer($date));
+        $this->assertEquals(Carbon::create(1999, 9, 23, 11, 32, 38, 'UTC'), Time::getAutumn($date));
+        $this->assertEquals(Carbon::create(1999, 12, 22, 7, 45, 18, 'UTC'), Time::getWinter($date));
+
+        $date = Carbon::create(2000, 6, 5, 0, 0, 0, 'UTC');
+        $this->assertEquals(Carbon::create(2000, 3, 20, 7, 36, 28, 'UTC'), Time::getSpring($date));
+        $this->assertEquals(Carbon::create(2000, 6, 21, 1, 48, 47, 'UTC'), Time::getSummer($date));
+        $this->assertEquals(Carbon::create(2000, 9, 22, 17, 28, 54, 'UTC'), Time::getAutumn($date));
+        $this->assertEquals(Carbon::create(2000, 12, 21, 13, 38, 44, 'UTC'), Time::getWinter($date));
+
+        $date = Carbon::create(2001, 7, 6, 0, 0, 0, 'UTC');
+        $this->assertEquals(Carbon::create(2001, 3, 20, 13, 32, 4, 'UTC'), Time::getSpring($date));
+        $this->assertEquals(Carbon::create(2001, 6, 21, 7, 38, 49, 'UTC'), Time::getSummer($date));
+        $this->assertEquals(Carbon::create(2001, 9, 22, 23, 5, 35, 'UTC'), Time::getAutumn($date));
+        $this->assertEquals(Carbon::create(2001, 12, 21, 19, 22, 46, 'UTC'), Time::getWinter($date));
+
+        $date = Carbon::create(2002, 8, 7, 0, 0, 0, 'UTC');
+        $this->assertEquals(Carbon::create(2002, 3, 20, 19, 17, 20, 'UTC'), Time::getSpring($date));
+        $this->assertEquals(Carbon::create(2002, 6, 21, 13, 25, 57, 'UTC'), Time::getSummer($date));
+        $this->assertEquals(Carbon::create(2002, 9, 23, 4, 56, 38, 'UTC'), Time::getAutumn($date));
+        $this->assertEquals(Carbon::create(2002, 12, 22, 1, 15, 50, 'UTC'), Time::getWinter($date));
+
+        $date = Carbon::create(2003, 9, 8, 0, 0, 0, 'UTC');
+        $this->assertEquals(Carbon::create(2003, 3, 21, 1, 1, 30, 'UTC'), Time::getSpring($date));
+        $this->assertEquals(Carbon::create(2003, 6, 21, 19, 11, 46, 'UTC'), Time::getSummer($date));
+        $this->assertEquals(Carbon::create(2003, 9, 23, 10, 48, 5, 'UTC'), Time::getAutumn($date));
+        $this->assertEquals(Carbon::create(2003, 12, 22, 7, 5, 3, 'UTC'), Time::getWinter($date));
+
+        $date = Carbon::create(2004, 10, 9, 0, 0, 0, 'UTC');
+        $this->assertEquals(Carbon::create(2004, 3, 20, 6, 49, 51, 'UTC'), Time::getSpring($date));
+        $this->assertEquals(Carbon::create(2004, 6, 21, 0, 57, 54, 'UTC'), Time::getSummer($date));
+        $this->assertEquals(Carbon::create(2004, 9, 22, 16, 31, 4, 'UTC'), Time::getAutumn($date));
+        $this->assertEquals(Carbon::create(2004, 12, 21, 12, 42, 50, 'UTC'), Time::getWinter($date));
+
+        $date = Carbon::create(2005, 11, 10, 0, 0, 0, 'UTC');
+        $this->assertEquals(Carbon::create(2005, 3, 20, 12, 34, 48, 'UTC'), Time::getSpring($date));
+        $this->assertEquals(Carbon::create(2005, 6, 21, 6, 47, 16, 'UTC'), Time::getSummer($date));
+        $this->assertEquals(Carbon::create(2005, 9, 22, 22, 23, 48, 'UTC'), Time::getAutumn($date));
+        $this->assertEquals(Carbon::create(2005, 12, 21, 18, 36, 29, 'UTC'), Time::getWinter($date));
+
+        $date = Carbon::create(1962, 11, 10, 0, 0, 0, 'UTC');
+        $this->assertEquals(Carbon::create(1962, 6, 21, 21, 25, 7, 'UTC'), Time::getSummer($date));
     }
 }
