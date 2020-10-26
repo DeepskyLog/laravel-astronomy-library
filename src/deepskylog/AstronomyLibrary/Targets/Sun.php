@@ -17,11 +17,11 @@ namespace deepskylog\AstronomyLibrary\Targets;
 
 use Carbon\Carbon;
 use Carbon\CarbonInterval;
-use deepskylog\AstronomyLibrary\Time;
 use deepskylog\AstronomyLibrary\Coordinates\Coordinate;
 use deepskylog\AstronomyLibrary\Coordinates\EclipticalCoordinates;
 use deepskylog\AstronomyLibrary\Coordinates\EquatorialCoordinates;
 use deepskylog\AstronomyLibrary\Coordinates\RectangularCoordinates;
+use deepskylog\AstronomyLibrary\Time;
 
 /**
  * The target class describing the sun.
@@ -104,7 +104,7 @@ class Sun extends Target
         // R = radius vector
         $R = (1.000001018 * (1 - $e ** 2)) / (1 + $e * cos(deg2rad($nu)));
 
-        $omega  = 125.04 - 1934.136 * $julian_centuries;
+        $omega = 125.04 - 1934.136 * $julian_centuries;
         $lambda = $Odot - 0.00569 - 0.00478 * sin(deg2rad($omega));
 
         $ra = rad2deg(
@@ -159,7 +159,7 @@ class Sun extends Target
         [$Odot, $beta, $R] = $this->_calculateOdotBetaR($date);
 
         $lambda = $Odot + ($nutation[0] - 20.4898 / $R) / 3600.0;
-        $ecl    = new EclipticalCoordinates($lambda, $beta);
+        $ecl = new EclipticalCoordinates($lambda, $beta);
 
         return $ecl->convertToEquatorial($nutation[3]);
     }
@@ -397,8 +397,8 @@ class Sun extends Target
         $beta = -$B * 3600.0;
 
         $lambda_accent = $Odot - 1.397 * 10 * $tau - 0.00031 * (10 * $tau) ** 2;
-        $delta_Odot    = -0.09033;
-        $delta_beta    = 0.03916 * (cos(deg2rad($lambda_accent)) - sin(deg2rad($lambda_accent)));
+        $delta_Odot = -0.09033;
+        $delta_beta = 0.03916 * (cos(deg2rad($lambda_accent)) - sin(deg2rad($lambda_accent)));
 
         $Odot = $Odot + $delta_Odot / 3600.0;
         $beta = ($beta + $delta_beta) / 3600.0;
@@ -699,7 +699,7 @@ class Sun extends Target
     {
         $tau = (Time::getJd($date) - 2451545.0) / 365250.0;
 
-        $L0    = new Coordinate(280.4664567 + 360007.6982779 * $tau
+        $L0 = new Coordinate(280.4664567 + 360007.6982779 * $tau
                  + 0.03032028 * $tau ** 2 + $tau ** 3 / 49931
                  - $tau ** 4 / 15300 - $tau ** 5 / 2000000, 0, 360);
 
@@ -708,8 +708,8 @@ class Sun extends Target
         $this->calculateEquatorialCoordinatesHighAccuracy($date, $nutation);
         $ra = $this->getEquatorialCoordinates()->getRA()->getCoordinate() * 15.0;
 
-        $E     = $L0->getCoordinate() - 0.0057183 - $ra + $nutation[0] / 3600.0 * cos(deg2rad($nutation[3]));
+        $E = $L0->getCoordinate() - 0.0057183 - $ra + $nutation[0] / 3600.0 * cos(deg2rad($nutation[3]));
 
-        return CarbonInterval::make($E * 4 . 'm');
+        return CarbonInterval::make($E * 4 .'m');
     }
 }
