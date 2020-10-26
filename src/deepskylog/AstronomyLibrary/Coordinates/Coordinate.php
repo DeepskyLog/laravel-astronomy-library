@@ -104,7 +104,34 @@ class Coordinate
     }
 
     /**
-     * Converts the coordinate to hourshminutes'seconds''.
+     * Converts the coordinate to degrees°minutes.
+     *
+     * @return string A readable string of the coordinate in degrees,
+     *                minutes
+     */
+    public function convertToShortDegrees(): string
+    {
+        $sign = ' ';
+        $coords = $this->getCoordinate();
+        if ($coords < 0) {
+            $sign = '-';
+            $coords = -$this->getCoordinate();
+        }
+        $degrees = floor($coords);
+        $subminutes = 60 * ($coords - $degrees);
+        $minutes = floor($subminutes);
+
+        if ($minutes == 60) {
+            $minutes = 0;
+            $degrees++;
+        }
+
+        return $sign.sprintf('%02d', $degrees).'°'
+        .sprintf('%02d', $minutes)."'";
+    }
+
+    /**
+     * Converts the coordinate to hms.
      *
      * @return string A readable string of the coordinate in hours,
      *                minutes, seconds
@@ -130,6 +157,29 @@ class Coordinate
         return sprintf('%02d', $degrees).'h'
         .sprintf('%02d', $minutes).'m'
         .sprintf('%02d', $seconds).'s';
+    }
+
+    /**
+     * Converts the coordinate to hm.
+     *
+     * @return string A readable string of the coordinate in hours,
+     *                minutes
+     */
+    public function convertToShortHours(): string
+    {
+        $coords = $this->getCoordinate();
+
+        $degrees = floor($coords);
+        $subminutes = 60 * ($coords - $degrees);
+        $minutes = floor($subminutes);
+
+        if ($minutes == 60) {
+            $minutes = 0;
+            $degrees++;
+        }
+
+        return sprintf('%02d', $degrees).'h'
+        .sprintf('%02d', $minutes).'m';
     }
 
     /**

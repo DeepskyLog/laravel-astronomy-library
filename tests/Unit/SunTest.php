@@ -16,6 +16,7 @@
 namespace Tests\Unit;
 
 use Carbon\Carbon;
+use Carbon\CarbonInterval;
 use deepskylog\AstronomyLibrary\Targets\Sun;
 use deepskylog\AstronomyLibrary\Testing\BaseTestCase;
 use deepskylog\AstronomyLibrary\Time;
@@ -110,5 +111,15 @@ class SunTest extends BaseTestCase
         $this->assertEqualsWithDelta(-0.93739590, $rect_coords->getX()->getCoordinate(), 0.0000001);
         $this->assertEqualsWithDelta(-0.31316793, $rect_coords->getY()->getCoordinate(), 0.0000001);
         $this->assertEqualsWithDelta(-0.13577924, $rect_coords->getZ()->getCoordinate(), 0.0000001);
+    }
+
+    public function testEquationOfTime()
+    {
+        $sun = new Sun();
+        $date = Carbon::create(1992, 10, 13, 0, 0, 0, 'UTC');
+
+        $equationOfTime = $sun->calculateEquationOfTime($date);
+
+        $this->assertEquals(CarbonInterval::create(0, 0, 0, 0, 0, 13, 42, 564279), $equationOfTime);
     }
 }
