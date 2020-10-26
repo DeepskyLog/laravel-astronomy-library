@@ -407,6 +407,11 @@ $rect_coords = $sun->calculateGeometricCoordinates($date);
 
 // Calculate the rectangular coordinates of the sun in J2000.
 $rect_coords = $sun->calculateGeometricCoordinatesJ2000($date);
+
+// Calculate the equation of time
+$sun  = new Sun();
+$date = Carbon::create(1992, 10, 13, 0, 0, 0, 'UTC');
+$equationOfTime = $sun->calculateEquationOfTime($date);
 ```
 
 ## Change log

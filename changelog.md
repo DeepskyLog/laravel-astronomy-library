@@ -2,6 +2,15 @@
 
 All notable changes to `laravel-astronomy-library` will be documented in this file.
 
+## Version 4.14
+
+### Added
+
+- Added method to calculate the equation of time
+- Added methods to print the coordinates without seconds:
+  - convertToShortHours()
+  - convertToShortDegrees()
+
 ## Version 4.13
 
 ### Added
