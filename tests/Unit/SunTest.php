@@ -17,9 +17,9 @@ namespace Tests\Unit;
 
 use Carbon\Carbon;
 use Carbon\CarbonInterval;
-use deepskylog\AstronomyLibrary\Time;
 use deepskylog\AstronomyLibrary\Targets\Sun;
 use deepskylog\AstronomyLibrary\Testing\BaseTestCase;
+use deepskylog\AstronomyLibrary\Time;
 
 /**
  * Tests for the sun class.
@@ -40,7 +40,7 @@ class SunTest extends BaseTestCase
      *
      * @var string
      */
-    protected $appPath = __DIR__ . '/../../vendor/laravel/laravel/bootstrap/app.php';
+    protected $appPath = __DIR__.'/../../vendor/laravel/laravel/bootstrap/app.php';
 
     /**
      * Setup the test environment.
@@ -65,7 +65,7 @@ class SunTest extends BaseTestCase
 
     public function testEquatorialCoordinates()
     {
-        $sun  = new Sun();
+        $sun = new Sun();
         $date = Carbon::create(1992, 10, 13, 0, 0, 0, 'UTC');
 
         $nutation = Time::nutation(Time::getJd($date));
@@ -78,7 +78,7 @@ class SunTest extends BaseTestCase
 
     public function testEquatorialCoordinatesHighAccuracy()
     {
-        $sun  = new Sun();
+        $sun = new Sun();
         $date = Carbon::create(1992, 10, 13, 0, 0, 0, 'UTC');
 
         $nutation = Time::nutation(Time::getJd($date));
@@ -91,7 +91,7 @@ class SunTest extends BaseTestCase
 
     public function testRectangularCoordinates()
     {
-        $sun  = new Sun();
+        $sun = new Sun();
         $date = Carbon::create(1992, 10, 13, 0, 0, 0, 'UTC');
 
         $rect_coords = $sun->calculateGeometricCoordinates($date);
@@ -103,7 +103,7 @@ class SunTest extends BaseTestCase
 
     public function testRectangularCoordinatesJ2000()
     {
-        $sun  = new Sun();
+        $sun = new Sun();
         $date = Carbon::create(1992, 10, 13, 0, 0, 0, 'UTC');
 
         $rect_coords = $sun->calculateGeometricCoordinatesJ2000($date);
@@ -115,7 +115,7 @@ class SunTest extends BaseTestCase
 
     public function testEquationOfTime()
     {
-        $sun  = new Sun();
+        $sun = new Sun();
         $date = Carbon::create(1992, 10, 13, 0, 0, 0, 'UTC');
 
         $equationOfTime = $sun->calculateEquationOfTime($date);

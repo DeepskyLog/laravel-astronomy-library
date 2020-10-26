@@ -78,17 +78,17 @@ class Coordinate
      */
     public function convertToDegrees(): string
     {
-        $sign   = ' ';
+        $sign = ' ';
         $coords = $this->getCoordinate();
         if ($coords < 0) {
-            $sign   = '-';
+            $sign = '-';
             $coords = -$this->getCoordinate();
         }
-        $degrees    = floor($coords);
+        $degrees = floor($coords);
         $subminutes = 60 * ($coords - $degrees);
-        $minutes    = floor($subminutes);
+        $minutes = floor($subminutes);
         $subseconds = 60 * ($subminutes - $minutes);
-        $seconds    = round($subseconds);
+        $seconds = round($subseconds);
         if ($seconds == 60) {
             $seconds = 0;
             $minutes++;
@@ -98,9 +98,9 @@ class Coordinate
             $degrees++;
         }
 
-        return $sign . sprintf('%02d', $degrees) . '°'
-        . sprintf('%02d', $minutes) . "'"
-        . sprintf('%02d', $seconds) . '"';
+        return $sign.sprintf('%02d', $degrees).'°'
+        .sprintf('%02d', $minutes)."'"
+        .sprintf('%02d', $seconds).'"';
     }
 
     /**
@@ -111,23 +111,23 @@ class Coordinate
      */
     public function convertToShortDegrees(): string
     {
-        $sign   = ' ';
+        $sign = ' ';
         $coords = $this->getCoordinate();
         if ($coords < 0) {
-            $sign   = '-';
+            $sign = '-';
             $coords = -$this->getCoordinate();
         }
-        $degrees    = floor($coords);
+        $degrees = floor($coords);
         $subminutes = 60 * ($coords - $degrees);
-        $minutes    = floor($subminutes);
+        $minutes = floor($subminutes);
 
         if ($minutes == 60) {
             $minutes = 0;
             $degrees++;
         }
 
-        return $sign . sprintf('%02d', $degrees) . '°'
-        . sprintf('%02d', $minutes) . "'";
+        return $sign.sprintf('%02d', $degrees).'°'
+        .sprintf('%02d', $minutes)."'";
     }
 
     /**
@@ -140,11 +140,11 @@ class Coordinate
     {
         $coords = $this->getCoordinate();
 
-        $degrees    = floor($coords);
+        $degrees = floor($coords);
         $subminutes = 60 * ($coords - $degrees);
-        $minutes    = floor($subminutes);
+        $minutes = floor($subminutes);
         $subseconds = 60 * ($subminutes - $minutes);
-        $seconds    = round($subseconds);
+        $seconds = round($subseconds);
         if ($seconds == 60) {
             $seconds = 0;
             $minutes++;
@@ -154,9 +154,9 @@ class Coordinate
             $degrees++;
         }
 
-        return sprintf('%02d', $degrees) . 'h'
-        . sprintf('%02d', $minutes) . 'm'
-        . sprintf('%02d', $seconds) . 's';
+        return sprintf('%02d', $degrees).'h'
+        .sprintf('%02d', $minutes).'m'
+        .sprintf('%02d', $seconds).'s';
     }
 
     /**
@@ -169,17 +169,17 @@ class Coordinate
     {
         $coords = $this->getCoordinate();
 
-        $degrees    = floor($coords);
+        $degrees = floor($coords);
         $subminutes = 60 * ($coords - $degrees);
-        $minutes    = floor($subminutes);
+        $minutes = floor($subminutes);
 
         if ($minutes == 60) {
             $minutes = 0;
             $degrees++;
         }
 
-        return sprintf('%02d', $degrees) . 'h'
-        . sprintf('%02d', $minutes) . 'm';
+        return sprintf('%02d', $degrees).'h'
+        .sprintf('%02d', $minutes).'m';
     }
 
     /**
@@ -213,7 +213,7 @@ class Coordinate
      */
     public function bringInInterval(): void
     {
-        $coord    = $this->getCoordinate();
+        $coord = $this->getCoordinate();
         $interval = $this->_maxValue - $this->_minValue;
 
         $coord = $coord - $this->_minValue;
