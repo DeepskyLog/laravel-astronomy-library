@@ -2,6 +2,13 @@
 
 All notable changes to `laravel-astronomy-library` will be documented in this file.
 
+## Version 4.15
+
+### Added
+
+- Added method to calculate the ephemeris for physical observations of the sun
+  - getPhysicalEphemeris
+
 ## Version 4.14
 
 ### Added
