@@ -122,4 +122,16 @@ class SunTest extends BaseTestCase
 
         $this->assertEquals(CarbonInterval::create(0, 0, 0, 0, 0, 13, 42, 564279), $equationOfTime);
     }
+
+    public function testPhysicalEphemeris()
+    {
+        $sun = new Sun();
+        $date = Carbon::create(1992, 10, 13, 0, 0, 0, 'UTC');
+
+        $ephemeris = $sun->getPhysicalEphemeris($date, 59);
+
+        $this->assertEqualsWithDelta(26.27, $ephemeris[0], 0.01);
+        $this->assertEqualsWithDelta(5.99, $ephemeris[1], 0.01);
+        $this->assertEqualsWithDelta(238.63, $ephemeris[2], 0.01);
+    }
 }
