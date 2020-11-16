@@ -1061,4 +1061,30 @@ class Target
     {
         return $this->getEquatorialCoordinates()->getConstellation();
     }
+
+    /**
+     * Calculates the eccentric Anomaly using the equation of Kepler/**.
+     *
+     * @param float $eccentricity The eccentricity of the orbit
+     * @param float $meanAnomaly  The mean anomaly of the orbit in degrees
+     * @param float $accuracy     The accuracy of the result
+     *
+     * @return float The eccentric anomaly
+     *
+     * See chapter 30 of Astronomical Algorithms
+     */
+    public function eccentricAnomaly(float $eccentricity, float $meanAnomaly, float $accuracy): float
+    {
+        $e = $eccentricity * 180.0 / pi();
+
+        $old = $meanAnomaly;
+        $new = $meanAnomaly + $e * sin(deg2rad($old));
+
+        while (abs($old - $new) > $accuracy) {
+            $old = $new;
+            $new = $meanAnomaly + $e * sin(deg2rad($old));
+        }
+
+        return $new;
+    }
 }

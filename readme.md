@@ -410,6 +410,19 @@ $rect_coords = $sun->calculateGeometricCoordinatesJ2000($date);
 $sun  = new Sun();
 $date = Carbon::create(1992, 10, 13, 0, 0, 0, 'UTC');
 $equationOfTime = $sun->calculateEquationOfTime($date);
+
+// Calculate the ephemeris for physical observations
+$sun = new Sun();
+$date = Carbon::create(1992, 10, 13, 0, 0, 0, 'UTC');
+$deltaT = Time::deltaT($carbonDate);
+$ephemeris = $sun->getPhysicalEphemeris($date, $deltaT);
+
+// Calculate the eccentric Anomaly using the equation of Kepler
+$target = new Target();
+$eccenticity = 0.1;
+$meanAnomaly = 5;
+$accuracy = 0.000001;
+$target->eccentricAnomaly($eccentricity, $meanAnomaly, $accuracy);
 ```
 
 ## Change log

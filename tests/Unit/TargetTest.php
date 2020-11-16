@@ -536,4 +536,29 @@ class TargetTest extends BaseTestCase
             $target->getBestTimeToObserve()
         );
     }
+
+    /**
+     * Test the Equation of Kepler.
+     *
+     * @return None
+     */
+    public function testEquationOfKepler()
+    {
+        $target = new Target();
+        $this->assertEqualsWithDelta(5.554589, $target->eccentricAnomaly(0.1, 5, 0.000001), 0.000001);
+        $this->assertEqualsWithDelta(6.246908, $target->eccentricAnomaly(0.2, 5, 0.000001), 0.000001);
+        $this->assertEqualsWithDelta(7.134960, $target->eccentricAnomaly(0.3, 5, 0.000001), 0.000001);
+        $this->assertEqualsWithDelta(8.313903, $target->eccentricAnomaly(0.4, 5, 0.000001), 0.000001);
+        $this->assertEqualsWithDelta(9.950062, $target->eccentricAnomaly(0.5, 5, 0.000001), 0.000001);
+        $this->assertEqualsWithDelta(12.356653, $target->eccentricAnomaly(0.6, 5, 0.000001), 0.000001);
+        $this->assertEqualsWithDelta(16.167988, $target->eccentricAnomaly(0.7, 5, 0.000001), 0.000001);
+        $this->assertEqualsWithDelta(22.656576, $target->eccentricAnomaly(0.8, 5, 0.000001), 0.000001);
+        $this->assertEqualsWithDelta(33.344444, $target->eccentricAnomaly(0.9, 5, 0.000001), 0.000001);
+        $this->assertEqualsWithDelta(45.361021, $target->eccentricAnomaly(0.99, 5, 0.000001), 0.000001);
+        $this->assertEqualsWithDelta(24.725813, $target->eccentricAnomaly(0.99, 1, 0.000001), 0.000001);
+        $this->assertEqualsWithDelta(32.361002, $target->eccentricAnomaly(0.99, 2, 0.000001), 0.000001);
+        $this->assertEqualsWithDelta(89.722155, $target->eccentricAnomaly(0.99, 33, 0.000001), 0.000001);
+        $this->assertEqualsWithDelta(49.569623, $target->eccentricAnomaly(0.999, 6, 0.000001), 0.000001);
+        $this->assertEqualsWithDelta(52.270260, $target->eccentricAnomaly(0.999, 7, 0.000001), 0.000001);
+    }
 }
