@@ -2,12 +2,18 @@
 
 All notable changes to `laravel-astronomy-library` will be documented in this file.
 
+## Version 4.16
+
+### Added
+
+- Added method to calculate the eccentric anomaly using the equation of Kepler
+  - Target::eccentricAnomaly()
 ## Version 4.15
 
 ### Added
 
 - Added method to calculate the ephemeris for physical observations of the sun
-  - getPhysicalEphemeris
+  - Sun::getPhysicalEphemeris()
 
 ## Version 4.14
 
