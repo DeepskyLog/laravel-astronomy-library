@@ -16,6 +16,7 @@ use Carbon\Carbon;
 use deepskylog\AstronomyLibrary\Coordinates\Coordinate;
 use deepskylog\AstronomyLibrary\Coordinates\EquatorialCoordinates;
 use deepskylog\AstronomyLibrary\Coordinates\GeographicalCoordinates;
+use deepskylog\AstronomyLibrary\Targets\Mercury;
 use deepskylog\AstronomyLibrary\Targets\Moon;
 use deepskylog\AstronomyLibrary\Targets\Planet;
 use deepskylog\AstronomyLibrary\Targets\Target;
@@ -560,5 +561,22 @@ class TargetTest extends BaseTestCase
         $this->assertEqualsWithDelta(89.722155, $target->eccentricAnomaly(0.99, 33, 0.000001), 0.000001);
         $this->assertEqualsWithDelta(49.569623, $target->eccentricAnomaly(0.999, 6, 0.000001), 0.000001);
         $this->assertEqualsWithDelta(52.270260, $target->eccentricAnomaly(0.999, 7, 0.000001), 0.000001);
+    }
+
+    /**
+     * Test calculating the mean orbital parameters of Mercury.
+     */
+    public function testMeanOrbitalParametersMercury()
+    {
+        $date = Carbon::create(2065, 6, 24, 0);
+        $mercury = new Mercury();
+        $parameters = $mercury->calculateMeanOrbitalElements($date);
+        $this->assertEqualsWithDelta(203.494701, $parameters[0], 0.000001);
+        $this->assertEqualsWithDelta(0.387098310, $parameters[1], 0.000001);
+        $this->assertEqualsWithDelta(0.20564510, $parameters[2], 0.000001);
+        $this->assertEqualsWithDelta(7.006171, $parameters[3], 0.000001);
+        $this->assertEqualsWithDelta(49.107650, $parameters[4], 0.000001);
+        $this->assertEqualsWithDelta(78.475382, $parameters[5], 0.000001);
+        $this->assertEqualsWithDelta(125.019319, $parameters[6], 0.000001);
     }
 }

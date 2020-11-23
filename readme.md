@@ -423,6 +423,12 @@ $eccenticity = 0.1;
 $meanAnomaly = 5;
 $accuracy = 0.000001;
 $target->eccentricAnomaly($eccentricity, $meanAnomaly, $accuracy);
+
+// Calculate the mean orbital elements for Venus
+$date = Carbon::create(2065, 6, 24, 0);
+$venus = new Venus();
+$parameters = $venus->calculateMeanOrbitalElements($date);
+
 ```
 
 ## Change log

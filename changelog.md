@@ -2,6 +2,14 @@
 
 All notable changes to `laravel-astronomy-library` will be documented in this file.
 
+## Version 4.17
+
+### Added
+
+- Added classes for the planets:
+  - Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, Neptune
+- Added method to calculate the mean orbital parameters of the planets for a given date.
+
 ## Version 4.16
 
 ### Added
