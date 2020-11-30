@@ -91,12 +91,12 @@ class Uranus extends Planet
         return [$L, $a, $e, $i, $omega, $pi, $M];
     }
 
-        /**
+    /**
      * Calculates the heliocentric coordinates of Uranus.
      *
      * @param Carbon $date The date
      *
-     * @return Array L, B, R
+     * @return array L, B, R
      *
      * See chapter 32 of Astronomical Algorithms
      */
