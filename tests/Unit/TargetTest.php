@@ -20,6 +20,7 @@ use deepskylog\AstronomyLibrary\Targets\Mercury;
 use deepskylog\AstronomyLibrary\Targets\Moon;
 use deepskylog\AstronomyLibrary\Targets\Planet;
 use deepskylog\AstronomyLibrary\Targets\Target;
+use deepskylog\AstronomyLibrary\Targets\Venus;
 use deepskylog\AstronomyLibrary\Testing\BaseTestCase;
 use deepskylog\AstronomyLibrary\Time;
 
@@ -578,5 +579,18 @@ class TargetTest extends BaseTestCase
         $this->assertEqualsWithDelta(49.107650, $parameters[4], 0.000001);
         $this->assertEqualsWithDelta(78.475382, $parameters[5], 0.000001);
         $this->assertEqualsWithDelta(125.019319, $parameters[6], 0.000001);
+    }
+
+    /**
+     * Test calculating the heliocentric coordinates of Venus.
+     */
+    public function testHeliocentricCoordinatesVenus()
+    {
+        $date = Carbon::create(1992, 12, 20, 0);
+        $venus = new Venus();
+        $coords = $venus->calculateHeliocentricCoordinates($date);
+        $this->assertEqualsWithDelta(26.11412, $coords[0], 0.00001);
+        $this->assertEqualsWithDelta(-2.62060, $coords[1], 0.00001);
+        $this->assertEqualsWithDelta(0.724602, $coords[2], 0.000001);
     }
 }
