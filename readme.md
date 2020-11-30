@@ -429,6 +429,10 @@ $date = Carbon::create(2065, 6, 24, 0);
 $venus = new Venus();
 $parameters = $venus->calculateMeanOrbitalElements($date);
 
+// Calculate the heliocentric coordinates of Venus
+$date   = Carbon::create(1992, 12, 20, 0);
+$venus  = new Venus();
+$coords = $venus->calculateHeliocentricCoordinates($date);
 ```
 
 ## Change log
