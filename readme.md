@@ -437,16 +437,14 @@ $coords = $venus->calculateHeliocentricCoordinates($date);
 // Calculate the Equatorial Coordinates of Venus
 $date   = Carbon::create(1992, 12, 20, 0, 0, 0, 'UTC');
 $venus  = new Venus();
-$nutation = Time::nutation(Time::getJd($date));
-$venus->calculateEquatorialCoordinates($date, $nutation[3]);
+$venus->calculateEquatorialCoordinates($date);
 
 // Calculate the Equatorial Coordinates of comet Encke
 $date     = Carbon::create(1990, 10, 6, 0, 0, 0, 'UTC');
 $encke    = new Elliptic();
 $peridate = Carbon::create(1990, 10, 28, 13, 4, 50, 'UTC');
 $encke->setOrbitalElements(2.2091404, 0.8502196, 11.94524, 186.23352, 334.75006, $peridate);
-$nutation = Time::nutation(Time::getJd($date));
-$encke->calculateEquatorialCoordinates($date, $nutation[3]);
+$encke->calculateEquatorialCoordinates($date);
 ```
 
 ## Change log

@@ -2,6 +2,12 @@
 
 All notable changes to `laravel-astronomy-library` will be documented in this file.
 
+## Version 4.19.1
+
+### Changed
+
+- Obliquity is not needed as parameter in the calculateEquatorialCoordinates method of Planet and Elliptic
+
 ## Version 4.19
 
 ### Added
