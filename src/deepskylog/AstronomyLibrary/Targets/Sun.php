@@ -156,7 +156,7 @@ class Sun extends Target
      */
     private function _calculateEquatorialCoordinatesHighAccuracy(Carbon $date, array $nutation): EquatorialCoordinates
     {
-        [$Odot, $beta, $R] = $this->_calculateOdotBetaR($date);
+        [$Odot, $beta, $R] = $this->calculateOdotBetaR($date);
 
         $lambda = $Odot + ($nutation[0] - 20.4898 / $R) / 3600.0;
         $ecl = new EclipticalCoordinates($lambda, $beta);
@@ -174,7 +174,7 @@ class Sun extends Target
      *
      * See chapter 25 of Astronomical Algorithms
      */
-    private function _calculateOdotBetaR(Carbon $date): array
+    public function calculateOdotBetaR(Carbon $date): array
     {
         // tau = julian millenia since epoch J2000.0
         $tau = (Time::getJd($date) - 2451545.0) / 365250.0;
@@ -449,7 +449,7 @@ class Sun extends Target
      */
     public function calculateGeometricCoordinates(Carbon $date): RectangularCoordinates
     {
-        [$Odot, $beta, $R] = $this->_calculateOdotBetaR($date);
+        [$Odot, $beta, $R] = $this->calculateOdotBetaR($date);
 
         $nutation = Time::nutation(Time::getJd($date));
 

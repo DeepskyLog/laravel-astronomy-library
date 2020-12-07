@@ -16,6 +16,7 @@ use Carbon\Carbon;
 use deepskylog\AstronomyLibrary\Coordinates\Coordinate;
 use deepskylog\AstronomyLibrary\Coordinates\EquatorialCoordinates;
 use deepskylog\AstronomyLibrary\Coordinates\GeographicalCoordinates;
+use deepskylog\AstronomyLibrary\Targets\Elliptic;
 use deepskylog\AstronomyLibrary\Targets\Mercury;
 use deepskylog\AstronomyLibrary\Targets\Moon;
 use deepskylog\AstronomyLibrary\Targets\Planet;
@@ -592,5 +593,39 @@ class TargetTest extends BaseTestCase
         $this->assertEqualsWithDelta(26.11412, $coords[0], 0.00001);
         $this->assertEqualsWithDelta(-2.62060, $coords[1], 0.00001);
         $this->assertEqualsWithDelta(0.724602, $coords[2], 0.000001);
+    }
+
+    /**
+     * Test the apparent position of Venus on 1992 December 20 at 0:00.
+     */
+    public function testApparentPositionOfVenus()
+    {
+        $date = Carbon::create(1992, 12, 20, 0, 0, 0, 'UTC');
+        $venus = new Venus();
+
+        $nutation = Time::nutation(Time::getJd($date));
+        $venus->calculateEquatorialCoordinates($date, $nutation[3]);
+        $coordinates = $venus->getEquatorialCoordinates();
+
+        $this->assertEqualsWithDelta(21.078181, $coordinates->getRA()->getCoordinate(), 0.00001);
+        $this->assertEqualsWithDelta(-18.88802, $coordinates->getDeclination()->getCoordinate(), 0.00001);
+    }
+
+    /**
+     * Test the apparent position of comet Encke on 1990 October 6.
+     */
+    public function testEquatorialCoordinatesOfEncke()
+    {
+        $date = Carbon::create(1990, 10, 6, 0, 0, 0, 'UTC');
+        $encke = new Elliptic();
+        $peridate = Carbon::create(1990, 10, 28, 13, 4, 50, 'UTC');
+        $encke->setOrbitalElements(2.2091404, 0.8502196, 11.94524, 186.23352, 334.75006, $peridate);
+
+        $nutation = Time::nutation(Time::getJd($date));
+        $encke->calculateEquatorialCoordinates($date, $nutation[3]);
+        $coordinates = $encke->getEquatorialCoordinates();
+
+        $this->assertEqualsWithDelta(10.56228318, $coordinates->getRA()->getCoordinate(), 0.00001);
+        $this->assertEqualsWithDelta(19.18870874, $coordinates->getDeclination()->getCoordinate(), 0.00001);
     }
 }

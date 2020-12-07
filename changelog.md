@@ -2,6 +2,13 @@
 
 All notable changes to `laravel-astronomy-library` will be documented in this file.
 
+## Version 4.19
+
+### Added
+
+- Added methods to calculate the Equatorial coordinates of the planets for a given date.
+- Added Elliptic class, describing an object moving in an elliptic orbit. An add method to calculate the coordinates.
+
 ## Version 4.18
 
 ### Added
