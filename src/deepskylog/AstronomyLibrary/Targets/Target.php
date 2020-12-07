@@ -1063,7 +1063,7 @@ class Target
     }
 
     /**
-     * Calculates the eccentric Anomaly using the equation of Kepler/**.
+     * Calculates the eccentric Anomaly using the equation of Kepler
      *
      * @param float $eccentricity The eccentricity of the orbit
      * @param float $meanAnomaly  The mean anomaly of the orbit in degrees
