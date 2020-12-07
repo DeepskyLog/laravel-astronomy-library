@@ -70,24 +70,23 @@ class Elliptic extends Target
      * Calculates the equatorial coordinates of the planet.
      *
      * @param Carbon $date      The date for which to calculate the coordinates
-     * @param float  $obliquity The obliquity of the ecliptic for the given date
      *
      * See chapter 33 of Astronomical Algorithms
      */
-    public function calculateEquatorialCoordinates(Carbon $date, float $obliquity): void
+    public function calculateEquatorialCoordinates(Carbon $date): void
     {
         $this->setEquatorialCoordinatesToday(
-            $this->_calculateEquatorialCoordinates($date, $obliquity)
+            $this->_calculateEquatorialCoordinates($date)
         );
         $this->setEquatorialCoordinatesTomorrow(
-            $this->_calculateEquatorialCoordinates($date->addDay(), $obliquity)
+            $this->_calculateEquatorialCoordinates($date->addDay())
         );
         $this->setEquatorialCoordinatesYesterday(
-            $this->_calculateEquatorialCoordinates($date->subDays(2), $obliquity)
+            $this->_calculateEquatorialCoordinates($date->subDays(2))
         );
     }
 
-    public function _calculateEquatorialCoordinates(Carbon $date, float $obliquity): EquatorialCoordinates
+    public function _calculateEquatorialCoordinates(Carbon $date): EquatorialCoordinates
     {
         $F = cos(deg2rad($this->_longitude_ascending_node));
         $G = sin(deg2rad($this->_longitude_ascending_node)) * 0.917482062;
