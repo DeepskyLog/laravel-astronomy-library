@@ -16,11 +16,11 @@
 namespace deepskylog\AstronomyLibrary\Targets;
 
 use Carbon\Carbon;
+use RuntimeException;
+use deepskylog\AstronomyLibrary\Time;
 use deepskylog\AstronomyLibrary\Coordinates\Coordinate;
 use deepskylog\AstronomyLibrary\Coordinates\EquatorialCoordinates;
 use deepskylog\AstronomyLibrary\Coordinates\GeographicalCoordinates;
-use deepskylog\AstronomyLibrary\Time;
-use RuntimeException;
 
 /**
  * The target class describing an astronomical object.
@@ -57,6 +57,13 @@ class Target
     private ?Carbon $_bestTime = null;
 
     private ?string $_altitudeChart = null;
+
+    // The diameter of the target
+    private ?float $_diam1 = null;
+    private ?float $_diam2 = null;
+
+    // The magnitude of the object
+    private ?float $_magnitude = null;
 
     /**
      * The constructor.
@@ -159,12 +166,12 @@ class Target
      */
     private function _resetGlobalVariables(): void
     {
-        $this->_transit = null;
-        $this->_setting = null;
-        $this->_rising = null;
-        $this->_maxHeight = null;
+        $this->_transit          = null;
+        $this->_setting          = null;
+        $this->_rising           = null;
+        $this->_maxHeight        = null;
         $this->_maxHeightAtNight = null;
-        $this->_bestTime = null;
+        $this->_bestTime         = null;
     }
 
     /**
@@ -219,7 +226,7 @@ class Target
      **/
     public function getTransit(): Carbon
     {
-        if (! $this->_transit) {
+        if (!$this->_transit) {
             throw new RuntimeException('First execute the calculateEphemerides method');
         }
 
@@ -235,7 +242,7 @@ class Target
      **/
     public function getRising(): ?Carbon
     {
-        if (! $this->_transit) {
+        if (!$this->_transit) {
             throw new RuntimeException('First execute the calculateEphemerides method');
         }
 
@@ -251,7 +258,7 @@ class Target
      **/
     public function getSetting(): ?Carbon
     {
-        if (! $this->_transit) {
+        if (!$this->_transit) {
             throw new RuntimeException('First execute the calculateEphemerides method');
         }
 
@@ -266,7 +273,7 @@ class Target
      **/
     public function getMaxHeight(): ?Coordinate
     {
-        if (! $this->_transit) {
+        if (!$this->_transit) {
             throw new RuntimeException('First execute the calculateEphemerides method');
         }
 
@@ -284,7 +291,7 @@ class Target
      **/
     public function getMaxHeightAtNight(): ?Coordinate
     {
-        if (! $this->_transit) {
+        if (!$this->_transit) {
             throw new RuntimeException('First execute the calculateEphemerides method');
         }
 
@@ -299,7 +306,7 @@ class Target
      **/
     public function getBestTimeToObserve(): ?Carbon
     {
-        if (! $this->_transit) {
+        if (!$this->_transit) {
             throw new RuntimeException('First execute the calculateEphemerides method');
         }
 
@@ -396,8 +403,8 @@ class Target
         if ($this->getEquatorialCoordinatesYesterday()->getRA()->getCoordinate() == $this->getEquatorialCoordinatesTomorrow()->getRA()->getCoordinate()
             && $this->getEquatorialCoordinatesYesterday()->getDeclination()->getCoordinate() == $this->getEquatorialCoordinatesTomorrow()->getDeclination()->getCoordinate()
         ) {
-            $a = 0.0;
-            $b = 0.0;
+            $a    = 0.0;
+            $b    = 0.0;
             $adec = 0.0;
             $bdec = 0.0;
             // Target does not move.
@@ -406,7 +413,7 @@ class Target
             // Extra calculation for moving targets.
             // We use delta t for the given date.
             $targetDoesNotMove = false;
-            $a = $this->getEquatorialCoordinatesToday()->getRA()->getCoordinate()
+            $a                 = $this->getEquatorialCoordinatesToday()->getRA()->getCoordinate()
                 - $this->getEquatorialCoordinatesYesterday()->getRA()
                 ->getCoordinate();
             $b = $this->getEquatorialCoordinatesTomorrow()->getRA()->getCoordinate()
@@ -488,21 +495,21 @@ class Target
             }
         }
 
-        $transit = $m0 * 24.0;
-        $this->_transit = $this->_createTime($transit, $siderial_time);
+        $transit         = $m0 * 24.0;
+        $this->_transit  = $this->_createTime($transit, $siderial_time);
         $this->_bestTime = $this->_transit;
 
         if ($m1 == 99) {
             $this->_rising = Carbon::make(null);
         } else {
-            $rising = $m1 * 24.0;
+            $rising        = $m1 * 24.0;
             $this->_rising = $this->_createTime($rising, $siderial_time);
         }
 
         if ($m2 == 99) {
             $this->_setting = Carbon::make(null);
         } else {
-            $setting = $m2 * 24.0;
+            $setting        = $m2 * 24.0;
             $this->_setting = $this->_createTime($setting, $siderial_time);
         }
 
@@ -524,9 +531,9 @@ class Target
                 $sun_info['nautical_twilight_end']
             );
             if ($sun_info['nautical_twilight_begin'] === true) {
-                $this->_maxHeight = new Coordinate($transitHeight, -90.0, 90.0);
+                $this->_maxHeight        = new Coordinate($transitHeight, -90.0, 90.0);
                 $this->_maxHeightAtNight = null;
-                $this->_bestTime = null;
+                $this->_bestTime         = null;
             }
         } else {
             $endOfNight = Carbon::createFromTimestamp(
@@ -551,7 +558,7 @@ class Target
             }
         }
 
-        if (! $during_night) {
+        if (!$during_night) {
             $th = new Coordinate($transitHeight, -90.0, 90.0);
 
             // Calculate the height at the end of the night
@@ -586,10 +593,10 @@ class Target
 
             // Compare and use the hightest height as the best height for the target
             if ($height2 > $height) {
-                $th = new Coordinate($height2, -90.0, 90.0);
+                $th              = new Coordinate($height2, -90.0, 90.0);
                 $this->_bestTime = $startOfNight;
             } else {
-                $th = new Coordinate($height, -90.0, 90.0);
+                $th              = new Coordinate($height, -90.0, 90.0);
                 $this->_bestTime = $endOfNight;
             }
             // If max height < 0.0 at astronomical darkness, try nautical darkness.
@@ -636,10 +643,10 @@ class Target
                     // Compare and use the hightest height as the best height
                     // for the target
                     if ($height2 > $height) {
-                        $th = new Coordinate($height2, -90.0, 90.0);
+                        $th              = new Coordinate($height2, -90.0, 90.0);
                         $this->_bestTime = $startOfNight;
                     } else {
-                        $th = new Coordinate($height, -90.0, 90.0);
+                        $th              = new Coordinate($height, -90.0, 90.0);
                         $this->_bestTime = $endOfNight;
                     }
                 }
@@ -647,7 +654,7 @@ class Target
         } else {
             $th = new Coordinate($transitHeight, -90.0, 90.0);
         }
-        $this->_maxHeight = new Coordinate($transitHeight, -90.0, 90.0);
+        $this->_maxHeight        = new Coordinate($transitHeight, -90.0, 90.0);
         $this->_maxHeightAtNight = $th;
     }
 
@@ -687,9 +694,9 @@ class Target
         $geo_coords
     ): array {
         $theta = $this->_calculateTheta($theta0, $time);
-        $n = $this->_calculateN($time, $deltaT);
+        $n     = $this->_calculateN($time, $deltaT);
 
-        if (! $targetDoesNotMove) {
+        if (!$targetDoesNotMove) {
             $alphaInterpol = $this->_interpolate(
                 $this->getEquatorialCoordinatesToday()->getRA()->getCoordinate(),
                 $n,
@@ -855,7 +862,7 @@ class Target
     private function _createTime(float $time, Carbon $carbonTime): Carbon
     {
         // Same for rising, transit and setting
-        $hour = intval($time);
+        $hour   = intval($time);
         $minute = intval(($time - $hour) * 60.0);
         $second = intval(((($time - $hour) * 60.0) - $minute) * 60.0);
 
@@ -877,7 +884,7 @@ class Target
         GeographicalCoordinates $geo_coords,
         Carbon $date
     ): string {
-        if (! $this->_altitudeChart) {
+        if (!$this->_altitudeChart) {
             $image = imagecreatetruecolor(1000, 400);
 
             // Show the night
@@ -958,7 +965,7 @@ class Target
                 $startAstronomical = 12;
             }
 
-            $daycolor = imagecolorallocate($image, 0, 0, 200);
+            $daycolor      = imagecolorallocate($image, 0, 0, 200);
             $twilightcolor = imagecolorallocate($image, 100, 100, 200);
 
             imagefilledrectangle($image, 70, 5, 70 + $startNautical * 37, 365, $daycolor);
@@ -986,10 +993,10 @@ class Target
                     $coords = $this->getEquatorialCoordinates();
                 } else {
                     // Coordinates are for 0:00 TD
-                    $raToday = $this->getEquatorialCoordinatesToday()->getRA()->getCoordinate();
+                    $raToday   = $this->getEquatorialCoordinatesToday()->getRA()->getCoordinate();
                     $declToday = $this->getEquatorialCoordinatesToday()
                         ->getDeclination()->getCoordinate();
-                    $raTomorrow = $this->getEquatorialCoordinatesTomorrow()->getRA()->getCoordinate();
+                    $raTomorrow   = $this->getEquatorialCoordinatesTomorrow()->getRA()->getCoordinate();
                     $declTomorrow = $this->getEquatorialCoordinatesTomorrow()
                         ->getDeclination()->getCoordinate();
 
@@ -1002,8 +1009,8 @@ class Target
                         }
                     }
                     $raInterval = $raDiff / 24;
-                    $ra = $raToday + $raInterval * (12 + $i);
-                    $decl = $declToday
+                    $ra         = $raToday + $raInterval * (12 + $i);
+                    $decl       = $declToday
                         + ($declTomorrow - $declToday) / 24 * (12 + $i);
 
                     $coords = new EquatorialCoordinates($ra, $decl);
@@ -1046,7 +1053,7 @@ class Target
             $rawImageBytes = ob_get_clean();
 
             $this->_altitudeChart = "<img src='data:image/jpeg;base64,"
-                .base64_encode($rawImageBytes)."' />";
+                . base64_encode($rawImageBytes) . "' />";
         }
 
         return $this->_altitudeChart;
@@ -1086,5 +1093,67 @@ class Target
         }
 
         return $new;
+    }
+
+    /**
+     * Set the diameter of the target.
+     *
+     * @param float $diam1 The diam1 in arcseconds
+     * @param float $diam2 The diam2 in arcseconds
+     *
+     * @return None
+     */
+    public function setDiameter(?float $diam1, ?float $diam2 = 0.0): void
+    {
+        if ($diam2 == 0) {
+            $diam2 = $diam1;
+        }
+        $this->_diam1 = $diam1;
+        $this->_diam2 = $diam2;
+    }
+
+    /**
+     * Get diameter.
+     *
+     * @return array The diam1 and diam2 value
+     */
+    public function getDiameter(): array
+    {
+        return [$this->_diam1, $this->_diam2];
+    }
+
+    /**
+     * Set the magnitude of the target.
+     *
+     * @param float $magnitude The magnitude
+     *
+     * @return None
+     */
+    public function setMagnitude(?float $magnitude): void
+    {
+        $this->_magnitude = $magnitude;
+    }
+
+    /**
+     * Get the magnitude of the target.
+     *
+     * @return float The magnitude
+     */
+    public function getMagnitude(): ?float
+    {
+        return $this->_magnitude;
+    }
+
+    /**
+     * Calculates the SBObj of the target.  This is needed to calculate the contrast of the target.
+     */
+    public function calculateSBObj()
+    {
+        if (($this->_magnitude) && ($this->_magnitude != 99.9) && (($this->_diam1 != 0) || ($this->_diam2 != 0))) {
+            $SBObj = ($this->_magnitude + (2.5 * log10(2827.0 * ($this->_diam1 / 60) * ($this->_diam2 / 60))));
+        } else {
+            $SBObj = null;
+        }
+        return $SBObj;
     }
 }
