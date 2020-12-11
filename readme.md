@@ -52,6 +52,8 @@ For more documentation on the mathematical background, see [docs.md](docs/docs.m
 ```php
 <?php
 // Use the factory to create a AstronomyLibrary instance
+use Carbon\Carbon;
+$carbonDate = Carbon::now();
 $coords = new GeographicalCoordinates(-70.73330, -29.25);
 $astrolib = new AstronomyLibrary($carbonDate, $coords);
 ```
