@@ -12,7 +12,7 @@ The laravel-astronomy-library is part of [DeepskyLog](https://www.deepskylog.org
 
 ## Installation
 
-AstronomyLibrary can be installed via composer:
+AstronomyLibrary can be installed via composer.  laravel-astronomy-library needs at least php 7.4 to run.
 
 ``` bash
 composer require deepskylog/laravel-astronomy-library
@@ -52,6 +52,8 @@ For more documentation on the mathematical background, see [docs.md](docs/docs.m
 ```php
 <?php
 // Use the factory to create a AstronomyLibrary instance
+use Carbon\Carbon;
+$carbonDate = Carbon::now();
 $coords = new GeographicalCoordinates(-70.73330, -29.25);
 $astrolib = new AstronomyLibrary($carbonDate, $coords);
 ```
