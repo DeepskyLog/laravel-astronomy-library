@@ -447,6 +447,19 @@ $encke    = new Elliptic();
 $peridate = Carbon::create(1990, 10, 28, 13, 4, 50, 'UTC');
 $encke->setOrbitalElements(2.2091404, 0.8502196, 11.94524, 186.23352, 334.75006, $peridate);
 $encke->calculateEquatorialCoordinates($date);
+
+// Calculate the contrast reserve and best magnification for the detection
+$target = new Target();
+$target->setDiameter(540, 138);
+$target->setMagnitude(9.2);
+$contrastReserve = $target->calculateContrastReserve($target->calculateSBObj(), 22, 457, 66);
+
+$magnifications = [
+    66, 103, 158, 257, 411,
+    76, 118, 182, 296, 473,
+    133, 206, 317, 514, 823,
+];
+$target->calculateBestMagnification($target->calculateSBObj(), 22, 457, $magnifications)
 ```
 
 ## Change log

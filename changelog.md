@@ -2,6 +2,13 @@
 
 All notable changes to `laravel-astronomy-library` will be documented in this file.
 
+## Version 4.20
+
+### Added
+
+- Added methods to calculate the contrast reserve and the magnification of an object. The contrast reserve tells how easy it is to detect an object.
+- If the contrast difference is < 0, the object is not visible, contrast difference < -0.2 : Not visible, -0.2 < contrast diff < 0.1 : questionable, 0.10 < contrast diff < 0.35 : Difficult, 0.35 < contrast diff < 0.5 : Quite difficult to see, 0.50 < contr diff < 1.0 : Easy to see, 1.00 < contrast diff : Very easy to see
+
 ## Version 4.19.1
 
 ### Changed

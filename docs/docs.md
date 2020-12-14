@@ -38,3 +38,17 @@ The formulae to convert between NELM and SQM are taken from the Telescope Limiti
 
 - There are classes for Ecliptical, Equatorial, Galactic, Horizontal and Geographical Coordinates.
 - The formulae to do the conversions between Coordinate systems are from Astronomical Algorithms by Jean Meeus.
+
+### Contrast Reserve
+
+- The contrast reserve of an object tells how easy it is to detect an object with a certain instrument from a certain sky.  The calculation of the contrast reserve does not take into account brighter parts of the object.  It is possible that the contrast reserve clearly tells that a galaxy is not visible, but that the center of the galaxy is really bright and is visible after all.  The conclusion is that the contrast reserve is an indication of how easy an object is to see, but even if the contrast reserve points out that the object should not be visible, you should always try to see if the brighter parts of the object is not visible.
+- When a list of possible magnifications is given, the best magnification to detect the object can be given.  This does not mean that this magnification is the best magnification to see the most details.
+
+| Contrast reserve interval | Constrast reserve interval | Meaning |
+|----| ----| ---|
+| | < -0.2 | The object is not visible |
+| > -0.2 | < 0.1 | The detection of the object is questionable |
+| 0.10 | < 0.35 | The detection of the object is difficult |
+| 0.35 | < 0.5 | The detection of the object is quite difficult |
+| 0.50 | < 1.0 | The detection of the object is easy |
+| 1.00 |  | The detection of the object is very easy |
