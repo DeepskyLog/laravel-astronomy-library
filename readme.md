@@ -446,7 +446,16 @@ $date     = Carbon::create(1990, 10, 6, 0, 0, 0, 'UTC');
 $encke    = new Elliptic();
 $peridate = Carbon::create(1990, 10, 28, 13, 4, 50, 'UTC');
 $encke->setOrbitalElements(2.2091404, 0.8502196, 11.94524, 186.23352, 334.75006, $peridate);
-$encke->calculateEquatorialCoordinates($date);
+$encke->calculateEquatorialCoordinates($date, $nutation[3]);
+
+// Calculate the Equatorial Coordinates of comet Stonehouse
+$date       = Carbon::create(1998, 8, 5, 0, 0, 0, 'UTC');
+$stonehouse = new Parabolic();
+$peridate   = Carbon::create(1998, 4, 14, 10, 27, 33, 'UTC');
+$stonehouse->setOrbitalElements(1.487469, 104.69219, 1.32431, 222.10887, $peridate);
+$nutation = Time::nutation(Time::getJd($date));
+$stonehouse->calculateEquatorialCoordinates($date, $nutation[3]);
+$coordinates = $stonehouse->getEquatorialCoordinates();
 
 // Calculate the contrast reserve and best magnification for the detection
 $target = new Target();

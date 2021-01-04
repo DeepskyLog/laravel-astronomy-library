@@ -19,6 +19,7 @@ use deepskylog\AstronomyLibrary\Coordinates\GeographicalCoordinates;
 use deepskylog\AstronomyLibrary\Targets\Elliptic;
 use deepskylog\AstronomyLibrary\Targets\Mercury;
 use deepskylog\AstronomyLibrary\Targets\Moon;
+use deepskylog\AstronomyLibrary\Targets\Parabolic;
 use deepskylog\AstronomyLibrary\Targets\Planet;
 use deepskylog\AstronomyLibrary\Targets\Target;
 use deepskylog\AstronomyLibrary\Targets\Venus;
@@ -627,5 +628,23 @@ class TargetTest extends BaseTestCase
 
         $this->assertEqualsWithDelta(10.56228318, $coordinates->getRA()->getCoordinate(), 0.00001);
         $this->assertEqualsWithDelta(19.18870874, $coordinates->getDeclination()->getCoordinate(), 0.00001);
+    }
+
+    /**
+     * Test the apparent position of comet Stonehouse (C/1998 H1) on 1998 August 5.
+     */
+    public function testEquatorialCoordinatesOfStonehouse()
+    {
+        $date = Carbon::create(1998, 8, 5, 0, 0, 0, 'UTC');
+        $stonehouse = new Parabolic();
+        $peridate = Carbon::create(1998, 4, 14, 10, 27, 33, 'UTC');
+        $stonehouse->setOrbitalElements(1.487469, 104.69219, 1.32431, 222.10887, $peridate);
+
+        $nutation = Time::nutation(Time::getJd($date));
+        $stonehouse->calculateEquatorialCoordinates($date, $nutation[3]);
+        $coordinates = $stonehouse->getEquatorialCoordinates();
+
+        $this->assertEqualsWithDelta(12.523385, $coordinates->getRA()->getCoordinate(), 0.00001);
+        $this->assertEqualsWithDelta(50.7636309, $coordinates->getDeclination()->getCoordinate(), 0.00001);
     }
 }

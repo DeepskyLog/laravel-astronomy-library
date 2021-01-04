@@ -2,6 +2,12 @@
 
 All notable changes to `laravel-astronomy-library` will be documented in this file.
 
+## Version 4.21
+
+### Added
+
+- Added Parabolic class, describing an object moving in a parabolic orbit. An add method to calculate the coordinates.
+
 ## Version 4.20
 
 ### Added
