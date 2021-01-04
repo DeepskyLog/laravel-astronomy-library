@@ -53,11 +53,11 @@ class Parabolic extends Target
      */
     public function setOrbitalElements(float $q, float $i, float $omega, float $longitude_ascending_node, Carbon $perihelion_date): void
     {
-        $this->_q                        = $q;
-        $this->_i                        = $i;
-        $this->_omega                    = $omega;
+        $this->_q = $q;
+        $this->_i = $i;
+        $this->_omega = $omega;
         $this->_longitude_ascending_node = $longitude_ascending_node;
-        $this->_perihelion_date          = $perihelion_date;
+        $this->_perihelion_date = $perihelion_date;
     }
 
     /**
@@ -100,13 +100,13 @@ class Parabolic extends Target
         $b = sqrt($G ** 2 + $Q ** 2);
         $c = sqrt($H ** 2 + $R ** 2);
 
-        $W     = 0.03649116245 / ($this->_q * sqrt($this->_q)) * $diff_in_date;
+        $W = 0.03649116245 / ($this->_q * sqrt($this->_q)) * $diff_in_date;
 
-        $G     = $W / 2;
-        $Y     = pow($G + sqrt($G * $G + 1), 1 / 3);
-        $s     = $Y - 1 / $Y;
-        $v     = rad2deg(2 * atan($s));
-        $r     = $this->_q * (1 + $s * $s);
+        $G = $W / 2;
+        $Y = pow($G + sqrt($G * $G + 1), 1 / 3);
+        $s = $Y - 1 / $Y;
+        $v = rad2deg(2 * atan($s));
+        $r = $this->_q * (1 + $s * $s);
 
         $x = $r * $a * sin(deg2rad($A + $this->_omega + $v));
         $y = $r * $b * sin(deg2rad($B + $this->_omega + $v));
@@ -115,14 +115,14 @@ class Parabolic extends Target
         $sun = new Sun();
         $XYZ = $sun->calculateGeometricCoordinates($date);
 
-        $ksi  = $XYZ->getX()->getCoordinate() + $x;
-        $eta  = $XYZ->getY()->getCoordinate() + $y;
+        $ksi = $XYZ->getX()->getCoordinate() + $x;
+        $eta = $XYZ->getY()->getCoordinate() + $y;
         $zeta = $XYZ->getZ()->getCoordinate() + $z;
 
         $delta = sqrt($ksi ** 2 + $eta ** 2 + $zeta ** 2);
-        $tau   = 0.0057755183 * $delta;
+        $tau = 0.0057755183 * $delta;
 
-        $ra  = rad2deg(atan2($eta, $ksi)) / 15.0;
+        $ra = rad2deg(atan2($eta, $ksi)) / 15.0;
         $dec = rad2deg(asin($zeta / $delta));
 
         return new EquatorialCoordinates($ra, $dec);
