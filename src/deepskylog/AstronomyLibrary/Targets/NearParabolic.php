@@ -55,12 +55,12 @@ class NearParabolic extends Target
      */
     public function setOrbitalElements(float $q, float $e, float $i, float $omega, float $longitude_ascending_node, Carbon $perihelion_date): void
     {
-        $this->_q                        = $q;
-        $this->_e                        = $e;
-        $this->_i                        = $i;
-        $this->_omega                    = $omega;
+        $this->_q = $q;
+        $this->_e = $e;
+        $this->_i = $i;
+        $this->_omega = $omega;
         $this->_longitude_ascending_node = $longitude_ascending_node;
-        $this->_perihelion_date          = $perihelion_date;
+        $this->_perihelion_date = $perihelion_date;
     }
 
     /**
@@ -87,17 +87,17 @@ class NearParabolic extends Target
     {
         $diff_in_date = $this->_perihelion_date->diffInSeconds($date) / 3600.0 / 24.0;
 
-        $k            = 0.01720209895;
-        $Q            = $k / (2 * $this->_q) * sqrt((1 + $this->_e) / $this->_q);
-        $gamma        = (1 - $this->_e) / (1 + $this->_e);
+        $k = 0.01720209895;
+        $Q = $k / (2 * $this->_q) * sqrt((1 + $this->_e) / $this->_q);
+        $gamma = (1 - $this->_e) / (1 + $this->_e);
 
         if ($diff_in_date == 0) {
             $r = $this->_q;
             $v = 0.0;
         } else {
             $q2 = $Q * $diff_in_date;
-            $s  = 2 / (3 * abs($q2));
-            $s  = 2 / tan(2 * atan(tan(atan($s) / 2) ** (1 / 3)));
+            $s = 2 / (3 * abs($q2));
+            $s = 2 / tan(2 * atan(tan(atan($s) / 2) ** (1 / 3)));
             if ($diff_in_date < 0) {
                 $s = -$s;
             }
@@ -105,21 +105,21 @@ class NearParabolic extends Target
                 $l = 0;
                 do {
                     $s0 = $s;
-                    $z  = 1;
-                    $y  = $s * $s;
+                    $z = 1;
+                    $y = $s * $s;
                     $g1 = -$y * $s;
                     $q3 = $q2 + 2 * $gamma * $s * $y / 3;
                     do {
-                        $z  = $z + 1;
+                        $z = $z + 1;
                         $g1 = -$g1 * $gamma * $y;
                         $z1 = ($z - ($z + 1) * $gamma) / (2 * $z + 1);
-                        $f  = $z1 * $g1;
+                        $f = $z1 * $g1;
                         $q3 = $q3 + $f;
                     } while (abs($f) > 1e-9 && $z < 500);
                     $l++;
                     do {
                         $s1 = $s;
-                        $s  = (2 * $s * $s * $s / 3 + $q3) / ($s * $s + 1);
+                        $s = (2 * $s * $s * $s / 3 + $q3) / ($s * $s + 1);
                     } while (abs($s - $s1) > 1e-9);
                 } while (abs($s - $s0) > 1e-9 && $l < 500);
             }
@@ -151,14 +151,14 @@ class NearParabolic extends Target
         $sun = new Sun();
         $XYZ = $sun->calculateGeometricCoordinates($date);
 
-        $ksi  = $XYZ->getX()->getCoordinate() + $x;
-        $eta  = $XYZ->getY()->getCoordinate() + $y;
+        $ksi = $XYZ->getX()->getCoordinate() + $x;
+        $eta = $XYZ->getY()->getCoordinate() + $y;
         $zeta = $XYZ->getZ()->getCoordinate() + $z;
 
         $delta = sqrt($ksi ** 2 + $eta ** 2 + $zeta ** 2);
-        $tau   = 0.0057755183 * $delta;
+        $tau = 0.0057755183 * $delta;
 
-        $ra  = rad2deg(atan2($eta, $ksi)) / 15.0;
+        $ra = rad2deg(atan2($eta, $ksi)) / 15.0;
         $dec = rad2deg(asin($zeta / $delta));
 
         return new EquatorialCoordinates($ra, $dec);
