@@ -469,6 +469,22 @@ $magnifications = [
     133, 206, 317, 514, 823,
 ];
 $target->calculateBestMagnification($target->calculateSBObj(), 22, 457, $magnifications)
+
+// Calculate the next inferior and superior conjunction of Mercury after a given date
+$date    = Carbon::create(1993, 10, 1, 0, 0, 0, 'UTC');
+$mercury = new Mercury();
+$inf     = $mercury->inferior_conjunction($date);
+$sup     = $mercury->superior_conjunction($date);
+
+// Calculate the date of the greatest eastern (best evening visibility) and western (best morning visibility) elongation of Mercury
+$western = $mercury->greatest_western_elongation($date);
+$eastern = $mercury->greatest_eastern_elongation($date);
+
+// Calculate the opposition and conjunction of Jupiter after a given date
+$date        = Carbon::create(1993, 10, 1, 0, 0, 0, 'UTC');
+$jupiter     = new Jupiter();
+$opposition  = $jupiter->opposition($date);
+$conjunction = $jupiter->conjunction($date);
 ```
 
 ## Change log

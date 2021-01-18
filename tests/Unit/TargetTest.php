@@ -13,18 +13,23 @@
 namespace Tests\Unit;
 
 use Carbon\Carbon;
+use deepskylog\AstronomyLibrary\Time;
+use deepskylog\AstronomyLibrary\Targets\Mars;
+use deepskylog\AstronomyLibrary\Targets\Moon;
+use deepskylog\AstronomyLibrary\Targets\Venus;
+use deepskylog\AstronomyLibrary\Targets\Planet;
+use deepskylog\AstronomyLibrary\Targets\Saturn;
+use deepskylog\AstronomyLibrary\Targets\Target;
+use deepskylog\AstronomyLibrary\Targets\Uranus;
+use deepskylog\AstronomyLibrary\Targets\Jupiter;
+use deepskylog\AstronomyLibrary\Targets\Mercury;
+use deepskylog\AstronomyLibrary\Targets\Neptune;
+use deepskylog\AstronomyLibrary\Targets\Elliptic;
+use deepskylog\AstronomyLibrary\Targets\Parabolic;
+use deepskylog\AstronomyLibrary\Testing\BaseTestCase;
 use deepskylog\AstronomyLibrary\Coordinates\Coordinate;
 use deepskylog\AstronomyLibrary\Coordinates\EquatorialCoordinates;
 use deepskylog\AstronomyLibrary\Coordinates\GeographicalCoordinates;
-use deepskylog\AstronomyLibrary\Targets\Elliptic;
-use deepskylog\AstronomyLibrary\Targets\Mercury;
-use deepskylog\AstronomyLibrary\Targets\Moon;
-use deepskylog\AstronomyLibrary\Targets\Parabolic;
-use deepskylog\AstronomyLibrary\Targets\Planet;
-use deepskylog\AstronomyLibrary\Targets\Target;
-use deepskylog\AstronomyLibrary\Targets\Venus;
-use deepskylog\AstronomyLibrary\Testing\BaseTestCase;
-use deepskylog\AstronomyLibrary\Time;
 
 /**
  * Tests for the target classes.
@@ -43,7 +48,7 @@ class TargetTest extends BaseTestCase
      *
      * @var string
      */
-    protected $appPath = __DIR__.'/../../vendor/laravel/laravel/bootstrap/app.php';
+    protected $appPath = __DIR__ . '/../../vendor/laravel/laravel/bootstrap/app.php';
 
     /**
      * Setup the test environment.
@@ -95,10 +100,10 @@ class TargetTest extends BaseTestCase
      */
     public function testRisingTransitSettingVenus()
     {
-        $date = Carbon::create(1988, 3, 20, 12);
-        $geo_coords = new GeographicalCoordinates(-71.0833, 42.3333);
-        $equaToday = new EquatorialCoordinates(2.782086, 18.44092);
-        $equaTomorrow = new EquatorialCoordinates(2.852136, 18.82742);
+        $date          = Carbon::create(1988, 3, 20, 12);
+        $geo_coords    = new GeographicalCoordinates(-71.0833, 42.3333);
+        $equaToday     = new EquatorialCoordinates(2.782086, 18.44092);
+        $equaTomorrow  = new EquatorialCoordinates(2.852136, 18.82742);
         $equaYesterday = new EquatorialCoordinates(2.712014, 18.04761);
 
         $target = new Planet();
@@ -149,10 +154,10 @@ class TargetTest extends BaseTestCase
      */
     public function testRisingTransitSettingVenus2()
     {
-        $date = Carbon::create(2020, 5, 18, 12);
-        $geo_coords = new GeographicalCoordinates(4.86463, 50.83220);
-        $equaToday = new EquatorialCoordinates(5.33815, 26.8638);
-        $equaTomorrow = new EquatorialCoordinates(5.3236, 26.7175);
+        $date          = Carbon::create(2020, 5, 18, 12);
+        $geo_coords    = new GeographicalCoordinates(4.86463, 50.83220);
+        $equaToday     = new EquatorialCoordinates(5.33815, 26.8638);
+        $equaTomorrow  = new EquatorialCoordinates(5.3236, 26.7175);
         $equaYesterday = new EquatorialCoordinates(5.3498, 26.9984);
 
         $target = new Planet();
@@ -203,9 +208,9 @@ class TargetTest extends BaseTestCase
      */
     public function testRisingTransitSettingNoRise()
     {
-        $date = Carbon::create(1988, 3, 20, 12);
+        $date       = Carbon::create(1988, 3, 20, 12);
         $geo_coords = new GeographicalCoordinates(-71.0833, 42.3333);
-        $equa = new EquatorialCoordinates(2.852136, -78.82742);
+        $equa       = new EquatorialCoordinates(2.852136, -78.82742);
 
         $target = new Target();
         $target->setEquatorialCoordinates($equa);
@@ -251,9 +256,9 @@ class TargetTest extends BaseTestCase
      */
     public function testRisingTransitSettingCircumpolar()
     {
-        $date = Carbon::create(1988, 3, 20, 12);
+        $date       = Carbon::create(1988, 3, 20, 12);
         $geo_coords = new GeographicalCoordinates(-71.0833, 42.3333);
-        $equa = new EquatorialCoordinates(2.852136, 85.82742);
+        $equa       = new EquatorialCoordinates(2.852136, 85.82742);
 
         $target = new Target();
         $target->setEquatorialCoordinates($equa);
@@ -299,9 +304,9 @@ class TargetTest extends BaseTestCase
      */
     public function testRisingTransitSettingBelgium()
     {
-        $date = Carbon::create(2020, 5, 13, 12);
+        $date       = Carbon::create(2020, 5, 13, 12);
         $geo_coords = new GeographicalCoordinates(4.86463, 50.83220);
-        $equa = new EquatorialCoordinates(13.703055555555556, 28.37555556);
+        $equa       = new EquatorialCoordinates(13.703055555555556, 28.37555556);
 
         $target = new Target();
         $target->setEquatorialCoordinates($equa);
@@ -350,9 +355,9 @@ class TargetTest extends BaseTestCase
      */
     public function testRisingTransitSetting2()
     {
-        $date = Carbon::create(2020, 5, 13, 12);
+        $date       = Carbon::create(2020, 5, 13, 12);
         $geo_coords = new GeographicalCoordinates(4.86463, 50.83220);
-        $equa = new EquatorialCoordinates(16.695, 36.460278);
+        $equa       = new EquatorialCoordinates(16.695, 36.460278);
 
         $target = new Target();
         $target->setEquatorialCoordinates($equa);
@@ -404,7 +409,7 @@ class TargetTest extends BaseTestCase
         $date = Carbon::create(2020, 5, 13, 12);
         $date->timezone('Europe/Brussels');
         $geo_coords = new GeographicalCoordinates(4.86463, 50.83220);
-        $equa = new EquatorialCoordinates(16.695, 36.460278);
+        $equa       = new EquatorialCoordinates(16.695, 36.460278);
 
         $target = new Target();
         $target->setEquatorialCoordinates($equa);
@@ -453,9 +458,9 @@ class TargetTest extends BaseTestCase
      */
     public function testRisingTransitSettingNoAstronomicalDarkness()
     {
-        $date = Carbon::create(2020, 6, 13, 12);
+        $date       = Carbon::create(2020, 6, 13, 12);
         $geo_coords = new GeographicalCoordinates(4.86463, 50.83220);
-        $equa = new EquatorialCoordinates(16.695, 36.460278);
+        $equa       = new EquatorialCoordinates(16.695, 36.460278);
 
         $target = new Target();
         $target->setEquatorialCoordinates($equa);
@@ -505,9 +510,9 @@ class TargetTest extends BaseTestCase
      */
     public function testRisingTransitSettingNoAstronomicalDarkness2()
     {
-        $date = Carbon::create(2020, 6, 13, 12);
+        $date       = Carbon::create(2020, 6, 13, 12);
         $geo_coords = new GeographicalCoordinates(4.86463, 80.83220);
-        $equa = new EquatorialCoordinates(16.695, 36.460278);
+        $equa       = new EquatorialCoordinates(16.695, 36.460278);
 
         $target = new Target();
         $target->setEquatorialCoordinates($equa);
@@ -571,8 +576,8 @@ class TargetTest extends BaseTestCase
      */
     public function testMeanOrbitalParametersMercury()
     {
-        $date = Carbon::create(2065, 6, 24, 0);
-        $mercury = new Mercury();
+        $date       = Carbon::create(2065, 6, 24, 0);
+        $mercury    = new Mercury();
         $parameters = $mercury->calculateMeanOrbitalElements($date);
         $this->assertEqualsWithDelta(203.494701, $parameters[0], 0.000001);
         $this->assertEqualsWithDelta(0.387098310, $parameters[1], 0.000001);
@@ -588,8 +593,8 @@ class TargetTest extends BaseTestCase
      */
     public function testHeliocentricCoordinatesVenus()
     {
-        $date = Carbon::create(1992, 12, 20, 0);
-        $venus = new Venus();
+        $date   = Carbon::create(1992, 12, 20, 0);
+        $venus  = new Venus();
         $coords = $venus->calculateHeliocentricCoordinates($date);
         $this->assertEqualsWithDelta(26.11412, $coords[0], 0.00001);
         $this->assertEqualsWithDelta(-2.62060, $coords[1], 0.00001);
@@ -601,7 +606,7 @@ class TargetTest extends BaseTestCase
      */
     public function testApparentPositionOfVenus()
     {
-        $date = Carbon::create(1992, 12, 20, 0, 0, 0, 'UTC');
+        $date  = Carbon::create(1992, 12, 20, 0, 0, 0, 'UTC');
         $venus = new Venus();
 
         $nutation = Time::nutation(Time::getJd($date));
@@ -617,8 +622,8 @@ class TargetTest extends BaseTestCase
      */
     public function testEquatorialCoordinatesOfEncke()
     {
-        $date = Carbon::create(1990, 10, 6, 0, 0, 0, 'UTC');
-        $encke = new Elliptic();
+        $date     = Carbon::create(1990, 10, 6, 0, 0, 0, 'UTC');
+        $encke    = new Elliptic();
         $peridate = Carbon::create(1990, 10, 28, 13, 4, 50, 'UTC');
         $encke->setOrbitalElements(2.2091404, 0.8502196, 11.94524, 186.23352, 334.75006, $peridate);
 
@@ -635,9 +640,9 @@ class TargetTest extends BaseTestCase
      */
     public function testEquatorialCoordinatesOfStonehouse()
     {
-        $date = Carbon::create(1998, 8, 5, 0, 0, 0, 'UTC');
+        $date       = Carbon::create(1998, 8, 5, 0, 0, 0, 'UTC');
         $stonehouse = new Parabolic();
-        $peridate = Carbon::create(1998, 4, 14, 10, 27, 33, 'UTC');
+        $peridate   = Carbon::create(1998, 4, 14, 10, 27, 33, 'UTC');
         $stonehouse->setOrbitalElements(1.487469, 104.69219, 1.32431, 222.10887, $peridate);
 
         $nutation = Time::nutation(Time::getJd($date));
@@ -646,5 +651,133 @@ class TargetTest extends BaseTestCase
 
         $this->assertEqualsWithDelta(12.523385, $coordinates->getRA()->getCoordinate(), 0.00001);
         $this->assertEqualsWithDelta(50.7636309, $coordinates->getDeclination()->getCoordinate(), 0.00001);
+    }
+
+    /**
+     * Test the date of the inferior conjunction of Mercury.
+     */
+    public function testMercuryInferiorConjunction()
+    {
+        $date    = Carbon::create(1993, 10, 1, 0, 0, 0, 'UTC');
+        $mercury = new Mercury();
+        $inf     = $mercury->inferior_conjunction($date);
+        $this->assertEquals($inf->year, 1993);
+        $this->assertEquals($inf->month, 11);
+        $this->assertEquals($inf->day, 6);
+        $this->assertEquals($inf->hour, 3);
+
+        $date    = Carbon::create(1631, 10, 1, 0, 0, 0, 'UTC');
+        $mercury = new Mercury();
+        $inf     = $mercury->inferior_conjunction($date);
+        $this->assertEquals($inf->year, 1631);
+        $this->assertEquals($inf->month, 11);
+        $this->assertEquals($inf->day, 7);
+        $this->assertEquals($inf->hour, 7);
+    }
+
+    /**
+     * Test the date of the inferior conjunction of venus.
+     */
+    public function testVenusInferiorConjunction()
+    {
+        $date    = Carbon::create(1882, 10, 1, 0, 0, 0, 'UTC');
+        $venus   = new Venus();
+        $inf     = $venus->inferior_conjunction($date);
+        $this->assertEquals($inf->year, 1882);
+        $this->assertEquals($inf->month, 12);
+        $this->assertEquals($inf->day, 6);
+        $this->assertEquals($inf->hour, 16);
+    }
+
+    /**
+     * Test the date of the opposition of Mars.
+     */
+    public function testMarsOpposition()
+    {
+        $date       = Carbon::create(2729, 1, 1, 0, 0, 0, 'UTC');
+        $mars       = new Mars();
+        $opposition = $mars->opposition($date);
+        $this->assertEquals($opposition->year, 2729);
+        $this->assertEquals($opposition->month, 9);
+        $this->assertEquals($opposition->day, 9);
+        $this->assertEquals($opposition->hour, 3);
+    }
+
+    /**
+     * Test the date of the opposition of Jupiter.
+     */
+    public function testJupiterOpposition()
+    {
+        $date          = Carbon::create(-6, 5, 1, 0, 0, 0, 'UTC');
+        $jupiter       = new Jupiter();
+        $opposition    = $jupiter->opposition($date);
+        $this->assertEquals($opposition->year, -6);
+        $this->assertEquals($opposition->month, 9);
+        $this->assertEquals($opposition->day, 15);
+        $this->assertEquals($opposition->hour, 6);
+    }
+
+    /**
+     * Test the date of the opposition of Saturn.
+     */
+    public function testSaturnOpposition()
+    {
+        $date          = Carbon::create(-6, 5, 1, 0, 0, 0, 'UTC');
+        $saturn        = new Saturn();
+        $opposition    = $saturn->opposition($date);
+        $this->assertEquals($opposition->year, -6);
+        $this->assertEquals($opposition->month, 9);
+        $this->assertEquals($opposition->day, 14);
+        $this->assertEquals($opposition->hour, 9);
+
+        $date          = Carbon::create(2125, 5, 1, 0, 0, 0, 'UTC');
+        $saturn        = new Saturn();
+        $opposition    = $saturn->conjunction($date);
+        $this->assertEquals($opposition->year, 2125);
+        $this->assertEquals($opposition->month, 8);
+        $this->assertEquals($opposition->day, 26);
+        $this->assertEquals($opposition->hour, 7);
+    }
+
+    /**
+     * Test the date of the opposition of Uranus.
+     */
+    public function testUranusOpposition()
+    {
+        $date          = Carbon::create(1780, 10, 1, 0, 0, 0, 'UTC');
+        $uranus        = new Uranus();
+        $opposition    = $uranus->opposition($date);
+        $this->assertEquals($opposition->year, 1780);
+        $this->assertEquals($opposition->month, 12);
+        $this->assertEquals($opposition->day, 17);
+        $this->assertEquals($opposition->hour, 14);
+    }
+
+    /**
+     * Test the date of the opposition of Neptune.
+     */
+    public function testNeptuneOpposition()
+    {
+        $date           = Carbon::create(1846, 5, 1, 0, 0, 0, 'UTC');
+        $neptune        = new Neptune();
+        $opposition     = $neptune->opposition($date);
+        $this->assertEquals($opposition->year, 1846);
+        $this->assertEquals($opposition->month, 8);
+        $this->assertEquals($opposition->day, 20);
+        $this->assertEquals($opposition->hour, 3);
+    }
+
+    /**
+     * Test the date of the greatest western elongation of Merury.
+     */
+    public function testMercuryWesternElongation()
+    {
+        $date           = Carbon::create(1993, 11, 1, 0, 0, 0, 'UTC');
+        $mercury        = new Mercury();
+        $elongation     = $mercury->greatest_western_elongation($date);
+        $this->assertEquals($elongation->year, 1993);
+        $this->assertEquals($elongation->month, 11);
+        $this->assertEquals($elongation->day, 22);
+        $this->assertEquals($elongation->hour, 15);
     }
 }

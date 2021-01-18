@@ -14,8 +14,8 @@
 namespace deepskylog\AstronomyLibrary\Targets;
 
 use Carbon\Carbon;
-use deepskylog\AstronomyLibrary\Coordinates\Coordinate;
 use deepskylog\AstronomyLibrary\Time;
+use deepskylog\AstronomyLibrary\Coordinates\Coordinate;
 
 /**
  * The target class describing Mercury.
@@ -47,15 +47,15 @@ class Mercury extends Planet
     public function calculateMeanOrbitalElements(Carbon $date)
     {
         $jd = Time::getJd($date);
-        $T = ($jd - 2451545.0) / 36525.0;
+        $T  = ($jd - 2451545.0) / 36525.0;
 
-        $L = (new Coordinate(252.250906 + 149474.0722491 * $T + 0.00030350 * $T ** 2 + 0.000000018 * $T ** 3, 0, 360))->getCoordinate();
-        $a = 0.387098310;
-        $e = 0.20563175 + 0.000020407 * $T - 0.0000000283 * $T ** 2 - 0.00000000018 * $T ** 3;
-        $i = (new Coordinate(7.004986 + 0.0018215 * $T - 0.00001810 * $T ** 2 + 0.000000056 * $T ** 3, 0, 360))->getCoordinate();
+        $L     = (new Coordinate(252.250906 + 149474.0722491 * $T + 0.00030350 * $T ** 2 + 0.000000018 * $T ** 3, 0, 360))->getCoordinate();
+        $a     = 0.387098310;
+        $e     = 0.20563175 + 0.000020407 * $T - 0.0000000283 * $T ** 2 - 0.00000000018 * $T ** 3;
+        $i     = (new Coordinate(7.004986 + 0.0018215 * $T - 0.00001810 * $T ** 2 + 0.000000056 * $T ** 3, 0, 360))->getCoordinate();
         $omega = (new Coordinate(48.330893 + 1.1861883 * $T + 0.00017542 * $T ** 2 + 0.000000215 * $T ** 3, 0, 360))->getCoordinate();
-        $pi = (new Coordinate(77.456119 + 1.5564776 * $T + 0.00029544 * $T ** 2 + 0.000000009 * $T ** 3, 0, 360))->getCoordinate();
-        $M = $L - $pi;
+        $pi    = (new Coordinate(77.456119 + 1.5564776 * $T + 0.00029544 * $T ** 2 + 0.000000009 * $T ** 3, 0, 360))->getCoordinate();
+        $M     = $L - $pi;
 
         return [$L, $a, $e, $i, $omega, $pi, $M];
     }
@@ -78,15 +78,15 @@ class Mercury extends Planet
     public function calculateMeanOrbitalElementsJ2000(Carbon $date)
     {
         $jd = Time::getJd($date);
-        $T = ($jd - 2451545.0) / 36525.0;
+        $T  = ($jd - 2451545.0) / 36525.0;
 
-        $L = (new Coordinate(252.250906 + 149472.6746358 * $T - 0.00000536 * $T ** 2 + 0.000000002 * $T ** 3, 0, 360))->getCoordinate();
-        $a = 0.387098310;
-        $e = 0.20563175 + 0.000020407 * $T - 0.0000000283 * $T ** 2 - 0.00000000018 * $T ** 3;
-        $i = (new Coordinate(7.004986 - 0.0059516 * $T + 0.00000080 * $T ** 2 + 0.000000043 * $T ** 3, 0, 360))->getCoordinate();
+        $L     = (new Coordinate(252.250906 + 149472.6746358 * $T - 0.00000536 * $T ** 2 + 0.000000002 * $T ** 3, 0, 360))->getCoordinate();
+        $a     = 0.387098310;
+        $e     = 0.20563175 + 0.000020407 * $T - 0.0000000283 * $T ** 2 - 0.00000000018 * $T ** 3;
+        $i     = (new Coordinate(7.004986 - 0.0059516 * $T + 0.00000080 * $T ** 2 + 0.000000043 * $T ** 3, 0, 360))->getCoordinate();
         $omega = (new Coordinate(48.330893 - 0.1254227 * $T - 0.00008833 * $T ** 2 - 0.000000200 * $T ** 3, 0, 360))->getCoordinate();
-        $pi = (new Coordinate(77.456119 + 0.1588643 * $T - 0.00001342 * $T ** 2 - 0.000000007 * $T ** 3, 0, 360))->getCoordinate();
-        $M = $L - $pi;
+        $pi    = (new Coordinate(77.456119 + 0.1588643 * $T - 0.00001342 * $T ** 2 - 0.000000007 * $T ** 3, 0, 360))->getCoordinate();
+        $M     = $L - $pi;
 
         return [$L, $a, $e, $i, $omega, $pi, $M];
     }
@@ -7403,5 +7403,159 @@ class Mercury extends Planet
         $R = $R0 + $R1 * $tau + $R2 * $tau ** 2 + $R3 * $tau ** 3 + $R4 * $tau ** 4 + $R5 * $tau ** 5;
 
         return [$L, $B, $R];
+    }
+
+    /**
+     * Calculates the inferior conjunction closest to the given date
+     *
+     * @param Carbon $date The date for which we want to calculate the closest inferior conjunction
+     *
+     * @return Carbon The date of the inferior conjunction
+     */
+    public function inferior_conjunction(Carbon $date)
+    {
+        $A     = 2451612.023;
+        $B     = 115.8774771;
+        $M0    = 63.5867;
+        $M1    = 114.2088742;
+
+        $Y = $date->year + $date->dayOfYear / (365 + $date->format('L'));
+
+        $k     = ceil((365.2425 * $Y + 1721060 - $A) / ($B));
+        $JDE0  = $A + $k * $B;
+        $M     = deg2rad($M0 + $k * $M1);
+        $T     = ($JDE0 - 2451545) / 36525;
+
+        $diff = 0.0545 + 0.0002 * $T
+            + sin($M) * (-6.2008 + 0.0074 * $T + 0.00003 * $T * $T)
+            + cos($M) * (-3.2750 - 0.0197 * $T + 0.00001 * $T * $T)
+            + sin(2 * $M) * (0.4737 - 0.0052 * $T - 0.00001 * $T * $T)
+            + cos(2 * $M) * (0.8111 + 0.0033 * $T - 0.00002 * $T * $T)
+            + sin(3 * $M) * (0.0037 + 0.0018 * $T)
+            + cos(3 * $M) * (-0.1768 + 0.00001 * $T * $T)
+            + sin(4 * $M) * (-0.0211 - 0.0004 * $T)
+            + cos(4 * $M) * (0.0326 - 0.0003 * $T)
+            + sin(5 * $M) * (0.0083 + 0.0001 * $T)
+            + cos(5 * $M) * (-0.0040 + 0.0001 * $T);
+
+        $JDE    = $JDE0 + $diff;
+
+        return Time::fromJd($JDE);
+    }
+
+    /**
+     * Calculates the superior conjunction closest to the given date
+     *
+     * @param Carbon $date The date for which we want to calculate the closest inferior conjunction
+     *
+     * @return Carbon The date of the inferior conjunction
+     */
+    public function superior_conjunction(Carbon $date)
+    {
+        $A     = 2451554.084;
+        $B     = 115.8774771;
+        $M0    = 6.4822;
+        $M1    = 114.2088742;
+
+        $Y = $date->year + $date->dayOfYear / (365 + $date->format('L'));
+
+        $k     = ceil((365.2425 * $Y + 1721060 - $A) / ($B));
+        $JDE0  = $A + $k * $B;
+        $M     = deg2rad($M0 + $k * $M1);
+        $T     = ($JDE0 - 2451545) / 36525;
+
+        $diff = -0.0545 - 0.0002 * $T
+            + sin($M) * (7.3894 - 0.0100 * $T - 0.00003 * $T * $T)
+            + cos($M) * (3.2200 + 0.0197 * $T - 0.00001 * $T * $T)
+            + sin(2 * $M) * (0.8383 - 0.0064 * $T - 0.00001 * $T * $T)
+            + cos(2 * $M) * (0.9666 + 0.0039 * $T - 0.00003 * $T * $T)
+            + sin(3 * $M) * (0.0770 - 0.0026 * $T)
+            + cos(3 * $M) * (0.2758 + 0.0002 * $T - 0.00002 * $T * $T)
+            + sin(4 * $M) * (-0.0128 - 0.0008 * $T)
+            + cos(4 * $M) * (0.0734 - 0.0004 * $T - 0.00001 * $T * $T)
+            + sin(5 * $M) * (-0.0122 - 0.0002 * $T)
+            + cos(5 * $M) * (0.0173 - 0.0002 * $T);
+
+        $JDE    = $JDE0 + $diff;
+
+        return Time::fromJd($JDE);
+    }
+
+    /**
+     * Calculates the greatest eastern elongation closest to the given date. This is the best
+     * evening visibility.
+     *
+     * @param Carbon $date The date for which we want to calculate the greatest eastern elongation
+     *
+     * @return Carbon The date of the greatest eastern elongation
+     */
+    public function greatest_eastern_elongation(Carbon $date)
+    {
+        $A     = 2451612.023;
+        $B     = 115.8774771;
+        $M0    = 63.5867;
+        $M1    = 114.2088742;
+
+        $Y = $date->year + $date->dayOfYear / (365 + $date->format('L'));
+
+        $k     = ceil((365.2425 * $Y + 1721060 - $A) / ($B));
+        $JDE0  = $A + $k * $B;
+        $M     = deg2rad($M0 + $k * $M1);
+        $T     = ($JDE0 - 2451545) / 36525;
+
+        $diff = -21.6101 + 0.0002 * $T
+            + sin($M) * (-1.9803 - 0.0060 * $T + 0.00001 * $T * $T)
+            + cos($M) * (1.4151 - 0.0072 * $T - 0.00001 * $T * $T)
+            + sin(2 * $M) * (0.5528 - 0.0005 * $T - 0.00001 * $T * $T)
+            + cos(2 * $M) * (0.2905 + 0.0034 * $T + 0.00001 * $T * $T)
+            + sin(3 * $M) * (-0.1121 - 0.0001 * $T + 0.00001 * $T * $T)
+            + cos(3 * $M) * (-0.0098 - 0.0015 * $T)
+            + sin(4 * $M) * (0.0192)
+            + cos(4 * $M) * (0.0111 + 0.0004 * $T)
+            + sin(5 * $M) * (-0.0061)
+            + cos(5 * $M) * (-0.0032 - 0.0001 * $T);
+
+        $JDE    = $JDE0 + $diff;
+
+        return Time::fromJd($JDE);
+    }
+
+    /**
+     * Calculates the greatest western elongation closest to the given date. This is the best
+     * morning visibility.
+     *
+     * @param Carbon $date The date for which we want to calculate the greatest western elongation
+     *
+     * @return Carbon The date of the greatest western elongation
+     */
+    public function greatest_western_elongation(Carbon $date)
+    {
+        $A     = 2451612.023;
+        $B     = 115.8774771;
+        $M0    = 63.5867;
+        $M1    = 114.2088742;
+
+        $Y = $date->year + $date->dayOfYear / (365 + $date->format('L'));
+
+        $k     = ceil((365.2425 * $Y + 1721060 - $A) / ($B));
+        $JDE0  = $A + $k * $B;
+        $M     = deg2rad($M0 + $k * $M1);
+        $T     = ($JDE0 - 2451545) / 36525;
+
+        $diff = 21.6249 - 0.0002 * $T
+            + sin($M) * (0.1306 + 0.0065 * $T)
+            + cos($M) * (-2.7661 - 0.0011 * $T + 0.00001 * $T * $T)
+            + sin(2 * $M) * (0.2438 - 0.0024 * $T - 0.00001 * $T * $T)
+            + cos(2 * $M) * (0.5767 + 0.0023 * $T)
+            + sin(3 * $M) * (0.1041)
+            + cos(3 * $M) * (-0.0184 + 0.0007 * $T)
+            + sin(4 * $M) * (-0.0051 - 0.0001 * $T)
+            + cos(4 * $M) * (0.0048 + 0.0001 * $T)
+            + sin(5 * $M) * (0.0026)
+            + cos(5 * $M) * (0.0037);
+
+        $JDE    = $JDE0 + $diff;
+
+        return Time::fromJd($JDE);
     }
 }

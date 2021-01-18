@@ -14,8 +14,8 @@
 namespace deepskylog\AstronomyLibrary\Targets;
 
 use Carbon\Carbon;
-use deepskylog\AstronomyLibrary\Coordinates\Coordinate;
 use deepskylog\AstronomyLibrary\Time;
+use deepskylog\AstronomyLibrary\Coordinates\Coordinate;
 
 /**
  * The target class describing Neptune.
@@ -47,15 +47,15 @@ class Neptune extends Planet
     public function calculateMeanOrbitalElements(Carbon $date)
     {
         $jd = Time::getJd($date);
-        $T = ($jd - 2451545.0) / 36525.0;
+        $T  = ($jd - 2451545.0) / 36525.0;
 
-        $L = (new Coordinate(304.348665 + 219.8833092 * $T + 0.00030882 * $T ** 2 + 0.000000018 * $T ** 3, 0, 360))->getCoordinate();
-        $a = 30.110386869 - 0.0000001663 * $T + 0.00000000069 * $T ** 2;
-        $e = 0.00945575 + 0.000006033 * $T + 0.0 * $T ** 2 - 0.00000000005 * $T ** 3;
-        $i = (new Coordinate(1.769953 - 0.0093082 * $T - 0.00000708 * $T ** 2 + 0.000000027 * $T ** 3, 0, 360))->getCoordinate();
+        $L     = (new Coordinate(304.348665 + 219.8833092 * $T + 0.00030882 * $T ** 2 + 0.000000018 * $T ** 3, 0, 360))->getCoordinate();
+        $a     = 30.110386869 - 0.0000001663 * $T + 0.00000000069 * $T ** 2;
+        $e     = 0.00945575 + 0.000006033 * $T + 0.0 * $T ** 2 - 0.00000000005 * $T ** 3;
+        $i     = (new Coordinate(1.769953 - 0.0093082 * $T - 0.00000708 * $T ** 2 + 0.000000027 * $T ** 3, 0, 360))->getCoordinate();
         $omega = (new Coordinate(131.784057 + 1.1022039 * $T + 0.00025952 * $T ** 2 - 0.000000637 * $T ** 3, 0, 360))->getCoordinate();
-        $pi = (new Coordinate(48.120276 + 1.4262957 * $T + 0.00038434 * $T ** 2 + 0.000000020 * $T ** 3, 0, 360))->getCoordinate();
-        $M = $L - $pi;
+        $pi    = (new Coordinate(48.120276 + 1.4262957 * $T + 0.00038434 * $T ** 2 + 0.000000020 * $T ** 3, 0, 360))->getCoordinate();
+        $M     = $L - $pi;
 
         return [$L, $a, $e, $i, $omega, $pi, $M];
     }
@@ -78,15 +78,15 @@ class Neptune extends Planet
     public function calculateMeanOrbitalElementsJ2000(Carbon $date)
     {
         $jd = Time::getJd($date);
-        $T = ($jd - 2451545.0) / 36525.0;
+        $T  = ($jd - 2451545.0) / 36525.0;
 
-        $L = (new Coordinate(304.348665 + 218.4862002 * $T + 0.00000059 * $T ** 2 - 0.000000002 * $T ** 3, 0, 360))->getCoordinate();
-        $a = 30.110386869 - 0.0000001663 * $T + 0.00000000069 * $T ** 2;
-        $e = 0.00945575 + 0.000006033 * $T + 0.0 * $T ** 2 - 0.00000000005 * $T ** 3;
-        $i = (new Coordinate(1.769953 + 0.0002256 * $T + 0.00000023 * $T ** 2 - 0.0 * $T ** 3, 0, 360))->getCoordinate();
+        $L     = (new Coordinate(304.348665 + 218.4862002 * $T + 0.00000059 * $T ** 2 - 0.000000002 * $T ** 3, 0, 360))->getCoordinate();
+        $a     = 30.110386869 - 0.0000001663 * $T + 0.00000000069 * $T ** 2;
+        $e     = 0.00945575 + 0.000006033 * $T + 0.0 * $T ** 2 - 0.00000000005 * $T ** 3;
+        $i     = (new Coordinate(1.769953 + 0.0002256 * $T + 0.00000023 * $T ** 2 - 0.0 * $T ** 3, 0, 360))->getCoordinate();
         $omega = (new Coordinate(131.784057 - 0.0061651 * $T - 0.00000219 * $T ** 2 - 0.000000078 * $T ** 3, 0, 360))->getCoordinate();
-        $pi = (new Coordinate(48.120276 + 0.0291866 * $T + 0.00007610 * $T ** 2 + 0.0 * $T ** 3, 0, 360))->getCoordinate();
-        $M = $L - $pi;
+        $pi    = (new Coordinate(48.120276 + 0.0291866 * $T + 0.00007610 * $T ** 2 + 0.0 * $T ** 3, 0, 360))->getCoordinate();
+        $M     = $L - $pi;
 
         return [$L, $a, $e, $i, $omega, $pi, $M];
     }
@@ -2060,5 +2060,79 @@ class Neptune extends Planet
         $R = $R0 + $R1 * $tau + $R2 * $tau ** 2 + $R3 * $tau ** 3 + $R4 * $tau ** 4;
 
         return [$L, $B, $R];
+    }
+
+    /**
+     * Calculates the opposition closest to the given date
+     *
+     * @param Carbon $date The date for which we want to calculate the closest opposition
+     *
+     * @return Carbon The date of the opposition
+     */
+    public function opposition(Carbon $date)
+    {
+        $A     = 2451753.122;
+        $B     = 367.486703;
+        $M0    = 202.6544;
+        $M1    = 2.194998;
+
+        $Y = $date->year + $date->dayOfYear / (365 + $date->format('L'));
+
+        $k     = ceil((365.2425 * $Y + 1721060 - $A) / ($B));
+        $JDE0  = $A + $k * $B;
+        $M     = deg2rad($M0 + $k * $M1);
+        $T     = ($JDE0 - 2451545) / 36525;
+
+        $e     = deg2rad(207.83 + 8.51 * $T);
+        $g     = deg2rad(276.74 + 209.98 * $T);
+
+        $diff = -0.0140 + 0.0000 * $T + 0.00001 * $T * $T
+            + (-1.3486 + 0.0010 * $T + 0.00001 * $T * $T) * sin($M)
+            + (0.8597 + 0.0037 * $T + 0.00000 * $T * $T) * cos($M)
+            + (-0.0082 - 0.0002 * $T + 0.00001 * $T * $T) * sin(2 * $M)
+            + (0.0037 - 0.0003 * $T + 0.00000 * $T * $T) * cos(2 * $M)
+            + (-0.5964 + 0.0000 * $T + 0.00000 * $T * $T) * cos($e)
+            + (0.0728 + 0.0000 * $T + 0.00000 * $T * $T) * cos($g);
+
+        $JDE    = $JDE0 + $diff;
+
+        return Time::fromJd($JDE);
+    }
+
+    /**
+     * Calculates the conjunction closest to the given date
+     *
+     * @param Carbon $date The date for which we want to calculate the closest conjunction
+     *
+     * @return Carbon The date of the conjunction
+     */
+    public function conjunction(Carbon $date)
+    {
+        $A     = 2451569.379;
+        $B     = 367.486703;
+        $M0    = 21.5569;
+        $M1    = 2.194998;
+
+        $Y = $date->year + $date->dayOfYear / (365 + $date->format('L'));
+
+        $k     = ceil((365.2425 * $Y + 1721060 - $A) / ($B));
+        $JDE0  = $A + $k * $B;
+        $M     = deg2rad($M0 + $k * $M1);
+        $T     = ($JDE0 - 2451545) / 36525;
+
+        $e     = deg2rad(207.83 + 8.51 * $T);
+        $g     = deg2rad(276.74 + 209.98 * $T);
+
+        $diff = 0.0168 + 0.0000 * $T + 0.00000 * $T * $T
+            + (-2.5606 + 0.0088 * $T + 0.00002 * $T * $T) * sin($M)
+            + (-0.8611 - 0.0037 * $T + 0.00002 * $T * $T) * cos($M)
+            + (0.0118 - 0.0004 * $T + 0.00001 * $T * $T) * sin(2 * $M)
+            + (0.0307 - 0.0003 * $T + 0.00000 * $T * $T) * cos(2 * $M)
+            + (-0.5964 + 0.0000 * $T + 0.00000 * $T * $T) * cos($e)
+            + (0.0728 + 0.0000 * $T + 0.00000 * $T * $T) * cos($g);
+
+        $JDE    = $JDE0 + $diff;
+
+        return Time::fromJd($JDE);
     }
 }
