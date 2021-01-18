@@ -5892,4 +5892,98 @@ class Saturn extends Planet
 
         return [$L, $B, $R];
     }
+
+    /**
+     * Calculates the opposition closest to the given date.
+     *
+     * @param Carbon $date The date for which we want to calculate the closest opposition
+     *
+     * @return Carbon The date of the opposition
+     */
+    public function opposition(Carbon $date)
+    {
+        $A = 2451870.170;
+        $B = 378.091904;
+        $M0 = 318.0172;
+        $M1 = 12.647487;
+
+        $Y = $date->year + $date->dayOfYear / (365 + $date->format('L'));
+
+        $k = ceil((365.2425 * $Y + 1721060 - $A) / ($B));
+        $JDE0 = $A + $k * $B;
+        $M = deg2rad($M0 + $k * $M1);
+        $T = ($JDE0 - 2451545) / 36525;
+
+        $a = deg2rad(82.74 + 40.76 * $T);
+        $b = deg2rad(29.86 + 1181.36 * $T);
+        $c = deg2rad(14.13 + 590.68 * $T);
+        $d = deg2rad(220.02 + 1262.87 * $T);
+
+        $diff = -0.0209 + 0.0006 * $T + 0.00023 * $T * $T
+            + (4.5795 - 0.0312 * $T - 0.00017 * $T * $T) * sin($M)
+            + (1.1462 - 0.0351 * $T + 0.00011 * $T * $T) * cos($M)
+            + (0.0985 - 0.0015 * $T + 0.00000 * $T * $T) * sin(2 * $M)
+            + (0.0733 - 0.0031 * $T + 0.00001 * $T * $T) * cos(2 * $M)
+            + (0.0025 - 0.0001 * $T + 0.00000 * $T * $T) * sin(3 * $M)
+            + (0.0050 - 0.0002 * $T + 0.00000 * $T * $T) * cos(3 * $M)
+            + (0.0 - 0.0337 * $T + 0.00018 * $T * $T) * sin($a)
+            + (-0.8510 + 0.0044 * $T + 0.00068 * $T * $T) * cos($a)
+            + (0.0 - 0.0064 * $T + 0.00004 * $T * $T) * sin($b)
+            + (0.2397 - 0.0012 * $T - 0.00008 * $T * $T) * cos($b)
+            + (0.0 - 0.0010 * $T + 0.00000 * $T * $T) * sin($c)
+            + (0.1245 + 0.0006 * $T + 0.00000 * $T * $T) * cos($c)
+            + (0.0 + 0.0024 * $T - 0.00003 * $T * $T) * sin($d)
+            + (0.0477 - 0.0005 * $T - 0.00006 * $T * $T) * cos($a);
+
+        $JDE = $JDE0 + $diff;
+
+        return Time::fromJd($JDE);
+    }
+
+    /**
+     * Calculates the conjunction closest to the given date.
+     *
+     * @param Carbon $date The date for which we want to calculate the closest conjunction
+     *
+     * @return Carbon The date of the conjunction
+     */
+    public function conjunction(Carbon $date)
+    {
+        $A = 2451681.124;
+        $B = 378.091904;
+        $M0 = 131.6934;
+        $M1 = 12.647487;
+
+        $Y = $date->year + $date->dayOfYear / (365 + $date->format('L'));
+
+        $k = ceil((365.2425 * $Y + 1721060 - $A) / ($B));
+        $JDE0 = $A + $k * $B;
+        $M = deg2rad($M0 + $k * $M1);
+        $T = ($JDE0 - 2451545) / 36525;
+
+        $a = deg2rad(82.74 + 40.76 * $T);
+        $b = deg2rad(29.86 + 1181.36 * $T);
+        $c = deg2rad(14.13 + 590.68 * $T);
+        $d = deg2rad(220.02 + 1262.87 * $T);
+
+        $diff = 0.0172 - 0.0006 * $T + 0.00023 * $T * $T
+            + (-8.5885 + 0.0411 * $T + 0.00020 * $T * $T) * sin($M)
+            + (-1.1470 + 0.0352 * $T - 0.00011 * $T * $T) * cos($M)
+            + (0.3331 - 0.0034 * $T - 0.00001 * $T * $T) * sin(2 * $M)
+            + (0.1145 - 0.0045 * $T + 0.00002 * $T * $T) * cos(2 * $M)
+            + (-0.0169 + 0.0002 * $T + 0.00000 * $T * $T) * sin(3 * $M)
+            + (-0.0109 + 0.0004 * $T + 0.00000 * $T * $T) * cos(3 * $M)
+            + (0.0000 - 0.0337 * $T + 0.00018 * $T * $T) * sin($a)
+            + (-0.8510 + 0.0044 * $T + 0.00068 * $T * $T) * cos($a)
+            + (0.0000 - 0.0064 * $T + 0.00004 * $T * $T) * sin($b)
+            + (0.2397 - 0.0012 * $T - 0.00008 * $T * $T) * cos($b)
+            + (0.0000 - 0.0010 * $T + 0.00000 * $T * $T) * sin($c)
+            + (0.1245 + 0.0006 * $T + 0.00000 * $T * $T) * cos($c)
+            + (0.0000 + 0.0024 * $T - 0.00003 * $T * $T) * sin($d)
+            + (0.0477 - 0.0002 * $T - 0.00006 * $T * $T) * cos($a);
+
+        $JDE = $JDE0 + $diff;
+
+        return Time::fromJd($JDE);
+    }
 }

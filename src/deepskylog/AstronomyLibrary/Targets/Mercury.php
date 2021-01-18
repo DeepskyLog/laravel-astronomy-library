@@ -7404,4 +7404,158 @@ class Mercury extends Planet
 
         return [$L, $B, $R];
     }
+
+    /**
+     * Calculates the inferior conjunction closest to the given date.
+     *
+     * @param Carbon $date The date for which we want to calculate the closest inferior conjunction
+     *
+     * @return Carbon The date of the inferior conjunction
+     */
+    public function inferior_conjunction(Carbon $date)
+    {
+        $A = 2451612.023;
+        $B = 115.8774771;
+        $M0 = 63.5867;
+        $M1 = 114.2088742;
+
+        $Y = $date->year + $date->dayOfYear / (365 + $date->format('L'));
+
+        $k = ceil((365.2425 * $Y + 1721060 - $A) / ($B));
+        $JDE0 = $A + $k * $B;
+        $M = deg2rad($M0 + $k * $M1);
+        $T = ($JDE0 - 2451545) / 36525;
+
+        $diff = 0.0545 + 0.0002 * $T
+            + sin($M) * (-6.2008 + 0.0074 * $T + 0.00003 * $T * $T)
+            + cos($M) * (-3.2750 - 0.0197 * $T + 0.00001 * $T * $T)
+            + sin(2 * $M) * (0.4737 - 0.0052 * $T - 0.00001 * $T * $T)
+            + cos(2 * $M) * (0.8111 + 0.0033 * $T - 0.00002 * $T * $T)
+            + sin(3 * $M) * (0.0037 + 0.0018 * $T)
+            + cos(3 * $M) * (-0.1768 + 0.00001 * $T * $T)
+            + sin(4 * $M) * (-0.0211 - 0.0004 * $T)
+            + cos(4 * $M) * (0.0326 - 0.0003 * $T)
+            + sin(5 * $M) * (0.0083 + 0.0001 * $T)
+            + cos(5 * $M) * (-0.0040 + 0.0001 * $T);
+
+        $JDE = $JDE0 + $diff;
+
+        return Time::fromJd($JDE);
+    }
+
+    /**
+     * Calculates the superior conjunction closest to the given date.
+     *
+     * @param Carbon $date The date for which we want to calculate the closest inferior conjunction
+     *
+     * @return Carbon The date of the inferior conjunction
+     */
+    public function superior_conjunction(Carbon $date)
+    {
+        $A = 2451554.084;
+        $B = 115.8774771;
+        $M0 = 6.4822;
+        $M1 = 114.2088742;
+
+        $Y = $date->year + $date->dayOfYear / (365 + $date->format('L'));
+
+        $k = ceil((365.2425 * $Y + 1721060 - $A) / ($B));
+        $JDE0 = $A + $k * $B;
+        $M = deg2rad($M0 + $k * $M1);
+        $T = ($JDE0 - 2451545) / 36525;
+
+        $diff = -0.0545 - 0.0002 * $T
+            + sin($M) * (7.3894 - 0.0100 * $T - 0.00003 * $T * $T)
+            + cos($M) * (3.2200 + 0.0197 * $T - 0.00001 * $T * $T)
+            + sin(2 * $M) * (0.8383 - 0.0064 * $T - 0.00001 * $T * $T)
+            + cos(2 * $M) * (0.9666 + 0.0039 * $T - 0.00003 * $T * $T)
+            + sin(3 * $M) * (0.0770 - 0.0026 * $T)
+            + cos(3 * $M) * (0.2758 + 0.0002 * $T - 0.00002 * $T * $T)
+            + sin(4 * $M) * (-0.0128 - 0.0008 * $T)
+            + cos(4 * $M) * (0.0734 - 0.0004 * $T - 0.00001 * $T * $T)
+            + sin(5 * $M) * (-0.0122 - 0.0002 * $T)
+            + cos(5 * $M) * (0.0173 - 0.0002 * $T);
+
+        $JDE = $JDE0 + $diff;
+
+        return Time::fromJd($JDE);
+    }
+
+    /**
+     * Calculates the greatest eastern elongation closest to the given date. This is the best
+     * evening visibility.
+     *
+     * @param Carbon $date The date for which we want to calculate the greatest eastern elongation
+     *
+     * @return Carbon The date of the greatest eastern elongation
+     */
+    public function greatest_eastern_elongation(Carbon $date)
+    {
+        $A = 2451612.023;
+        $B = 115.8774771;
+        $M0 = 63.5867;
+        $M1 = 114.2088742;
+
+        $Y = $date->year + $date->dayOfYear / (365 + $date->format('L'));
+
+        $k = ceil((365.2425 * $Y + 1721060 - $A) / ($B));
+        $JDE0 = $A + $k * $B;
+        $M = deg2rad($M0 + $k * $M1);
+        $T = ($JDE0 - 2451545) / 36525;
+
+        $diff = -21.6101 + 0.0002 * $T
+            + sin($M) * (-1.9803 - 0.0060 * $T + 0.00001 * $T * $T)
+            + cos($M) * (1.4151 - 0.0072 * $T - 0.00001 * $T * $T)
+            + sin(2 * $M) * (0.5528 - 0.0005 * $T - 0.00001 * $T * $T)
+            + cos(2 * $M) * (0.2905 + 0.0034 * $T + 0.00001 * $T * $T)
+            + sin(3 * $M) * (-0.1121 - 0.0001 * $T + 0.00001 * $T * $T)
+            + cos(3 * $M) * (-0.0098 - 0.0015 * $T)
+            + sin(4 * $M) * (0.0192)
+            + cos(4 * $M) * (0.0111 + 0.0004 * $T)
+            + sin(5 * $M) * (-0.0061)
+            + cos(5 * $M) * (-0.0032 - 0.0001 * $T);
+
+        $JDE = $JDE0 + $diff;
+
+        return Time::fromJd($JDE);
+    }
+
+    /**
+     * Calculates the greatest western elongation closest to the given date. This is the best
+     * morning visibility.
+     *
+     * @param Carbon $date The date for which we want to calculate the greatest western elongation
+     *
+     * @return Carbon The date of the greatest western elongation
+     */
+    public function greatest_western_elongation(Carbon $date)
+    {
+        $A = 2451612.023;
+        $B = 115.8774771;
+        $M0 = 63.5867;
+        $M1 = 114.2088742;
+
+        $Y = $date->year + $date->dayOfYear / (365 + $date->format('L'));
+
+        $k = ceil((365.2425 * $Y + 1721060 - $A) / ($B));
+        $JDE0 = $A + $k * $B;
+        $M = deg2rad($M0 + $k * $M1);
+        $T = ($JDE0 - 2451545) / 36525;
+
+        $diff = 21.6249 - 0.0002 * $T
+            + sin($M) * (0.1306 + 0.0065 * $T)
+            + cos($M) * (-2.7661 - 0.0011 * $T + 0.00001 * $T * $T)
+            + sin(2 * $M) * (0.2438 - 0.0024 * $T - 0.00001 * $T * $T)
+            + cos(2 * $M) * (0.5767 + 0.0023 * $T)
+            + sin(3 * $M) * (0.1041)
+            + cos(3 * $M) * (-0.0184 + 0.0007 * $T)
+            + sin(4 * $M) * (-0.0051 - 0.0001 * $T)
+            + cos(4 * $M) * (0.0048 + 0.0001 * $T)
+            + sin(5 * $M) * (0.0026)
+            + cos(5 * $M) * (0.0037);
+
+        $JDE = $JDE0 + $diff;
+
+        return Time::fromJd($JDE);
+    }
 }

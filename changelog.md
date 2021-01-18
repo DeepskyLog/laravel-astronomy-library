@@ -2,6 +2,15 @@
 
 All notable changes to `laravel-astronomy-library` will be documented in this file.
 
+## Version 4.23
+
+### Added
+
+- Added:
+  - Calculation of inferior / superior conjunction for inner planets
+  - Opposition / conjuntion of outer planets
+  - Greatest eastern and western elongation of inner planets.
+
 ## Version 4.22
 
 ### Added

@@ -5616,4 +5616,80 @@ class Mars extends Planet
 
         return [$L, $B, $R];
     }
+
+    /**
+     * Calculates the opposition closest to the given date.
+     *
+     * @param Carbon $date The date for which we want to calculate the closest opposition
+     *
+     * @return Carbon The date of the opposition
+     */
+    public function opposition(Carbon $date)
+    {
+        $A = 2452097.382;
+        $B = 779.936104;
+        $M0 = 181.9573;
+        $M1 = 48.705244;
+
+        $Y = $date->year + $date->dayOfYear / (365 + $date->format('L'));
+
+        $k = ceil((365.2425 * $Y + 1721060 - $A) / ($B));
+        $JDE0 = $A + $k * $B;
+        $M = deg2rad($M0 + $k * $M1);
+        $T = ($JDE0 - 2451545) / 36525;
+
+        $diff = -0.3088 + 0.0000 * $T + 0.00002 * $T * $T
+            + (-17.6965 + 0.0363 * $T + 0.00005 * $T * $T) * sin($M)
+            + (18.3131 + 0.0467 * $T - 0.00006 * $T * $T) * cos($M)
+            + (-0.2162 - 0.0198 * $T - 0.00001 * $T * $T) * sin(2 * $M)
+            + (-4.5028 - 0.0019 * $T + 0.00007 * $T * $T) * cos(2 * $M)
+            + (0.8987 + 0.0058 * $T - 0.00002 * $T * $T) * sin(3 * $M)
+            + (0.7666 - 0.0050 * $T - 0.00003 * $T * $T) * cos(3 * $M)
+            + (-0.3636 - 0.0001 * $T + 0.00002 * $T * $T) * sin(4 * $M)
+            + (0.0402 + 0.0032 * $T - 0.00000 * $T * $T) * cos(4 * $M)
+            + (0.0737 - 0.0008 * $T - 0.00000 * $T * $T) * sin(5 * $M)
+            + (-0.0980 - 0.0011 * $T - 0.00000 * $T * $T) * cos(5 * $M);
+
+        $JDE = $JDE0 + $diff;
+
+        return Time::fromJd($JDE);
+    }
+
+    /**
+     * Calculates the conjunction closest to the given date.
+     *
+     * @param Carbon $date The date for which we want to calculate the closest conjunction
+     *
+     * @return Carbon The date of the conjunction
+     */
+    public function conjunction(Carbon $date)
+    {
+        $A = 2451707.414;
+        $B = 779.936104;
+        $M0 = 157.6047;
+        $M1 = 48.705244;
+
+        $Y = $date->year + $date->dayOfYear / (365 + $date->format('L'));
+
+        $k = ceil((365.2425 * $Y + 1721060 - $A) / ($B));
+        $JDE0 = $A + $k * $B;
+        $M = deg2rad($M0 + $k * $M1);
+        $T = ($JDE0 - 2451545) / 36525;
+
+        $diff = 0.3102 - 0.0001 * $T + 0.00001 * $T * $T
+            + (9.7273 - 0.0156 * $T + 0.00001 * $T * $T) * sin($M)
+            + (-18.3195 - 0.0467 * $T + 0.00009 * $T * $T) * cos($M)
+            + (-1.6488 - 0.0133 * $T + 0.00001 * $T * $T) * sin(2 * $M)
+            + (-2.6117 - 0.0020 * $T + 0.00004 * $T * $T) * cos(2 * $M)
+            + (-0.6827 - 0.0026 * $T + 0.00001 * $T * $T) * sin(3 * $M)
+            + (0.0281 + 0.0035 * $T + 0.00001 * $T * $T) * cos(3 * $M)
+            + (-0.0823 + 0.0006 * $T + 0.00001 * $T * $T) * sin(4 * $M)
+            + (0.1584 + 0.0013 * $T - 0.00000 * $T * $T) * cos(4 * $M)
+            + (0.0270 + 0.0005 * $T - 0.00000 * $T * $T) * sin(5 * $M)
+            + (0.0433 - 0.0000 * $T - 0.00000 * $T * $T) * cos(5 * $M);
+
+        $JDE = $JDE0 + $diff;
+
+        return Time::fromJd($JDE);
+    }
 }

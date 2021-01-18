@@ -2061,4 +2061,78 @@ class Neptune extends Planet
 
         return [$L, $B, $R];
     }
+
+    /**
+     * Calculates the opposition closest to the given date.
+     *
+     * @param Carbon $date The date for which we want to calculate the closest opposition
+     *
+     * @return Carbon The date of the opposition
+     */
+    public function opposition(Carbon $date)
+    {
+        $A = 2451753.122;
+        $B = 367.486703;
+        $M0 = 202.6544;
+        $M1 = 2.194998;
+
+        $Y = $date->year + $date->dayOfYear / (365 + $date->format('L'));
+
+        $k = ceil((365.2425 * $Y + 1721060 - $A) / ($B));
+        $JDE0 = $A + $k * $B;
+        $M = deg2rad($M0 + $k * $M1);
+        $T = ($JDE0 - 2451545) / 36525;
+
+        $e = deg2rad(207.83 + 8.51 * $T);
+        $g = deg2rad(276.74 + 209.98 * $T);
+
+        $diff = -0.0140 + 0.0000 * $T + 0.00001 * $T * $T
+            + (-1.3486 + 0.0010 * $T + 0.00001 * $T * $T) * sin($M)
+            + (0.8597 + 0.0037 * $T + 0.00000 * $T * $T) * cos($M)
+            + (-0.0082 - 0.0002 * $T + 0.00001 * $T * $T) * sin(2 * $M)
+            + (0.0037 - 0.0003 * $T + 0.00000 * $T * $T) * cos(2 * $M)
+            + (-0.5964 + 0.0000 * $T + 0.00000 * $T * $T) * cos($e)
+            + (0.0728 + 0.0000 * $T + 0.00000 * $T * $T) * cos($g);
+
+        $JDE = $JDE0 + $diff;
+
+        return Time::fromJd($JDE);
+    }
+
+    /**
+     * Calculates the conjunction closest to the given date.
+     *
+     * @param Carbon $date The date for which we want to calculate the closest conjunction
+     *
+     * @return Carbon The date of the conjunction
+     */
+    public function conjunction(Carbon $date)
+    {
+        $A = 2451569.379;
+        $B = 367.486703;
+        $M0 = 21.5569;
+        $M1 = 2.194998;
+
+        $Y = $date->year + $date->dayOfYear / (365 + $date->format('L'));
+
+        $k = ceil((365.2425 * $Y + 1721060 - $A) / ($B));
+        $JDE0 = $A + $k * $B;
+        $M = deg2rad($M0 + $k * $M1);
+        $T = ($JDE0 - 2451545) / 36525;
+
+        $e = deg2rad(207.83 + 8.51 * $T);
+        $g = deg2rad(276.74 + 209.98 * $T);
+
+        $diff = 0.0168 + 0.0000 * $T + 0.00000 * $T * $T
+            + (-2.5606 + 0.0088 * $T + 0.00002 * $T * $T) * sin($M)
+            + (-0.8611 - 0.0037 * $T + 0.00002 * $T * $T) * cos($M)
+            + (0.0118 - 0.0004 * $T + 0.00001 * $T * $T) * sin(2 * $M)
+            + (0.0307 - 0.0003 * $T + 0.00000 * $T * $T) * cos(2 * $M)
+            + (-0.5964 + 0.0000 * $T + 0.00000 * $T * $T) * cos($e)
+            + (0.0728 + 0.0000 * $T + 0.00000 * $T * $T) * cos($g);
+
+        $JDE = $JDE0 + $diff;
+
+        return Time::fromJd($JDE);
+    }
 }

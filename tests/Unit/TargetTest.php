@@ -17,11 +17,16 @@ use deepskylog\AstronomyLibrary\Coordinates\Coordinate;
 use deepskylog\AstronomyLibrary\Coordinates\EquatorialCoordinates;
 use deepskylog\AstronomyLibrary\Coordinates\GeographicalCoordinates;
 use deepskylog\AstronomyLibrary\Targets\Elliptic;
+use deepskylog\AstronomyLibrary\Targets\Jupiter;
+use deepskylog\AstronomyLibrary\Targets\Mars;
 use deepskylog\AstronomyLibrary\Targets\Mercury;
 use deepskylog\AstronomyLibrary\Targets\Moon;
+use deepskylog\AstronomyLibrary\Targets\Neptune;
 use deepskylog\AstronomyLibrary\Targets\Parabolic;
 use deepskylog\AstronomyLibrary\Targets\Planet;
+use deepskylog\AstronomyLibrary\Targets\Saturn;
 use deepskylog\AstronomyLibrary\Targets\Target;
+use deepskylog\AstronomyLibrary\Targets\Uranus;
 use deepskylog\AstronomyLibrary\Targets\Venus;
 use deepskylog\AstronomyLibrary\Testing\BaseTestCase;
 use deepskylog\AstronomyLibrary\Time;
@@ -646,5 +651,133 @@ class TargetTest extends BaseTestCase
 
         $this->assertEqualsWithDelta(12.523385, $coordinates->getRA()->getCoordinate(), 0.00001);
         $this->assertEqualsWithDelta(50.7636309, $coordinates->getDeclination()->getCoordinate(), 0.00001);
+    }
+
+    /**
+     * Test the date of the inferior conjunction of Mercury.
+     */
+    public function testMercuryInferiorConjunction()
+    {
+        $date = Carbon::create(1993, 10, 1, 0, 0, 0, 'UTC');
+        $mercury = new Mercury();
+        $inf = $mercury->inferior_conjunction($date);
+        $this->assertEquals($inf->year, 1993);
+        $this->assertEquals($inf->month, 11);
+        $this->assertEquals($inf->day, 6);
+        $this->assertEquals($inf->hour, 3);
+
+        $date = Carbon::create(1631, 10, 1, 0, 0, 0, 'UTC');
+        $mercury = new Mercury();
+        $inf = $mercury->inferior_conjunction($date);
+        $this->assertEquals($inf->year, 1631);
+        $this->assertEquals($inf->month, 11);
+        $this->assertEquals($inf->day, 7);
+        $this->assertEquals($inf->hour, 7);
+    }
+
+    /**
+     * Test the date of the inferior conjunction of venus.
+     */
+    public function testVenusInferiorConjunction()
+    {
+        $date = Carbon::create(1882, 10, 1, 0, 0, 0, 'UTC');
+        $venus = new Venus();
+        $inf = $venus->inferior_conjunction($date);
+        $this->assertEquals($inf->year, 1882);
+        $this->assertEquals($inf->month, 12);
+        $this->assertEquals($inf->day, 6);
+        $this->assertEquals($inf->hour, 16);
+    }
+
+    /**
+     * Test the date of the opposition of Mars.
+     */
+    public function testMarsOpposition()
+    {
+        $date = Carbon::create(2729, 1, 1, 0, 0, 0, 'UTC');
+        $mars = new Mars();
+        $opposition = $mars->opposition($date);
+        $this->assertEquals($opposition->year, 2729);
+        $this->assertEquals($opposition->month, 9);
+        $this->assertEquals($opposition->day, 9);
+        $this->assertEquals($opposition->hour, 3);
+    }
+
+    /**
+     * Test the date of the opposition of Jupiter.
+     */
+    public function testJupiterOpposition()
+    {
+        $date = Carbon::create(-6, 5, 1, 0, 0, 0, 'UTC');
+        $jupiter = new Jupiter();
+        $opposition = $jupiter->opposition($date);
+        $this->assertEquals($opposition->year, -6);
+        $this->assertEquals($opposition->month, 9);
+        $this->assertEquals($opposition->day, 15);
+        $this->assertEquals($opposition->hour, 6);
+    }
+
+    /**
+     * Test the date of the opposition of Saturn.
+     */
+    public function testSaturnOpposition()
+    {
+        $date = Carbon::create(-6, 5, 1, 0, 0, 0, 'UTC');
+        $saturn = new Saturn();
+        $opposition = $saturn->opposition($date);
+        $this->assertEquals($opposition->year, -6);
+        $this->assertEquals($opposition->month, 9);
+        $this->assertEquals($opposition->day, 14);
+        $this->assertEquals($opposition->hour, 9);
+
+        $date = Carbon::create(2125, 5, 1, 0, 0, 0, 'UTC');
+        $saturn = new Saturn();
+        $opposition = $saturn->conjunction($date);
+        $this->assertEquals($opposition->year, 2125);
+        $this->assertEquals($opposition->month, 8);
+        $this->assertEquals($opposition->day, 26);
+        $this->assertEquals($opposition->hour, 7);
+    }
+
+    /**
+     * Test the date of the opposition of Uranus.
+     */
+    public function testUranusOpposition()
+    {
+        $date = Carbon::create(1780, 10, 1, 0, 0, 0, 'UTC');
+        $uranus = new Uranus();
+        $opposition = $uranus->opposition($date);
+        $this->assertEquals($opposition->year, 1780);
+        $this->assertEquals($opposition->month, 12);
+        $this->assertEquals($opposition->day, 17);
+        $this->assertEquals($opposition->hour, 14);
+    }
+
+    /**
+     * Test the date of the opposition of Neptune.
+     */
+    public function testNeptuneOpposition()
+    {
+        $date = Carbon::create(1846, 5, 1, 0, 0, 0, 'UTC');
+        $neptune = new Neptune();
+        $opposition = $neptune->opposition($date);
+        $this->assertEquals($opposition->year, 1846);
+        $this->assertEquals($opposition->month, 8);
+        $this->assertEquals($opposition->day, 20);
+        $this->assertEquals($opposition->hour, 3);
+    }
+
+    /**
+     * Test the date of the greatest western elongation of Merury.
+     */
+    public function testMercuryWesternElongation()
+    {
+        $date = Carbon::create(1993, 11, 1, 0, 0, 0, 'UTC');
+        $mercury = new Mercury();
+        $elongation = $mercury->greatest_western_elongation($date);
+        $this->assertEquals($elongation->year, 1993);
+        $this->assertEquals($elongation->month, 11);
+        $this->assertEquals($elongation->day, 22);
+        $this->assertEquals($elongation->hour, 15);
     }
 }
