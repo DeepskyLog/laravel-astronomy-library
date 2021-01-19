@@ -2,6 +2,13 @@
 
 All notable changes to `laravel-astronomy-library` will be documented in this file.
 
+## Version 4.23.1
+
+### Fixed
+
+- Fixed:
+    - Fix calculation of delta T in the beginning of the year if the new value is not yet available in the database.
+
 ## Version 4.23
 
 ### Added
