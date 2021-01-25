@@ -5700,14 +5700,14 @@ class Mars extends Planet
      *
      * @return Carbon The date of the perihelion
      */
-    public function perihelionDate(Carbon $date):Carbon
+    public function perihelionDate(Carbon $date): Carbon
     {
         $Y = $date->year + $date->dayOfYear / (365 + $date->format('L'));
 
         // $k is integer
         $k = round(0.53166 * ($Y - 2001.78));
 
-        $JDE   = 2452195.026 + 686.9957857 * $k - 0.0000001187 * $k * $k;
+        $JDE = 2452195.026 + 686.9957857 * $k - 0.0000001187 * $k * $k;
 
         return Time::fromJd($JDE);
     }
@@ -5719,14 +5719,14 @@ class Mars extends Planet
      *
      * @return Carbon The date of the aphelion
      */
-    public function aphelionDate(Carbon $date):Carbon
+    public function aphelionDate(Carbon $date): Carbon
     {
         $Y = $date->year + $date->dayOfYear / (365 + $date->format('L'));
 
         // $k is integer increased by 0.5
         $k = round(0.53166 * ($Y - 2001.78)) + 0.5;
 
-        $JDE   = 2452195.026 + 686.9957857 * $k - 0.0000001187 * $k * $k;
+        $JDE = 2452195.026 + 686.9957857 * $k - 0.0000001187 * $k * $k;
 
         return Time::fromJd($JDE);
     }

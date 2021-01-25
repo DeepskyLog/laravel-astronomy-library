@@ -3700,14 +3700,14 @@ class Jupiter extends Planet
      *
      * @return Carbon The date of the perihelion
      */
-    public function perihelionDate(Carbon $date):Carbon
+    public function perihelionDate(Carbon $date): Carbon
     {
         $Y = $date->year + $date->dayOfYear / (365 + $date->format('L'));
 
         // $k is integer
         $k = round(0.08430 * ($Y - 2011.20));
 
-        $JDE   = 2455636.936 + 4332.897065 * $k + 0.0001367 * $k * $k;
+        $JDE = 2455636.936 + 4332.897065 * $k + 0.0001367 * $k * $k;
 
         return Time::fromJd($JDE);
     }
@@ -3719,14 +3719,14 @@ class Jupiter extends Planet
      *
      * @return Carbon The date of the aphelion
      */
-    public function aphelionDate(Carbon $date):Carbon
+    public function aphelionDate(Carbon $date): Carbon
     {
         $Y = $date->year + $date->dayOfYear / (365 + $date->format('L'));
 
         // $k is integer increased by 0.5
         $k = round(0.08430 * ($Y - 2011.20)) + 0.5;
 
-        $JDE   = 2455636.936 + 4332.897065 * $k + 0.0001367 * $k * $k;
+        $JDE = 2455636.936 + 4332.897065 * $k + 0.0001367 * $k * $k;
 
         return Time::fromJd($JDE);
     }
