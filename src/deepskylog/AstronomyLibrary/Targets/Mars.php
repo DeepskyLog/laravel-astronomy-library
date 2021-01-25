@@ -5624,7 +5624,7 @@ class Mars extends Planet
      *
      * @return Carbon The date of the opposition
      */
-    public function opposition(Carbon $date)
+    public function opposition(Carbon $date): Carbon
     {
         $A = 2452097.382;
         $B = 779.936104;
@@ -5662,7 +5662,7 @@ class Mars extends Planet
      *
      * @return Carbon The date of the conjunction
      */
-    public function conjunction(Carbon $date)
+    public function conjunction(Carbon $date): Carbon
     {
         $A = 2451707.414;
         $B = 779.936104;
@@ -5689,6 +5689,44 @@ class Mars extends Planet
             + (0.0433 - 0.0000 * $T - 0.00000 * $T * $T) * cos(5 * $M);
 
         $JDE = $JDE0 + $diff;
+
+        return Time::fromJd($JDE);
+    }
+
+    /**
+     * Returns the date of perihelion closest to the given date.
+     *
+     * @param Carbon $date The date for which we want to calculate the closest perihelion
+     *
+     * @return Carbon The date of the perihelion
+     */
+    public function perihelionDate(Carbon $date):Carbon
+    {
+        $Y = $date->year + $date->dayOfYear / (365 + $date->format('L'));
+
+        // $k is integer
+        $k = round(0.53166 * ($Y - 2001.78));
+
+        $JDE   = 2452195.026 + 686.9957857 * $k - 0.0000001187 * $k * $k;
+
+        return Time::fromJd($JDE);
+    }
+
+    /**
+     * Returns the date of aphelion closest to the given date.
+     *
+     * @param Carbon $date The date for which we want to calculate the closest aphelion
+     *
+     * @return Carbon The date of the aphelion
+     */
+    public function aphelionDate(Carbon $date):Carbon
+    {
+        $Y = $date->year + $date->dayOfYear / (365 + $date->format('L'));
+
+        // $k is integer increased by 0.5
+        $k = round(0.53166 * ($Y - 2001.78)) + 0.5;
+
+        $JDE   = 2452195.026 + 686.9957857 * $k - 0.0000001187 * $k * $k;
 
         return Time::fromJd($JDE);
     }

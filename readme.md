@@ -485,6 +485,15 @@ $date        = Carbon::create(1993, 10, 1, 0, 0, 0, 'UTC');
 $jupiter     = new Jupiter();
 $opposition  = $jupiter->opposition($date);
 $conjunction = $jupiter->conjunction($date);
+
+// Calculate the date of aphelion and perihelion
+$date       = Carbon::create(1978, 10, 15, 0, 0, 0, 'UTC');
+$venus      = new Venus();
+$perihelion = $venus->perihelionDate($date);
+
+$date       = Carbon::create(2032, 1, 1, 0, 0, 0, 'UTC');
+$mars       = new Mars();
+$aphelion   = $mars->aphelionDate($date);
 ```
 
 ## Change log
