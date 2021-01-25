@@ -780,4 +780,32 @@ class TargetTest extends BaseTestCase
         $this->assertEquals($elongation->day, 22);
         $this->assertEquals($elongation->hour, 15);
     }
+
+    /**
+     * Test the perihelion date for Venus nearest to 1978 October 15.
+     */
+    public function testPerihelionDateVenus()
+    {
+        $date = Carbon::create(1978, 10, 15, 0, 0, 0, 'UTC');
+        $venus = new Venus();
+        $perihelion = $venus->perihelionDate($date);
+        $this->assertEquals($perihelion->year, 1978);
+        $this->assertEquals($perihelion->month, 12);
+        $this->assertEquals($perihelion->day, 31);
+        $this->assertEquals($perihelion->hour, 4);
+    }
+
+    /**
+     * Test the aphelion date for Mars in 2032.
+     */
+    public function testAphelionDateMars()
+    {
+        $date = Carbon::create(2032, 1, 1, 0, 0, 0, 'UTC');
+        $mars = new Mars();
+        $aphelion = $mars->aphelionDate($date);
+        $this->assertEquals($aphelion->year, 2032);
+        $this->assertEquals($aphelion->month, 10);
+        $this->assertEquals($aphelion->day, 24);
+        $this->assertEquals($aphelion->hour, 22);
+    }
 }

@@ -7412,7 +7412,7 @@ class Mercury extends Planet
      *
      * @return Carbon The date of the inferior conjunction
      */
-    public function inferior_conjunction(Carbon $date)
+    public function inferior_conjunction(Carbon $date): Carbon
     {
         $A = 2451612.023;
         $B = 115.8774771;
@@ -7450,7 +7450,7 @@ class Mercury extends Planet
      *
      * @return Carbon The date of the inferior conjunction
      */
-    public function superior_conjunction(Carbon $date)
+    public function superior_conjunction(Carbon $date): Carbon
     {
         $A = 2451554.084;
         $B = 115.8774771;
@@ -7489,7 +7489,7 @@ class Mercury extends Planet
      *
      * @return Carbon The date of the greatest eastern elongation
      */
-    public function greatest_eastern_elongation(Carbon $date)
+    public function greatest_eastern_elongation(Carbon $date): Carbon
     {
         $A = 2451612.023;
         $B = 115.8774771;
@@ -7528,7 +7528,7 @@ class Mercury extends Planet
      *
      * @return Carbon The date of the greatest western elongation
      */
-    public function greatest_western_elongation(Carbon $date)
+    public function greatest_western_elongation(Carbon $date): Carbon
     {
         $A = 2451612.023;
         $B = 115.8774771;
@@ -7555,6 +7555,43 @@ class Mercury extends Planet
             + cos(5 * $M) * (0.0037);
 
         $JDE = $JDE0 + $diff;
+
+        return Time::fromJd($JDE);
+    }
+
+    /**
+     * Returns the date of perihelion closest to the given date.
+     *
+     * @param Carbon $date The date for which we want to calculate the closest perihelion
+     *
+     * @return Carbon The date of the perihelion
+     */
+    public function perihelionDate(Carbon $date): Carbon
+    {
+        $Y = $date->year + $date->dayOfYear / (365 + $date->format('L'));
+
+        // $k is integer
+        $k = round(4.15201 * ($Y - 2000.12));
+
+        $JDE = 2451590.257 + 87.96934963 * $k - 0.0000000000 * $k * $k;
+
+        return Time::fromJd($JDE);
+    }
+
+    /**
+     * Returns the date of aphelion closest to the given date.
+     *
+     * @param Carbon $date The date for which we want to calculate the closest aphelion
+     *
+     * @return Carbon The date of the aphelion
+     */
+    public function aphelionDate(Carbon $date): Carbon
+    {
+        $Y = $date->year + $date->dayOfYear / (365 + $date->format('L'));
+
+        // $k is integer increased by 0.5
+        $k = round(4.15201 * ($Y - 2000.12)) + 0.5;
+        $JDE = 2451590.257 + 87.96934963 * $k - 0.0000000000 * $k * $k;
 
         return Time::fromJd($JDE);
     }

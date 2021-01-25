@@ -2,6 +2,13 @@
 
 All notable changes to `laravel-astronomy-library` will be documented in this file.
 
+## Version 4.24
+
+### Added
+
+- Added:
+  - Calculation of aphelion and perihelion date for the planets
+
 ## Version 4.23.1
 
 ### Fixed
