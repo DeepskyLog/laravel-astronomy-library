@@ -5994,14 +5994,14 @@ class Saturn extends Planet
      *
      * @return Carbon The date of the perihelion
      */
-    public function perihelionDate(Carbon $date):Carbon
+    public function perihelionDate(Carbon $date): Carbon
     {
         $Y = $date->year + $date->dayOfYear / (365 + $date->format('L'));
 
         // $k is integer
         $k = round(0.03393 * ($Y - 2003.52));
 
-        $JDE   = 2452830.12 + 10764.21676 * $k + 0.000827 * $k * $k;
+        $JDE = 2452830.12 + 10764.21676 * $k + 0.000827 * $k * $k;
 
         return Time::fromJd($JDE);
     }
@@ -6013,14 +6013,14 @@ class Saturn extends Planet
      *
      * @return Carbon The date of the aphelion
      */
-    public function aphelionDate(Carbon $date):Carbon
+    public function aphelionDate(Carbon $date): Carbon
     {
         $Y = $date->year + $date->dayOfYear / (365 + $date->format('L'));
 
         // $k is integer increased by 0.5
         $k = round(0.03393 * ($Y - 2003.52)) + 0.5;
 
-        $JDE   = 2452830.12 + 10764.21676 * $k + 0.000827 * $k * $k;
+        $JDE = 2452830.12 + 10764.21676 * $k + 0.000827 * $k * $k;
 
         return Time::fromJd($JDE);
     }

@@ -14,8 +14,8 @@
 namespace deepskylog\AstronomyLibrary\Targets;
 
 use Carbon\Carbon;
-use deepskylog\AstronomyLibrary\Time;
 use deepskylog\AstronomyLibrary\Coordinates\Coordinate;
+use deepskylog\AstronomyLibrary\Time;
 
 /**
  * The target class describing Venus.
@@ -47,15 +47,15 @@ class Venus extends Planet
     public function calculateMeanOrbitalElements(Carbon $date)
     {
         $jd = Time::getJd($date);
-        $T  = ($jd - 2451545.0) / 36525.0;
+        $T = ($jd - 2451545.0) / 36525.0;
 
-        $L     = (new Coordinate(181.979801 + 58519.2130302 * $T + 0.00031014 * $T ** 2 + 0.000000015 * $T ** 3, 0, 360))->getCoordinate();
-        $a     = 0.723329820;
-        $e     = 0.00677192 - 0.000047765 * $T + 0.0000000981 * $T ** 2 - 0.00000000046 * $T ** 3;
-        $i     = (new Coordinate(3.394662 + 0.0010037 * $T - 0.00000088 * $T ** 2 - 0.000000007 * $T ** 3, 0, 360))->getCoordinate();
+        $L = (new Coordinate(181.979801 + 58519.2130302 * $T + 0.00031014 * $T ** 2 + 0.000000015 * $T ** 3, 0, 360))->getCoordinate();
+        $a = 0.723329820;
+        $e = 0.00677192 - 0.000047765 * $T + 0.0000000981 * $T ** 2 - 0.00000000046 * $T ** 3;
+        $i = (new Coordinate(3.394662 + 0.0010037 * $T - 0.00000088 * $T ** 2 - 0.000000007 * $T ** 3, 0, 360))->getCoordinate();
         $omega = (new Coordinate(76.679920 + 0.9011206 * $T + 0.00040618 * $T ** 2 - 0.000000093 * $T ** 3, 0, 360))->getCoordinate();
-        $pi    = (new Coordinate(131.563703 + 1.4022288 * $T - 0.00107618 * $T ** 2 - 0.000005678 * $T ** 3, 0, 360))->getCoordinate();
-        $M     = $L - $pi;
+        $pi = (new Coordinate(131.563703 + 1.4022288 * $T - 0.00107618 * $T ** 2 - 0.000005678 * $T ** 3, 0, 360))->getCoordinate();
+        $M = $L - $pi;
 
         return [$L, $a, $e, $i, $omega, $pi, $M];
     }
@@ -78,15 +78,15 @@ class Venus extends Planet
     public function calculateMeanOrbitalElementsJ2000(Carbon $date)
     {
         $jd = Time::getJd($date);
-        $T  = ($jd - 2451545.0) / 36525.0;
+        $T = ($jd - 2451545.0) / 36525.0;
 
-        $L     = (new Coordinate(181.979801 + 58517.8156760 * $T + 0.00000165 * $T ** 2 - 0.000000002 * $T ** 3, 0, 360))->getCoordinate();
-        $a     = 0.723329820;
-        $e     = 0.00677192 - 0.000047765 * $T + 0.0000000981 * $T ** 2 - 0.00000000046 * $T ** 3;
-        $i     = (new Coordinate(3.394662 - 0.0008568 * $T - 0.00003244 * $T ** 2 + 0.000000009 * $T ** 3, 0, 360))->getCoordinate();
+        $L = (new Coordinate(181.979801 + 58517.8156760 * $T + 0.00000165 * $T ** 2 - 0.000000002 * $T ** 3, 0, 360))->getCoordinate();
+        $a = 0.723329820;
+        $e = 0.00677192 - 0.000047765 * $T + 0.0000000981 * $T ** 2 - 0.00000000046 * $T ** 3;
+        $i = (new Coordinate(3.394662 - 0.0008568 * $T - 0.00003244 * $T ** 2 + 0.000000009 * $T ** 3, 0, 360))->getCoordinate();
         $omega = (new Coordinate(76.679920 - 0.2780134 * $T - 0.00014257 * $T ** 2 - 0.000000164 * $T ** 3, 0, 360))->getCoordinate();
-        $pi    = (new Coordinate(131.563703 + 0.0048746 * $T - 0.00138467 * $T ** 2 - 0.000005695 * $T ** 3, 0, 360))->getCoordinate();
-        $M     = $L - $pi;
+        $pi = (new Coordinate(131.563703 + 0.0048746 * $T - 0.00138467 * $T ** 2 - 0.000005695 * $T ** 3, 0, 360))->getCoordinate();
+        $M = $L - $pi;
 
         return [$L, $a, $e, $i, $omega, $pi, $M];
     }
@@ -1825,17 +1825,17 @@ class Venus extends Planet
      */
     public function inferior_conjunction(Carbon $date): Carbon
     {
-        $A  = 2451996.706;
-        $B  = 583.921361;
+        $A = 2451996.706;
+        $B = 583.921361;
         $M0 = 82.7311;
         $M1 = 215.513058;
 
         $Y = $date->year + $date->dayOfYear / (365 + $date->format('L'));
 
-        $k    = ceil((365.2425 * $Y + 1721060 - $A) / ($B));
+        $k = ceil((365.2425 * $Y + 1721060 - $A) / ($B));
         $JDE0 = $A + $k * $B;
-        $M    = deg2rad($M0 + $k * $M1);
-        $T    = ($JDE0 - 2451545) / 36525;
+        $M = deg2rad($M0 + $k * $M1);
+        $T = ($JDE0 - 2451545) / 36525;
 
         $diff = -0.0096 + 0.0002 * $T - 0.00001 * $T * $T
             + sin($M) * (2.0009 - 0.0033 * $T - 0.00001 * $T * $T)
@@ -1859,17 +1859,17 @@ class Venus extends Planet
      */
     public function superior_conjunction(Carbon $date): Carbon
     {
-        $A  = 2451704.746;
-        $B  = 583.921361;
+        $A = 2451704.746;
+        $B = 583.921361;
         $M0 = 154.9745;
         $M1 = 215.513058;
 
         $Y = $date->year + $date->dayOfYear / (365 + $date->format('L'));
 
-        $k    = ceil((365.2425 * $Y + 1721060 - $A) / ($B));
+        $k = ceil((365.2425 * $Y + 1721060 - $A) / ($B));
         $JDE0 = $A + $k * $B;
-        $M    = deg2rad($M0 + $k * $M1);
-        $T    = ($JDE0 - 2451545) / 36525;
+        $M = deg2rad($M0 + $k * $M1);
+        $T = ($JDE0 - 2451545) / 36525;
 
         $diff = -0.0099 - 0.0002 * $T - 0.00001 * $T * $T
             + sin($M) * (4.1991 - 0.0121 * $T - 0.00003 * $T * $T)
@@ -1894,17 +1894,17 @@ class Venus extends Planet
      */
     public function greatest_eastern_elongation(Carbon $date): Carbon
     {
-        $A  = 2451996.706;
-        $B  = 583.921361;
+        $A = 2451996.706;
+        $B = 583.921361;
         $M0 = 82.7311;
         $M1 = 215.513058;
 
         $Y = $date->year + $date->dayOfYear / (365 + $date->format('L'));
 
-        $k    = ceil((365.2425 * $Y + 1721060 - $A) / ($B));
+        $k = ceil((365.2425 * $Y + 1721060 - $A) / ($B));
         $JDE0 = $A + $k * $B;
-        $M    = deg2rad($M0 + $k * $M1);
-        $T    = ($JDE0 - 2451545) / 36525;
+        $M = deg2rad($M0 + $k * $M1);
+        $T = ($JDE0 - 2451545) / 36525;
 
         $diff = -70.7600 + 0.0002 * $T - 0.00001 * $T * $T
             + sin($M) * (1.0282 - 0.0010 * $T - 0.00001 * $T * $T)
@@ -1929,17 +1929,17 @@ class Venus extends Planet
      */
     public function greatest_western_elongation(Carbon $date): Carbon
     {
-        $A  = 2451996.706;
-        $B  = 583.921361;
+        $A = 2451996.706;
+        $B = 583.921361;
         $M0 = 82.7311;
         $M1 = 215.513058;
 
         $Y = $date->year + $date->dayOfYear / (365 + $date->format('L'));
 
-        $k    = ceil((365.2425 * $Y + 1721060 - $A) / ($B));
+        $k = ceil((365.2425 * $Y + 1721060 - $A) / ($B));
         $JDE0 = $A + $k * $B;
-        $M    = deg2rad($M0 + $k * $M1);
-        $T    = ($JDE0 - 2451545) / 36525;
+        $M = deg2rad($M0 + $k * $M1);
+        $T = ($JDE0 - 2451545) / 36525;
 
         $diff = 70.7462 - 0.00001 * $T * $T
             + sin($M) * (1.1218 - 0.0025 * $T - 0.00001 * $T * $T)
@@ -1961,14 +1961,14 @@ class Venus extends Planet
      *
      * @return Carbon The date of the perihelion
      */
-    public function perihelionDate(Carbon $date):Carbon
+    public function perihelionDate(Carbon $date): Carbon
     {
         $Y = $date->year + $date->dayOfYear / (365 + $date->format('L'));
 
         // $k is integer
         $k = round(1.62549 * ($Y - 2000.53));
 
-        $JDE   = 2451738.233 + 224.7008188 * $k - 0.0000000327 * $k * $k;
+        $JDE = 2451738.233 + 224.7008188 * $k - 0.0000000327 * $k * $k;
 
         return Time::fromJd($JDE);
     }
@@ -1980,14 +1980,14 @@ class Venus extends Planet
      *
      * @return Carbon The date of the aphelion
      */
-    public function aphelionDate(Carbon $date):Carbon
+    public function aphelionDate(Carbon $date): Carbon
     {
         $Y = $date->year + $date->dayOfYear / (365 + $date->format('L'));
 
         // $k is integer increased by 0.5
-        $k     = round(1.62549 * ($Y - 2000.53)) + 0.5;
+        $k = round(1.62549 * ($Y - 2000.53)) + 0.5;
 
-        $JDE   = 2451738.233 + 224.7008188 * $k - 0.0000000327 * $k * $k;
+        $JDE = 2451738.233 + 224.7008188 * $k - 0.0000000327 * $k * $k;
 
         return Time::fromJd($JDE);
     }
