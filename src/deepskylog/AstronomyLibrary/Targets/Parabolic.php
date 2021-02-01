@@ -15,6 +15,7 @@ namespace deepskylog\AstronomyLibrary\Targets;
 
 use Carbon\Carbon;
 use deepskylog\AstronomyLibrary\Coordinates\EquatorialCoordinates;
+use deepskylog\AstronomyLibrary\Time;
 
 /**
  * The target class describing an object moving in a parabolic orbit.
@@ -126,5 +127,43 @@ class Parabolic extends Target
         $dec = rad2deg(asin($zeta / $delta));
 
         return new EquatorialCoordinates($ra, $dec);
+    }
+
+    /**
+     * Calculates the passage through the nodes.
+     *
+     * @return Carbon The date of the passage throug the ascending node
+     *
+     * See chapter 39 of Astronomical Algorithms
+     */
+    public function ascendingNode(): Carbon
+    {
+        $v = 360 - $this->_omega;
+        $s = tan(deg2rad($v / 2));
+
+        $t = 27.403895 * ($s ** 3 + 3 * $s) * $this->_q * sqrt($this->_q);
+
+        $JD = Time::getJd($this->_perihelion_date) + $t;
+
+        return Time::fromJd($JD);
+    }
+
+    /**
+     * Calculates the passage through the nodes.
+     *
+     * @return Carbon The date of the passage throug the descending node
+     *
+     * See chapter 39 of Astronomical Algorithms
+     */
+    public function descendingNode(): Carbon
+    {
+        $v = 180 - $this->_omega;
+        $s = tan(deg2rad($v / 2));
+
+        $t = 27.403895 * ($s ** 3 + 3 * $s) * $this->_q * sqrt($this->_q);
+
+        $JD = Time::getJd($this->_perihelion_date) + $t;
+
+        return Time::fromJd($JD);
     }
 }

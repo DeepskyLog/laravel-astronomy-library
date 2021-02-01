@@ -808,4 +808,56 @@ class TargetTest extends BaseTestCase
         $this->assertEquals($aphelion->day, 24);
         $this->assertEquals($aphelion->hour, 22);
     }
+
+    /**
+     * Test the passage through the nodes.
+     */
+    public function testPassageThroughNodes()
+    {
+        // Elliptic
+        $halley = new Elliptic();
+        $peridate = Carbon::create(1986, 2, 9, 11, 0, 50, 'UTC');
+        $halley->setOrbitalElements(17.9400782, 0.96727426, 162.0, 111.84644, 0.0, $peridate);
+
+        // Ascending node
+        $node = $halley->ascendingNode();
+
+        $this->assertEquals(1985, $node->year);
+        $this->assertEquals(11, $node->month);
+        $this->assertEquals(9, $node->day);
+        $this->assertEquals(3, $node->hour);
+        $this->assertEquals(49, $node->minute);
+
+        // Decending node
+        $node = $halley->descendingNode();
+
+        $this->assertEquals(1986, $node->year);
+        $this->assertEquals(3, $node->month);
+        $this->assertEquals(10, $node->day);
+        $this->assertEquals(8, $node->hour);
+        $this->assertEquals(51, $node->minute);
+
+        // Parabolic
+        $helin_roman = new Parabolic();
+        $peridate = Carbon::create(1989, 8, 20, 6, 59, 2, 'UTC');
+        $helin_roman->setOrbitalElements(1.324502, 0.0, 154.9103, 0.0, $peridate);
+
+        // Ascending node
+        $node = $helin_roman->ascendingNode();
+
+        $this->assertEquals(1977, $node->year);
+        $this->assertEquals(9, $node->month);
+        $this->assertEquals(17, $node->day);
+        $this->assertEquals(15, $node->hour);
+        $this->assertEquals(21, $node->minute);
+
+        // Decending node
+        $node = $helin_roman->descendingNode();
+
+        $this->assertEquals(1989, $node->year);
+        $this->assertEquals(9, $node->month);
+        $this->assertEquals(17, $node->day);
+        $this->assertEquals(15, $node->hour);
+        $this->assertEquals(16, $node->minute);
+    }
 }

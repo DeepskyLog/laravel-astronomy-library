@@ -5623,6 +5623,8 @@ class Mars extends Planet
      * @param Carbon $date The date for which we want to calculate the closest opposition
      *
      * @return Carbon The date of the opposition
+     *
+     * Chapter 36 of Astronomical Algorithms
      */
     public function opposition(Carbon $date): Carbon
     {
@@ -5661,6 +5663,8 @@ class Mars extends Planet
      * @param Carbon $date The date for which we want to calculate the closest conjunction
      *
      * @return Carbon The date of the conjunction
+     *
+     * Chapter 36 of Astronomical Algorithms
      */
     public function conjunction(Carbon $date): Carbon
     {
@@ -5699,6 +5703,8 @@ class Mars extends Planet
      * @param Carbon $date The date for which we want to calculate the closest perihelion
      *
      * @return Carbon The date of the perihelion
+     *
+     * Chapter 38 of Astronomical Algorithms
      */
     public function perihelionDate(Carbon $date): Carbon
     {
@@ -5718,6 +5724,8 @@ class Mars extends Planet
      * @param Carbon $date The date for which we want to calculate the closest aphelion
      *
      * @return Carbon The date of the aphelion
+     *
+     * Chapter 38 of Astronomical Algorithms
      */
     public function aphelionDate(Carbon $date): Carbon
     {

@@ -1822,6 +1822,8 @@ class Venus extends Planet
      * @param Carbon $date The date for which we want to calculate the closest inferior conjunction
      *
      * @return Carbon The date of the inferior conjunction
+     *
+     * Chapter 36 of Astronomical Algorithms
      */
     public function inferior_conjunction(Carbon $date): Carbon
     {
@@ -1856,6 +1858,8 @@ class Venus extends Planet
      * @param Carbon $date The date for which we want to calculate the closest inferior conjunction
      *
      * @return Carbon The date of the inferior conjunction
+     *
+     * Chapter 36 of Astronomical Algorithms
      */
     public function superior_conjunction(Carbon $date): Carbon
     {
@@ -1891,6 +1895,8 @@ class Venus extends Planet
      * @param Carbon $date The date for which we want to calculate the greatest eastern elongation
      *
      * @return Carbon The date of the greatest eastern elongation
+     *
+     * Chapter 36 of Astronomical Algorithms
      */
     public function greatest_eastern_elongation(Carbon $date): Carbon
     {
@@ -1926,6 +1932,8 @@ class Venus extends Planet
      * @param Carbon $date The date for which we want to calculate the greatest western elongation
      *
      * @return Carbon The date of the greatest western elongation
+     *
+     * Chapter 36 of Astronomical Algorithms
      */
     public function greatest_western_elongation(Carbon $date): Carbon
     {
@@ -1960,6 +1968,8 @@ class Venus extends Planet
      * @param Carbon $date The date for which we want to calculate the closest perihelion
      *
      * @return Carbon The date of the perihelion
+     *
+     * Chapter 38 of Astronomical Algorithms
      */
     public function perihelionDate(Carbon $date): Carbon
     {
@@ -1979,6 +1989,8 @@ class Venus extends Planet
      * @param Carbon $date The date for which we want to calculate the closest aphelion
      *
      * @return Carbon The date of the aphelion
+     *
+     * Chapter 38 of Astronomical Algorithms
      */
     public function aphelionDate(Carbon $date): Carbon
     {

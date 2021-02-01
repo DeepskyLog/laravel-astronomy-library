@@ -155,4 +155,44 @@ class Elliptic extends Target
 
         return new EquatorialCoordinates($ra, $dec);
     }
+
+    /**
+     * Calculates the passage through the nodes.
+     *
+     * @return Carbon The date of the passage throug the ascending node
+     *
+     * See chapter 39 of Astronomical Algorithms
+     */
+    public function ascendingNode(): Carbon
+    {
+        $v = 360 - $this->_omega;
+        $E = 2 * atan(sqrt((1 - $this->_e) / (1 + $this->_e)) * tan(deg2rad($v / 2)));
+
+        $M = rad2deg($E - $this->_e * sin($E));
+        $t = $M / $this->_n;
+
+        $JD = Time::getJd($this->_perihelion_date) + $t;
+
+        return Time::fromJd($JD);
+    }
+
+    /**
+     * Calculates the passage through the nodes.
+     *
+     * @return Carbon The date of the passage throug the descending node
+     *
+     * See chapter 39 of Astronomical Algorithms
+     */
+    public function descendingNode(): Carbon
+    {
+        $v = 180 - $this->_omega;
+        $E = 2 * atan(sqrt((1 - $this->_e) / (1 + $this->_e)) * tan(deg2rad($v / 2)));
+
+        $M = rad2deg($E - $this->_e * sin($E));
+        $t = $M / $this->_n;
+
+        $JD = Time::getJd($this->_perihelion_date) + $t;
+
+        return Time::fromJd($JD);
+    }
 }

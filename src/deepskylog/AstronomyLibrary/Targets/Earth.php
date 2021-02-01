@@ -2564,6 +2564,8 @@ class Earth extends Planet
      * @param Carbon $date The date for which we want to calculate the closest perihelion
      *
      * @return Carbon The date of the perihelion
+     *
+     * Chapter 38 of Astronomical Algorithms
      */
     public function perihelionDate(Carbon $date): Carbon
     {
@@ -2583,6 +2585,8 @@ class Earth extends Planet
      * @param Carbon $date The date for which we want to calculate the closest aphelion
      *
      * @return Carbon The date of the aphelion
+     *
+     * Chapter 38 of Astronomical Algorithms
      */
     public function aphelionDate(Carbon $date): Carbon
     {
