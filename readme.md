@@ -494,6 +494,13 @@ $perihelion = $venus->perihelionDate($date);
 $date       = Carbon::create(2032, 1, 1, 0, 0, 0, 'UTC');
 $mars       = new Mars();
 $aphelion   = $mars->aphelionDate($date);
+
+// Calculate the date of the ascending or descending node of targets in elliptical or parabolic orbits
+$halley   = new Elliptic();
+$peridate = Carbon::create(1986, 2, 9, 11, 0, 50, 'UTC');
+$halley->setOrbitalElements(17.9400782, 0.96727426, 162.0, 111.84644, 0.0, $peridate);
+$node = $halley->ascendingNode();
+$node = $halley->descendingNode();
 ```
 
 ## Change log

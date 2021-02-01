@@ -14,6 +14,7 @@
 namespace deepskylog\AstronomyLibrary\Targets;
 
 use Carbon\Carbon;
+use deepskylog\AstronomyLibrary\Time;
 use deepskylog\AstronomyLibrary\Coordinates\EquatorialCoordinates;
 
 /**
@@ -53,11 +54,11 @@ class Parabolic extends Target
      */
     public function setOrbitalElements(float $q, float $i, float $omega, float $longitude_ascending_node, Carbon $perihelion_date): void
     {
-        $this->_q = $q;
-        $this->_i = $i;
-        $this->_omega = $omega;
+        $this->_q                        = $q;
+        $this->_i                        = $i;
+        $this->_omega                    = $omega;
         $this->_longitude_ascending_node = $longitude_ascending_node;
-        $this->_perihelion_date = $perihelion_date;
+        $this->_perihelion_date          = $perihelion_date;
     }
 
     /**
@@ -115,16 +116,54 @@ class Parabolic extends Target
         $sun = new Sun();
         $XYZ = $sun->calculateGeometricCoordinates($date);
 
-        $ksi = $XYZ->getX()->getCoordinate() + $x;
-        $eta = $XYZ->getY()->getCoordinate() + $y;
+        $ksi  = $XYZ->getX()->getCoordinate() + $x;
+        $eta  = $XYZ->getY()->getCoordinate() + $y;
         $zeta = $XYZ->getZ()->getCoordinate() + $z;
 
         $delta = sqrt($ksi ** 2 + $eta ** 2 + $zeta ** 2);
-        $tau = 0.0057755183 * $delta;
+        $tau   = 0.0057755183 * $delta;
 
-        $ra = rad2deg(atan2($eta, $ksi)) / 15.0;
+        $ra  = rad2deg(atan2($eta, $ksi)) / 15.0;
         $dec = rad2deg(asin($zeta / $delta));
 
         return new EquatorialCoordinates($ra, $dec);
+    }
+
+    /**
+     * Calculates the passage through the nodes.
+     *
+     * @return Carbon The date of the passage throug the ascending node
+     *
+     * See chapter 39 of Astronomical Algorithms
+     */
+    public function ascendingNode(): Carbon
+    {
+        $v     = 360 - $this->_omega;
+        $s     = tan(deg2rad($v / 2));
+
+        $t     = 27.403895 * ($s ** 3 + 3 * $s) * $this->_q * sqrt($this->_q);
+
+        $JD    = Time::getJd($this->_perihelion_date) + $t;
+
+        return Time::fromJd($JD);
+    }
+
+    /**
+     * Calculates the passage through the nodes.
+     *
+     * @return Carbon The date of the passage throug the descending node
+     *
+     * See chapter 39 of Astronomical Algorithms
+     */
+    public function descendingNode(): Carbon
+    {
+        $v     = 180 - $this->_omega;
+        $s     = tan(deg2rad($v / 2));
+
+        $t     = 27.403895 * ($s ** 3 + 3 * $s) * $this->_q * sqrt($this->_q);
+
+        $JD    = Time::getJd($this->_perihelion_date) + $t;
+
+        return Time::fromJd($JD);
     }
 }

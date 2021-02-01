@@ -2,12 +2,19 @@
 
 All notable changes to `laravel-astronomy-library` will be documented in this file.
 
+## Version 4.25
+
+### Added
+
+- Added:
+  - Methods to calculate the data of the ascending and descending node of targets in ellipical and parabolic orbits.
+
 ## Version 4.24
 
 ### Added
 
 - Added:
-  - Calculation of aphelion and perihelion date for the planets
+  - Calculation of aphelion and perihelion date for the planets.
 
 ## Version 4.23.1
 
