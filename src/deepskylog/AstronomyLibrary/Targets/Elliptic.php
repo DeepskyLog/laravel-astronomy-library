@@ -14,8 +14,8 @@
 namespace deepskylog\AstronomyLibrary\Targets;
 
 use Carbon\Carbon;
-use deepskylog\AstronomyLibrary\Time;
 use deepskylog\AstronomyLibrary\Coordinates\EquatorialCoordinates;
+use deepskylog\AstronomyLibrary\Time;
 
 /**
  * The target class describing an object moving in an elliptic orbit.
@@ -57,13 +57,13 @@ class Elliptic extends Target
      */
     public function setOrbitalElements(float $a, float $e, float $i, float $omega, float $longitude_ascending_node, Carbon $perihelion_date): void
     {
-        $this->_a                        = $a;
-        $this->_e                        = $e;
-        $this->_i                        = $i;
-        $this->_omega                    = $omega;
+        $this->_a = $a;
+        $this->_e = $e;
+        $this->_i = $i;
+        $this->_omega = $omega;
         $this->_longitude_ascending_node = $longitude_ascending_node;
-        $this->_n                        = 0.9856076686 / ($a * sqrt($a));
-        $this->_perihelion_date          = $perihelion_date;
+        $this->_n = 0.9856076686 / ($a * sqrt($a));
+        $this->_perihelion_date = $perihelion_date;
     }
 
     /**
@@ -105,7 +105,7 @@ class Elliptic extends Target
         $c = sqrt($H ** 2 + $R ** 2);
 
         $diff_in_date = $this->_perihelion_date->diffInSeconds($date) / 3600.0 / 24.0;
-        $M            = -$diff_in_date * 0.300171252;
+        $M = -$diff_in_date * 0.300171252;
 
         $E = $this->eccentricAnomaly($this->_e, $M, 0.000001);
 
@@ -118,19 +118,19 @@ class Elliptic extends Target
         $sun = new Sun();
         $XYZ = $sun->calculateGeometricCoordinates($date);
 
-        $ksi  = $XYZ->getX()->getCoordinate() + $x;
-        $eta  = $XYZ->getY()->getCoordinate() + $y;
+        $ksi = $XYZ->getX()->getCoordinate() + $x;
+        $eta = $XYZ->getY()->getCoordinate() + $y;
         $zeta = $XYZ->getZ()->getCoordinate() + $z;
 
         $delta = sqrt($ksi ** 2 + $eta ** 2 + $zeta ** 2);
-        $tau   = 0.0057755183 * $delta;
+        $tau = 0.0057755183 * $delta;
 
         // Do the calculations again for t - $tau
-        $jd      = Time::getJd($date);
+        $jd = Time::getJd($date);
         $newDate = Time::fromJd($jd - $tau);
 
         $diff_in_date = $this->_perihelion_date->diffInSeconds($newDate) / 3600.0 / 24.0;
-        $M            = -$diff_in_date * 0.300171252;
+        $M = -$diff_in_date * 0.300171252;
 
         $E = $this->eccentricAnomaly($this->_e, $M, 0.000001);
 
@@ -143,14 +143,14 @@ class Elliptic extends Target
         $sun = new Sun();
         $XYZ = $sun->calculateGeometricCoordinates($date);
 
-        $ksi  = $XYZ->getX()->getCoordinate() + $x;
-        $eta  = $XYZ->getY()->getCoordinate() + $y;
+        $ksi = $XYZ->getX()->getCoordinate() + $x;
+        $eta = $XYZ->getY()->getCoordinate() + $y;
         $zeta = $XYZ->getZ()->getCoordinate() + $z;
 
         $delta = sqrt($ksi ** 2 + $eta ** 2 + $zeta ** 2);
-        $tau   = 0.0057755183 * $delta;
+        $tau = 0.0057755183 * $delta;
 
-        $ra  = rad2deg(atan2($eta, $ksi)) / 15.0;
+        $ra = rad2deg(atan2($eta, $ksi)) / 15.0;
         $dec = rad2deg(asin($zeta / $delta));
 
         return new EquatorialCoordinates($ra, $dec);
@@ -165,13 +165,13 @@ class Elliptic extends Target
      */
     public function ascendingNode(): Carbon
     {
-        $v     = 360 - $this->_omega;
-        $E     = 2 * atan(sqrt((1 - $this->_e) / (1 + $this->_e)) * tan(deg2rad($v / 2)));
+        $v = 360 - $this->_omega;
+        $E = 2 * atan(sqrt((1 - $this->_e) / (1 + $this->_e)) * tan(deg2rad($v / 2)));
 
-        $M     = rad2deg($E - $this->_e * sin($E));
-        $t     = $M / $this->_n;
+        $M = rad2deg($E - $this->_e * sin($E));
+        $t = $M / $this->_n;
 
-        $JD    = Time::getJd($this->_perihelion_date) + $t;
+        $JD = Time::getJd($this->_perihelion_date) + $t;
 
         return Time::fromJd($JD);
     }
@@ -185,13 +185,13 @@ class Elliptic extends Target
      */
     public function descendingNode(): Carbon
     {
-        $v     = 180 - $this->_omega;
-        $E     = 2 * atan(sqrt((1 - $this->_e) / (1 + $this->_e)) * tan(deg2rad($v / 2)));
+        $v = 180 - $this->_omega;
+        $E = 2 * atan(sqrt((1 - $this->_e) / (1 + $this->_e)) * tan(deg2rad($v / 2)));
 
-        $M     = rad2deg($E - $this->_e * sin($E));
-        $t     = $M / $this->_n;
+        $M = rad2deg($E - $this->_e * sin($E));
+        $t = $M / $this->_n;
 
-        $JD    = Time::getJd($this->_perihelion_date) + $t;
+        $JD = Time::getJd($this->_perihelion_date) + $t;
 
         return Time::fromJd($JD);
     }
