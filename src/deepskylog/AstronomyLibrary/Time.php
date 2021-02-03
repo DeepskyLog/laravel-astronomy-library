@@ -13,9 +13,10 @@
 
 namespace deepskylog\AstronomyLibrary;
 
+use Exception;
 use Carbon\Carbon;
-use deepskylog\AstronomyLibrary\Coordinates\GeographicalCoordinates;
 use deepskylog\AstronomyLibrary\Models\DeltaT;
+use deepskylog\AstronomyLibrary\Coordinates\GeographicalCoordinates;
 
 /**
  * Procedures to work with times.
@@ -46,10 +47,10 @@ class Time
             + $date->day;
 
         $month = $date->month;
-        $year = $date->year;
+        $year  = $date->year;
 
         if ($month <= 2) {
-            $year = --$year;
+            $year  = --$year;
             $month = $month + 12;
         }
 
@@ -98,14 +99,14 @@ class Time
         }
 
         $jd = $jd + 0.5;
-        $z = (int) $jd;
-        $f = $jd - $z;
+        $z  = (int) $jd;
+        $f  = $jd - $z;
 
         if ($z < 2299161.0) {
             $a = $z;
         } else {
             $alpha = floor(($z - 1867216.25) / 36524.25);
-            $a = $z + 1 + $alpha - floor($alpha / 4);
+            $a     = $z + 1 + $alpha - floor($alpha / 4);
         }
 
         $b = $a + 1524;
@@ -118,10 +119,10 @@ class Time
 
         $day = $b - $d - floor(30.6001 * $e);
 
-        $hour = (int) ($f * 24);
+        $hour          = (int) ($f * 24);
         $decimalMinute = (($f * 24) - $hour) * 60;
-        $minute = (int) $decimalMinute;
-        $second = (int) (($decimalMinute - $minute) * 60);
+        $minute        = (int) $decimalMinute;
+        $second        = (int) (($decimalMinute - $minute) * 60);
 
         if ($e < 14) {
             $month = (int) ($e - 1);
@@ -163,6 +164,22 @@ class Time
     {
         $y = $date->year + ($date->month - 0.5) / 12;
 
+        $databaseAvailable = false;
+        try {
+            $databaseDate = Carbon::create(
+                DeltaT::first()['year'] + 1,
+                1,
+                1,
+                0,
+                0,
+                0,
+                'UTC'
+            );
+            $databaseAvailable = true;
+        } catch (Exception $e) {
+            $databaseAvailable = false;
+        }
+
         if ($date < Carbon::create(-500, 1, 1, 12, 12, 12, 'UTC')) {
             $u = ($y - 1820) / 100;
 
@@ -191,16 +208,7 @@ class Time
             $deltaT = (int) (
                 120 - 0.9808 * $t - 0.01532 * ($t ** 2) + ($t ** 3) / 7129
             );
-        } elseif ($date < Carbon::create(
-            DeltaT::first()['year'] + 1,
-            1,
-            1,
-            0,
-            0,
-            0,
-            'UTC'
-        )
-        ) {
+        } elseif ($databaseAvailable && date < $databaseDate) {
             $databaseEntry = DeltaT::where('year', '=', $date->year)->first();
 
             return $databaseEntry['deltat'];
@@ -233,7 +241,7 @@ class Time
         GeographicalCoordinates $coords
     ): Carbon {
         $jd = self::getJd($date);
-        $T = ($jd - 2451545.0) / 36525;
+        $T  = ($jd - 2451545.0) / 36525;
 
         $theta0 = 280.46061837
             + 360.98564736629 * ($jd - 2451545.0)
@@ -246,11 +254,11 @@ class Time
         // Bring $theta0 in the 0 - 360.0 interval
         $theta0 -= floor($theta0 / 360.0) * 360;
 
-        $decimalHours = $theta0 / 15.0;
-        $hour = (int) ($decimalHours);
+        $decimalHours   = $theta0 / 15.0;
+        $hour           = (int) ($decimalHours);
         $decimalMinutes = ($decimalHours - $hour) * 60.0;
-        $minutes = (int) $decimalMinutes;
-        $seconds = ($decimalMinutes - $minutes) * 60.0;
+        $minutes        = (int) $decimalMinutes;
+        $seconds        = ($decimalMinutes - $minutes) * 60.0;
 
         return Carbon::create(
             $date->year,
@@ -278,9 +286,9 @@ class Time
         GeographicalCoordinates $coords,
         array $nutation = null
     ): Carbon {
-        $date = $date->copy()->timezone('UTC');
+        $date         = $date->copy()->timezone('UTC');
         $siderialTime = self::meanSiderialTime($date, $coords);
-        if (! $nutation) {
+        if (!$nutation) {
             $jd = self::getJd($date);
 
             $nutation = self::nutation($jd);
@@ -305,11 +313,11 @@ class Time
     public static function apparentSiderialTimeGreenwich(
         Carbon $date
     ): Carbon {
-        $newDate = $date->copy()->timezone('UTC');
-        $newDate->hour = 0;
+        $newDate         = $date->copy()->timezone('UTC');
+        $newDate->hour   = 0;
         $newDate->minute = 0;
         $newDate->second = 0;
-        $greenwich = new GeographicalCoordinates(0.0, 51.476852);
+        $greenwich       = new GeographicalCoordinates(0.0, 51.476852);
 
         return self::apparentSiderialTime($newDate, $greenwich);
     }
@@ -498,10 +506,10 @@ class Time
         $year = $date->year;
 
         if ($year < 1000) {
-            $Y = $year / 1000;
+            $Y    = $year / 1000;
             $JDE0 = 1721139.29189 + 365242.13740 * $Y + 0.06134 * $Y ** 2 + 0.00111 * $Y ** 3 - 0.00071 * $Y ** 4;
         } else {
-            $Y = ($year - 2000) / 1000;
+            $Y    = ($year - 2000) / 1000;
             $JDE0 = 2451623.80984 + 365242.37404 * $Y + 0.05169 * $Y ** 2 - 0.00411 * $Y ** 3 - 0.00057 * $Y ** 4;
         }
 
@@ -521,10 +529,10 @@ class Time
         $year = $date->year;
 
         if ($year < 1000) {
-            $Y = $year / 1000;
+            $Y    = $year / 1000;
             $JDE0 = 1721233.25401 + 365241.72562 * $Y - 0.05323 * $Y ** 2 + 0.00907 * $Y ** 3 + 0.00025 * $Y ** 4;
         } else {
-            $Y = ($year - 2000) / 1000;
+            $Y    = ($year - 2000) / 1000;
             $JDE0 = 2451716.56767 + 365241.62603 * $Y + 0.00325 * $Y ** 2 + 0.00888 * $Y ** 3 - 0.00030 * $Y ** 4;
         }
 
@@ -544,10 +552,10 @@ class Time
         $year = $date->year;
 
         if ($year < 1000) {
-            $Y = $year / 1000;
+            $Y    = $year / 1000;
             $JDE0 = 1721325.70455 + 365242.49558 * $Y - 0.11677 * $Y ** 2 - 0.00297 * $Y ** 3 + 0.00074 * $Y ** 4;
         } else {
-            $Y = ($year - 2000) / 1000;
+            $Y    = ($year - 2000) / 1000;
             $JDE0 = 2451810.21715 + 365242.01767 * $Y - 0.11575 * $Y ** 2 + 0.00337 * $Y ** 3 + 0.00078 * $Y ** 4;
         }
 
@@ -567,10 +575,10 @@ class Time
         $year = $date->year;
 
         if ($year < 1000) {
-            $Y = $year / 1000;
+            $Y    = $year / 1000;
             $JDE0 = 1721414.39987 + 365242.88257 * $Y - 0.00769 * $Y ** 2 - 0.00933 * $Y ** 3 + 0.00006 * $Y ** 4;
         } else {
-            $Y = ($year - 2000) / 1000;
+            $Y    = ($year - 2000) / 1000;
             $JDE0 = 2451900.05952 + 365242.74049 * $Y - 0.06223 * $Y ** 2 - 0.00823 * $Y ** 3 + 0.00032 * $Y ** 4;
         }
 
@@ -582,8 +590,8 @@ class Time
      */
     private static function calculateSeasonTime(float $JDE0): float
     {
-        $T = ($JDE0 - 2451545.0) / 36525.0;
-        $W = 35999.373 * $T - 2.47;
+        $T           = ($JDE0 - 2451545.0) / 36525.0;
+        $W           = 35999.373 * $T - 2.47;
         $deltaLambda = 1 + 0.0334 * cos(deg2rad($W)) + 0.0007 * cos(deg2rad(2 * $W));
 
         $S = 485 * cos(deg2rad(324.96 + 1934.136 * $T))

@@ -2,12 +2,20 @@
 
 All notable changes to `laravel-astronomy-library` will be documented in this file.
 
+## Version 4.26
+
+### Changed
+
+- Changed:
+  - AstronomyLibrary now also keeps deltaT, so that we don't have to recalculate or read it from the database again and again.
+  - The calculation of deltaT will now also work when no database is configured.
+
 ## Version 4.25
 
 ### Added
 
 - Added:
-  - Methods to calculate the data of the ascending and descending node of targets in ellipical and parabolic orbits.
+  - Methods to calculate the date of the ascending and descending node of targets in ellipical and parabolic orbits.
 
 ## Version 4.24
 
