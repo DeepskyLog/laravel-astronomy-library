@@ -208,7 +208,7 @@ class Time
             $deltaT = (int) (
                 120 - 0.9808 * $t - 0.01532 * ($t ** 2) + ($t ** 3) / 7129
             );
-        } elseif ($databaseAvailable && date < $databaseDate) {
+        } elseif ($databaseAvailable && $date < $databaseDate) {
             $databaseEntry = DeltaT::where('year', '=', $date->year)->first();
 
             return $databaseEntry['deltat'];
