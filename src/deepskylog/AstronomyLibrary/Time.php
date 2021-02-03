@@ -16,6 +16,7 @@ namespace deepskylog\AstronomyLibrary;
 use Carbon\Carbon;
 use deepskylog\AstronomyLibrary\Coordinates\GeographicalCoordinates;
 use deepskylog\AstronomyLibrary\Models\DeltaT;
+use Exception;
 
 /**
  * Procedures to work with times.
@@ -163,6 +164,22 @@ class Time
     {
         $y = $date->year + ($date->month - 0.5) / 12;
 
+        $databaseAvailable = false;
+        try {
+            $databaseDate = Carbon::create(
+                DeltaT::first()['year'] + 1,
+                1,
+                1,
+                0,
+                0,
+                0,
+                'UTC'
+            );
+            $databaseAvailable = true;
+        } catch (Exception $e) {
+            $databaseAvailable = false;
+        }
+
         if ($date < Carbon::create(-500, 1, 1, 12, 12, 12, 'UTC')) {
             $u = ($y - 1820) / 100;
 
@@ -191,16 +208,7 @@ class Time
             $deltaT = (int) (
                 120 - 0.9808 * $t - 0.01532 * ($t ** 2) + ($t ** 3) / 7129
             );
-        } elseif ($date < Carbon::create(
-            DeltaT::first()['year'] + 1,
-            1,
-            1,
-            0,
-            0,
-            0,
-            'UTC'
-        )
-        ) {
+        } elseif ($databaseAvailable && date < $databaseDate) {
             $databaseEntry = DeltaT::where('year', '=', $date->year)->first();
 
             return $databaseEntry['deltat'];

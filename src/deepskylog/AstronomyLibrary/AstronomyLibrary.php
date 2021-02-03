@@ -38,6 +38,7 @@ class AstronomyLibrary
     private float $_jd;
     private Carbon $_siderialTime;
     private ?string $_lengthOfNightChart = null;
+    private ?float $_deltaT = null;
 
     /**
      * The constructor.
@@ -57,6 +58,7 @@ class AstronomyLibrary
             $this->_date,
             $this->_coordinates
         );
+        $this->_deltaT = Time::deltaT($this->_date);
     }
 
     /**
@@ -86,6 +88,7 @@ class AstronomyLibrary
             $this->_coordinates
         );
         $this->_lengthOfNightChart = null;
+        $this->_deltaT = Time::deltaT($this->_date);
     }
 
     /**
@@ -109,8 +112,6 @@ class AstronomyLibrary
         GeographicalCoordinates $coordinates
     ): void {
         $this->_coordinates = $coordinates;
-        $this->_jd = Time::getJd($this->_date);
-        $this->_nutation = Time::nutation($this->getJd());
         $this->_siderialTime = Time::apparentSiderialTime(
             $this->_date,
             $this->_coordinates
@@ -144,6 +145,8 @@ class AstronomyLibrary
             $this->_date,
             $this->_coordinates
         );
+        $this->_deltaT = Time::deltaT($this->_date);
+
         $this->_lengthOfNightChart = null;
     }
 
@@ -154,7 +157,11 @@ class AstronomyLibrary
      */
     public function getDeltaT(): float
     {
-        return Time::deltaT($this->_date);
+        if ($this->_deltaT) {
+            return $this->_deltaT;
+        } else {
+            return Time::deltaT($this->_date);
+        }
     }
 
     /**
