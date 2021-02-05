@@ -2,6 +2,13 @@
 
 All notable changes to `laravel-astronomy-library` will be documented in this file.
 
+## Version 4.26.1
+
+### Changed
+
+- Changed:
+  - Added delta t value for 2021
+
 ## Version 4.26
 
 ### Changed
