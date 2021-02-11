@@ -12,8 +12,8 @@
 
 namespace Tests\Unit;
 
-use deepskylog\AstronomyLibrary\Coordinates\GeographicalCoordinates;
 use deepskylog\AstronomyLibrary\Testing\BaseTestCase;
+use deepskylog\AstronomyLibrary\Coordinates\GeographicalCoordinates;
 
 /**
  * Tests for the GeographicalCoordinates class.
@@ -32,7 +32,7 @@ class GeographicalCoordinatesTest extends BaseTestCase
      *
      * @var string
      */
-    protected $appPath = __DIR__.'/../../vendor/laravel/laravel/bootstrap/app.php';
+    protected $appPath = __DIR__ . '/../../vendor/laravel/laravel/bootstrap/app.php';
 
     /**
      * Setup the test environment.
@@ -85,5 +85,18 @@ class GeographicalCoordinatesTest extends BaseTestCase
 
         $coords->setLongitude(181.2);
         $this->assertEquals(-178.8, $coords->getLongitude()->getCoordinate());
+    }
+
+    /**
+     * Test calculating rhoSinPhi and rhoCosPhi.
+     *
+     * @return None
+     */
+    public function testEarthsGlobe()
+    {
+        $coords      = new GeographicalCoordinates(-7.790833333333333, 33.356111111111111);
+        $earthsGlobe = $coords->earthsGlobe(1706);
+        $this->assertEqualsWithDelta(0.546861, $earthsGlobe[0], 0.000001);
+        $this->assertEqualsWithDelta(0.836339, $earthsGlobe[1], 0.000001);
     }
 }

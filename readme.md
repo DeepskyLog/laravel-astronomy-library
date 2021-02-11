@@ -439,7 +439,10 @@ $coords = $venus->calculateHeliocentricCoordinates($date);
 // Calculate the Equatorial Coordinates of Venus
 $date   = Carbon::create(1992, 12, 20, 0, 0, 0, 'UTC');
 $venus  = new Venus();
-$venus->calculateEquatorialCoordinates($date);
+$venus->calculateApparentEquatorialCoordinates($date);
+// If the correction for the location on earth should be done, use the following method
+$heightOfLocation = 555;   // In meters
+$venus->calculateEquatorialCoordinates($date, $geo_coords, $heightOfLocation);
 
 // Calculate the Equatorial Coordinates of comet Encke
 $date     = Carbon::create(1990, 10, 6, 0, 0, 0, 'UTC');

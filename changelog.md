@@ -2,50 +2,57 @@
 
 All notable changes to `laravel-astronomy-library` will be documented in this file.
 
-## Version 4.26.1
+## Version 5.0
+
+### Backwards incompatible changes
+
+- The method calculateEquatorialCoordinates on planets now need three parameters, because the effect of parallax is taken into account.  In stead of only the date, also the geographical coordinates and height of the location are needed as parameter.
+- The method calculateApparentEquatorialCoordinates($date) can be used if the corrections for hte parallax are not needed.
+
+### Added
+
+- Height of the location in AstronomyLibrary
+- earthsGlobe method for GeographicalCoordinates to calculate rho sin phi accent and rho cas phi accent
+- Calculation of parallax for equatorial coordinates
+
+## Version 4.26.2
 
 ### Changed
 
-- Changed:
-  - Added delta t value for 2021
+- Added delta t value for 2021
 
 ## Version 4.26
 
 ### Changed
 
-- Changed:
-  - AstronomyLibrary now also keeps deltaT, so that we don't have to recalculate or read it from the database again and again.
-  - The calculation of deltaT will now also work when no database is configured.
+- AstronomyLibrary now also keeps deltaT, so that we don't have to recalculate or read it from the database again and again.
+- The calculation of deltaT will now also work when no database is configured.
 
 ## Version 4.25
 
 ### Added
 
-- Added:
-  - Methods to calculate the date of the ascending and descending node of targets in ellipical and parabolic orbits.
+- Methods to calculate the date of the ascending and descending node of targets in ellipical and parabolic orbits.
 
 ## Version 4.24
 
 ### Added
 
-- Added:
-  - Calculation of aphelion and perihelion date for the planets.
+- Calculation of aphelion and perihelion date for the planets.
 
 ## Version 4.23.1
 
 ### Fixed
 
-- Fixed:
-    - Fix calculation of delta T in the beginning of the year if the new value is not yet available in the database.
+- Fix calculation of delta T in the beginning of the year if the new value is not yet available in the database.
 
 ## Version 4.23
 
 ### Added
 
-- Added:
-  - Calculation of inferior / superior conjunction for inner planets
-  - Opposition / conjuntion of outer planets
-  - Greatest eastern and western elongation of inner planets.
+- Calculation of inferior / superior conjunction for inner planets
+- Opposition / conjuntion of outer planets
+- Greatest eastern and western elongation of inner planets.
 
 ## Version 4.22
 
