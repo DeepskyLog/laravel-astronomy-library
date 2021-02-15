@@ -118,9 +118,10 @@ class GeographicalCoordinates
      */
     public function earthsGlobe(float $height): array
     {
-        $u         = atan(0.99664719 * tan(deg2rad($this->getLatitude()->getCoordinate())));
+        $u = atan(0.99664719 * tan(deg2rad($this->getLatitude()->getCoordinate())));
         $rhoSinPhi = 0.99664719 * sin($u) + ($height / 6378140) * sin(deg2rad($this->getLatitude()->getCoordinate()));
         $rhoCosPhi = cos($u) + ($height / 6378140) * cos(deg2rad($this->getLatitude()->getCoordinate()));
+
         return [$rhoSinPhi, $rhoCosPhi];
     }
 }

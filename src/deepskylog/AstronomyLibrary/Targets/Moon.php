@@ -48,6 +48,6 @@ class Moon extends Target
     }
 
     /**
-     * TODO: After calculating the equatorial coordinates of the moon, the correction for parallax should be done.  See method _calculateEquatorialCoordinates in Planet.php
+     * TODO: After calculating the equatorial coordinates of the moon, the correction for parallax should be done.  See method _calculateEquatorialCoordinates in Planet.php.
      */
 }
