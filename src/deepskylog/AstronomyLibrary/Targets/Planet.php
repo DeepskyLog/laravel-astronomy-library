@@ -14,10 +14,10 @@
 namespace deepskylog\AstronomyLibrary\Targets;
 
 use Carbon\Carbon;
-use deepskylog\AstronomyLibrary\Time;
 use deepskylog\AstronomyLibrary\Coordinates\EclipticalCoordinates;
 use deepskylog\AstronomyLibrary\Coordinates\EquatorialCoordinates;
 use deepskylog\AstronomyLibrary\Coordinates\GeographicalCoordinates;
+use deepskylog\AstronomyLibrary\Time;
 
 /**
  * The target class describing a planet.
@@ -83,8 +83,8 @@ class Planet extends Target
 
     private function _calculateApparentEquatorialCoordinates(Carbon $date): EquatorialCoordinates
     {
-        $helio_coords       = $this->calculateHeliocentricCoordinates($date);
-        $earth              = new Earth();
+        $helio_coords = $this->calculateHeliocentricCoordinates($date);
+        $earth = new Earth();
         $helio_coords_earth = $earth->calculateHeliocentricCoordinates($date);
 
         $x = $helio_coords[2] * cos(deg2rad($helio_coords[1])) * cos(deg2rad($helio_coords[0])) -
@@ -94,13 +94,13 @@ class Planet extends Target
         $z = $helio_coords[2] * sin(deg2rad($helio_coords[1])) -
             $helio_coords_earth[2] * sin(deg2rad($helio_coords_earth[1]));
         $delta = sqrt($x ** 2 + $y ** 2 + $z ** 2);
-        $tau   = 0.0057755183 * $delta;
+        $tau = 0.0057755183 * $delta;
 
-        $jd      = Time::getJd($date);
+        $jd = Time::getJd($date);
         $newDate = Time::fromJd($jd - $tau);
 
         $helio_coords = $this->calculateHeliocentricCoordinates($newDate);
-        $x            = $helio_coords[2] * cos(deg2rad($helio_coords[1])) * cos(deg2rad($helio_coords[0])) -
+        $x = $helio_coords[2] * cos(deg2rad($helio_coords[1])) * cos(deg2rad($helio_coords[0])) -
             $helio_coords_earth[2] * cos(deg2rad($helio_coords_earth[1])) * cos(deg2rad($helio_coords_earth[0]));
         $y = $helio_coords[2] * cos(deg2rad($helio_coords[1])) * sin(deg2rad($helio_coords[0])) -
             $helio_coords_earth[2] * cos(deg2rad($helio_coords_earth[1])) * sin(deg2rad($helio_coords_earth[0]));
@@ -108,21 +108,21 @@ class Planet extends Target
             $helio_coords_earth[2] * sin(deg2rad($helio_coords_earth[1]));
         $delta = sqrt($x ** 2 + $y ** 2 + $z ** 2);
 
-        $tau   = 0.0057755183 * $delta;
+        $tau = 0.0057755183 * $delta;
 
         $lambda = rad2deg(atan2($y, $x));
-        $beta   = rad2deg(atan2($z, sqrt($x ** 2 + $y ** 2)));
+        $beta = rad2deg(atan2($z, sqrt($x ** 2 + $y ** 2)));
 
-        $T     = ($jd - 2451545) / 36525;
-        $e     = 0.016708634 - 0.000042037 * $T - 0.0000001267 * $T ** 2;
-        $pi    = 102.93735 + 1.71946 * $T + 0.00046 * $T ** 2;
+        $T = ($jd - 2451545) / 36525;
+        $e = 0.016708634 - 0.000042037 * $T - 0.0000001267 * $T ** 2;
+        $pi = 102.93735 + 1.71946 * $T + 0.00046 * $T ** 2;
         $kappa = 20.49552;
 
-        $sun  = new Sun();
+        $sun = new Sun();
         $Odot = $sun->calculateOdotBetaR($date)[0];
 
         $deltaLambda = ((-$kappa * cos(deg2rad($Odot - $lambda)) + $e * $kappa * cos(deg2rad($pi - $lambda))) / cos(deg2rad($beta))) / 3600.0;
-        $deltaBeta   = (-$kappa * sin(deg2rad($beta)) * (sin(deg2rad($Odot - $lambda)) - $e * sin(deg2rad($pi - $lambda)))) / 3600.0;
+        $deltaBeta = (-$kappa * sin(deg2rad($beta)) * (sin(deg2rad($Odot - $lambda)) - $e * sin(deg2rad($pi - $lambda)))) / 3600.0;
 
         $lambda += $deltaLambda;
         $beta += $deltaBeta;
@@ -130,7 +130,7 @@ class Planet extends Target
         $L_accent = $helio_coords[0] - 1.397 * ($T) - 0.00031 * ($T) ** 2;
 
         $deltaLambda = -0.09033 + 0.03916 * (cos(deg2rad($L_accent) + sin(deg2rad($L_accent)))) * tan(deg2rad($helio_coords[1]));
-        $deltaBeta   = 0.03916 * (cos(deg2rad($L_accent)) - sin(deg2rad($L_accent)));
+        $deltaBeta = 0.03916 * (cos(deg2rad($L_accent)) - sin(deg2rad($L_accent)));
 
         $lambda += $deltaLambda / 3600.0;
         $beta += $deltaBeta / 3600.0;
@@ -146,8 +146,8 @@ class Planet extends Target
 
     private function _calculateEquatorialCoordinates(Carbon $date, GeographicalCoordinates $geo_coords, float $height): EquatorialCoordinates
     {
-        $helio_coords       = $this->calculateHeliocentricCoordinates($date);
-        $earth              = new Earth();
+        $helio_coords = $this->calculateHeliocentricCoordinates($date);
+        $earth = new Earth();
         $helio_coords_earth = $earth->calculateHeliocentricCoordinates($date);
 
         $x = $helio_coords[2] * cos(deg2rad($helio_coords[1])) * cos(deg2rad($helio_coords[0])) -
@@ -157,34 +157,34 @@ class Planet extends Target
         $z = $helio_coords[2] * sin(deg2rad($helio_coords[1])) -
             $helio_coords_earth[2] * sin(deg2rad($helio_coords_earth[1]));
         $delta = sqrt($x ** 2 + $y ** 2 + $z ** 2);
-        $tau   = 0.0057755183 * $delta;
+        $tau = 0.0057755183 * $delta;
 
-        $jd      = Time::getJd($date);
+        $jd = Time::getJd($date);
         $newDate = Time::fromJd($jd - $tau);
 
         $helio_coords = $this->calculateHeliocentricCoordinates($newDate);
-        $x            = $helio_coords[2] * cos(deg2rad($helio_coords[1])) * cos(deg2rad($helio_coords[0])) -
+        $x = $helio_coords[2] * cos(deg2rad($helio_coords[1])) * cos(deg2rad($helio_coords[0])) -
             $helio_coords_earth[2] * cos(deg2rad($helio_coords_earth[1])) * cos(deg2rad($helio_coords_earth[0]));
         $y = $helio_coords[2] * cos(deg2rad($helio_coords[1])) * sin(deg2rad($helio_coords[0])) -
             $helio_coords_earth[2] * cos(deg2rad($helio_coords_earth[1])) * sin(deg2rad($helio_coords_earth[0]));
         $z = $helio_coords[2] * sin(deg2rad($helio_coords[1])) -
             $helio_coords_earth[2] * sin(deg2rad($helio_coords_earth[1]));
         $delta = sqrt($x ** 2 + $y ** 2 + $z ** 2);
-        $tau   = 0.0057755183 * $delta;
+        $tau = 0.0057755183 * $delta;
 
         $lambda = rad2deg(atan2($y, $x));
-        $beta   = rad2deg(atan2($z, sqrt($x ** 2 + $y ** 2)));
+        $beta = rad2deg(atan2($z, sqrt($x ** 2 + $y ** 2)));
 
-        $T     = ($jd - 2451545) / 36525;
-        $e     = 0.016708634 - 0.000042037 * $T - 0.0000001267 * $T ** 2;
-        $pi    = 102.93735 + 1.71946 * $T + 0.00046 * $T ** 2;
+        $T = ($jd - 2451545) / 36525;
+        $e = 0.016708634 - 0.000042037 * $T - 0.0000001267 * $T ** 2;
+        $pi = 102.93735 + 1.71946 * $T + 0.00046 * $T ** 2;
         $kappa = 20.49552;
 
-        $sun  = new Sun();
+        $sun = new Sun();
         $Odot = $sun->calculateOdotBetaR($date)[0];
 
         $deltaLambda = ((-$kappa * cos(deg2rad($Odot - $lambda)) + $e * $kappa * cos(deg2rad($pi - $lambda))) / cos(deg2rad($beta))) / 3600.0;
-        $deltaBeta   = (-$kappa * sin(deg2rad($beta)) * (sin(deg2rad($Odot - $lambda)) - $e * sin(deg2rad($pi - $lambda)))) / 3600.0;
+        $deltaBeta = (-$kappa * sin(deg2rad($beta)) * (sin(deg2rad($Odot - $lambda)) - $e * sin(deg2rad($pi - $lambda)))) / 3600.0;
 
         $lambda += $deltaLambda;
         $beta += $deltaBeta;
@@ -192,7 +192,7 @@ class Planet extends Target
         $L_accent = $helio_coords[0] - 1.397 * ($T) - 0.00031 * ($T) ** 2;
 
         $deltaLambda = -0.09033 + 0.03916 * (cos(deg2rad($L_accent) + sin(deg2rad($L_accent)))) * tan(deg2rad($helio_coords[1]));
-        $deltaBeta   = 0.03916 * (cos(deg2rad($L_accent)) - sin(deg2rad($L_accent)));
+        $deltaBeta = 0.03916 * (cos(deg2rad($L_accent)) - sin(deg2rad($L_accent)));
 
         $lambda += $deltaLambda / 3600.0;
         $beta += $deltaBeta / 3600.0;
@@ -206,16 +206,16 @@ class Planet extends Target
         $equa_coords = $ecl->convertToEquatorial($nutation[3]);
 
         // Calculate corrections for parallax
-        $pi    = 8.794 / $delta;
+        $pi = 8.794 / $delta;
 
-        $siderial_time  = Time::apparentSiderialTime($date, new GeographicalCoordinates(0.0, 0.0));
+        $siderial_time = Time::apparentSiderialTime($date, new GeographicalCoordinates(0.0, 0.0));
 
         $hour_angle = (new \deepskylog\AstronomyLibrary\Coordinates\Coordinate($equa_coords->getHourAngle($siderial_time) + $geo_coords->getLongitude()->getCoordinate() * 15.0, 0, 360))->getCoordinate();
 
         $earthsGlobe = $geo_coords->earthsGlobe($height);
 
-        $deltara     = rad2deg(atan(-$earthsGlobe[1] * sin(deg2rad($pi / 3600.0)) * sin(deg2rad($hour_angle)) / (cos(deg2rad($equa_coords->getDeclination()->getCoordinate())) - $earthsGlobe[1] * sin(deg2rad($pi / 3600.0)) * sin(deg2rad($hour_angle)))));
-        $dec         = rad2deg(atan((sin(deg2rad($equa_coords->getDeclination()->getCoordinate())) - $earthsGlobe[0] * sin(deg2rad($pi / 3600.0))) * cos(deg2rad($deltara / 3600.0))
+        $deltara = rad2deg(atan(-$earthsGlobe[1] * sin(deg2rad($pi / 3600.0)) * sin(deg2rad($hour_angle)) / (cos(deg2rad($equa_coords->getDeclination()->getCoordinate())) - $earthsGlobe[1] * sin(deg2rad($pi / 3600.0)) * sin(deg2rad($hour_angle)))));
+        $dec = rad2deg(atan((sin(deg2rad($equa_coords->getDeclination()->getCoordinate())) - $earthsGlobe[0] * sin(deg2rad($pi / 3600.0))) * cos(deg2rad($deltara / 3600.0))
                         / (cos(deg2rad($equa_coords->getDeclination()->getCoordinate())) - $earthsGlobe[1] * sin(deg2rad($pi / 3600.0)) * cos(deg2rad($height)))));
 
         $equa_coords->setRA($equa_coords->getRA()->getCoordinate() + $deltara);
@@ -228,19 +228,19 @@ class Planet extends Target
      * Calculates the illuminated fraction of the planet.
      *
      * @param Carbon $date The date for which to calculate the fraction
-
+     *
      * @return float The illuminated fraction
      *
      * See chapter 41 of Astronomical Algorithms
      */
     public function illuminatedFraction(Carbon $date): float
     {
-        $helio_coords       = $this->calculateHeliocentricCoordinates($date);
-        $R                  = $helio_coords[2];
+        $helio_coords = $this->calculateHeliocentricCoordinates($date);
+        $R = $helio_coords[2];
 
-        $earth              = new Earth();
+        $earth = new Earth();
         $helio_coords_earth = $earth->calculateHeliocentricCoordinates($date);
-        $R0                 = $helio_coords_earth[2];
+        $R0 = $helio_coords_earth[2];
 
         $x = $helio_coords[2] * cos(deg2rad($helio_coords[1])) * cos(deg2rad($helio_coords[0])) -
             $helio_coords_earth[2] * cos(deg2rad($helio_coords_earth[1])) * cos(deg2rad($helio_coords_earth[0]));
@@ -250,7 +250,7 @@ class Planet extends Target
             $helio_coords_earth[2] * sin(deg2rad($helio_coords_earth[1]));
         $delta = sqrt($x ** 2 + $y ** 2 + $z ** 2);
 
-        $k     = (($R + $delta) ** 2 - $R0 ** 2) / (4 * $R * $delta);
+        $k = (($R + $delta) ** 2 - $R0 ** 2) / (4 * $R * $delta);
 
         return round($k, 3);
     }
