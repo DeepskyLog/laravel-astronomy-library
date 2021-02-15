@@ -6032,4 +6032,38 @@ class Saturn extends Planet
 
         return Time::fromJd($JDE);
     }
+
+    /**
+     * Calculates the magnitude at the given date.
+     *
+     * @param Carbon $date The date for which we want to calculate the magnitude
+     *
+     * @return float The magnitude
+     *
+     * Chapter 41 of Astronomical Algorithms
+     */
+    public function magnitude(Carbon $date): float
+    {
+        $helio_coords = $this->calculateHeliocentricCoordinates($date);
+        $R = $helio_coords[2];
+
+        $earth = new Earth();
+        $helio_coords_earth = $earth->calculateHeliocentricCoordinates($date);
+        $R0 = $helio_coords_earth[2];
+
+        $x = $helio_coords[2] * cos(deg2rad($helio_coords[1])) * cos(deg2rad($helio_coords[0])) -
+            $helio_coords_earth[2] * cos(deg2rad($helio_coords_earth[1])) * cos(deg2rad($helio_coords_earth[0]));
+        $y = $helio_coords[2] * cos(deg2rad($helio_coords[1])) * sin(deg2rad($helio_coords[0])) -
+            $helio_coords_earth[2] * cos(deg2rad($helio_coords_earth[1])) * sin(deg2rad($helio_coords_earth[0]));
+        $z = $helio_coords[2] * sin(deg2rad($helio_coords[1])) -
+            $helio_coords_earth[2] * sin(deg2rad($helio_coords_earth[1]));
+        $delta = sqrt($x ** 2 + $y ** 2 + $z ** 2);
+
+        return round(-8.68 + 5 * log10($R * $delta), 1);
+
+        // TODO: Take ring into account
+        // return -8.68 + 5 * log10($R * $delta) + 0.044 * abs($deltaU) - 2.60 * sin(abs(deg2rad($B))) + 1.25 * sin(deg2rad($B)) ** 2;
+    }
+
+    // TODO: Calculate the angle of the ring and use this in the calculation of the magnitude. See chapter 45 of Astronomical Algorithms. Also adapt the test in TargetTest.php
 }

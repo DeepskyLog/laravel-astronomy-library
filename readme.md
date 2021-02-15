@@ -504,6 +504,16 @@ $peridate = Carbon::create(1986, 2, 9, 11, 0, 50, 'UTC');
 $halley->setOrbitalElements(17.9400782, 0.96727426, 162.0, 111.84644, 0.0, $peridate);
 $node = $halley->ascendingNode();
 $node = $halley->descendingNode();
+
+// Calculate the illuminated fraction of a planet
+$date   = Carbon::create(1992, 12, 20, 0, 0, 0, 'UTC');
+$venus  = new Venus();
+$fraction = $venus->illuminatedFraction($date);
+
+// Calculate the magnitude of a planet
+$date   = Carbon::create(1992, 12, 20, 0, 0, 0, 'UTC');
+$venus  = new Venus();
+$magnitude = $venus->magnitude($date);
 ```
 
 ## Change log

@@ -2,6 +2,13 @@
 
 All notable changes to `laravel-astronomy-library` will be documented in this file.
 
+## Version 5.1
+
+### Added
+
+- Method to calculate the illuminated fraction of a planet.
+- Method to calculate the magnitude of a planet.  The magnitude of Saturn is fainter the real value, because the orientation of the ring is not yet taken into account.  This correction for this will follow in one of the next versions of this library.
+
 ## Version 5.0
 
 ### Backwards incompatible changes

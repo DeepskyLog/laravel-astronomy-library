@@ -14,11 +14,11 @@ namespace deepskylog\AstronomyLibrary;
 
 use Carbon\Carbon;
 use deepskylog\AstronomyLibrary\Coordinates\Coordinate;
-use deepskylog\AstronomyLibrary\Coordinates\GalacticCoordinates;
 use deepskylog\AstronomyLibrary\Coordinates\EclipticalCoordinates;
 use deepskylog\AstronomyLibrary\Coordinates\EquatorialCoordinates;
-use deepskylog\AstronomyLibrary\Coordinates\HorizontalCoordinates;
+use deepskylog\AstronomyLibrary\Coordinates\GalacticCoordinates;
 use deepskylog\AstronomyLibrary\Coordinates\GeographicalCoordinates;
+use deepskylog\AstronomyLibrary\Coordinates\HorizontalCoordinates;
 
 /**
  * The main AstronomyLibrary class.
@@ -38,9 +38,9 @@ class AstronomyLibrary
     private float $_jd;
     private Carbon $_siderialTime;
     private ?string $_lengthOfNightChart = null;
-    private ?float $_deltaT              = null;
-    private float $_height               = 0.0;
-    private ?array $_earthsGlobe         = null;
+    private ?float $_deltaT = null;
+    private float $_height = 0.0;
+    private ?array $_earthsGlobe = null;
 
     /**
      * The constructor.
@@ -54,10 +54,10 @@ class AstronomyLibrary
         GeographicalCoordinates $coordinates,
         float $height = 0.0
     ) {
-        $this->_date         = $carbonDate;
-        $this->_coordinates  = $coordinates;
-        $this->_jd           = Time::getJd($this->_date);
-        $this->_nutation     = Time::nutation($this->getJd());
+        $this->_date = $carbonDate;
+        $this->_coordinates = $coordinates;
+        $this->_jd = Time::getJd($this->_date);
+        $this->_nutation = Time::nutation($this->getJd());
         $this->_siderialTime = Time::apparentSiderialTime(
             $this->_date,
             $this->_coordinates
@@ -85,15 +85,15 @@ class AstronomyLibrary
      */
     public function setDate(Carbon $date): void
     {
-        $this->_date         = $date;
-        $this->_jd           = Time::getJd($this->_date);
-        $this->_nutation     = Time::nutation($this->getJd());
+        $this->_date = $date;
+        $this->_jd = Time::getJd($this->_date);
+        $this->_nutation = Time::nutation($this->getJd());
         $this->_siderialTime = Time::apparentSiderialTime(
             $this->_date,
             $this->_coordinates
         );
         $this->_lengthOfNightChart = null;
-        $this->_deltaT             = Time::deltaT($this->_date);
+        $this->_deltaT = Time::deltaT($this->_date);
     }
 
     /**
@@ -116,13 +116,13 @@ class AstronomyLibrary
     public function setGeographicalCoordinates(
         GeographicalCoordinates $coordinates
     ): void {
-        $this->_coordinates  = $coordinates;
+        $this->_coordinates = $coordinates;
         $this->_siderialTime = Time::apparentSiderialTime(
             $this->_date,
             $this->_coordinates
         );
         $this->_lengthOfNightChart = null;
-        $this->_earthsGlobe        = null;
+        $this->_earthsGlobe = null;
     }
 
     /**
@@ -145,8 +145,8 @@ class AstronomyLibrary
     public function setHeight(
         float $height
     ): void {
-        $this->_height             = $height;
-        $this->_earthsGlobe        = null;
+        $this->_height = $height;
+        $this->_earthsGlobe = null;
     }
 
     /**
@@ -168,9 +168,9 @@ class AstronomyLibrary
      */
     public function setJd(float $jd): void
     {
-        $this->_jd           = $jd;
-        $this->_date         = Time::fromJd($jd);
-        $this->_nutation     = Time::nutation($this->getJd());
+        $this->_jd = $jd;
+        $this->_date = Time::fromJd($jd);
+        $this->_nutation = Time::nutation($this->getJd());
         $this->_siderialTime = Time::apparentSiderialTime(
             $this->_date,
             $this->_coordinates
@@ -346,7 +346,7 @@ class AstronomyLibrary
      */
     public function getLengthOfNightPlot($timezone): string
     {
-        if (!$this->_lengthOfNightChart) {
+        if (! $this->_lengthOfNightChart) {
             $date = Carbon::now();
             $date->year($this->getDate()->year);
 
@@ -393,10 +393,10 @@ class AstronomyLibrary
                     );
 
                     if ($sun_info['sunrise'] === true) {
-                        $sunriseHour   = 0;
+                        $sunriseHour = 0;
                         $sunriseMinute = 0;
                     } elseif ($sun_info['sunrise'] === false) {
-                        $sunriseHour   = 12;
+                        $sunriseHour = 12;
                         $sunriseMinute = 0;
                     } else {
                         $sunriseHour = Carbon::createFromTimestamp(
@@ -407,10 +407,10 @@ class AstronomyLibrary
                         )->timezone($timezone)->minute;
                     }
                     if ($sun_info['civil_twilight_begin'] === true) {
-                        $civilriseHour   = 0;
+                        $civilriseHour = 0;
                         $civilriseMinute = 0;
                     } elseif ($sun_info['civil_twilight_begin'] === false) {
-                        $civilriseHour   = 12;
+                        $civilriseHour = 12;
                         $civilriseMinute = 0;
                     } else {
                         $civilriseHour = Carbon::createFromTimestamp(
@@ -421,10 +421,10 @@ class AstronomyLibrary
                         )->timezone($timezone)->minute;
                     }
                     if ($sun_info['nautical_twilight_begin'] === true) {
-                        $nautriseHour   = 0;
+                        $nautriseHour = 0;
                         $nautriseMinute = 0;
                     } elseif ($sun_info['nautical_twilight_begin'] === false) {
-                        $nautriseHour   = 12;
+                        $nautriseHour = 12;
                         $nautriseMinute = 0;
                     } else {
                         $nautriseHour = Carbon::createFromTimestamp(
@@ -435,10 +435,10 @@ class AstronomyLibrary
                         )->timezone($timezone)->minute;
                     }
                     if ($sun_info['astronomical_twilight_begin'] === true) {
-                        $astroriseHour   = 0;
+                        $astroriseHour = 0;
                         $astroriseMinute = 0;
                     } elseif ($sun_info['astronomical_twilight_begin'] === false) {
-                        $astroriseHour   = 12;
+                        $astroriseHour = 12;
                         $astroriseMinute = 0;
                     } else {
                         $astroriseHour = Carbon::createFromTimestamp(
@@ -449,10 +449,10 @@ class AstronomyLibrary
                         )->timezone($timezone)->minute;
                     }
                     if ($sun_info['sunset'] === true) {
-                        $sunsetHour   = 24;
+                        $sunsetHour = 24;
                         $sunsetMinute = 0;
                     } elseif ($sun_info['sunset'] === false) {
-                        $sunsetHour   = 12;
+                        $sunsetHour = 12;
                         $sunsetMinute = 0;
                     } else {
                         $sunsetHour = Carbon::createFromTimestamp(
@@ -463,10 +463,10 @@ class AstronomyLibrary
                         )->timezone($timezone)->minute;
                     }
                     if ($sun_info['civil_twilight_end'] === true) {
-                        $civilsetHour   = 24;
+                        $civilsetHour = 24;
                         $civilsetMinute = 0;
                     } elseif ($sun_info['civil_twilight_end'] === false) {
-                        $civilsetHour   = 12;
+                        $civilsetHour = 12;
                         $civilsetMinute = 0;
                     } else {
                         $civilsetHour = Carbon::createFromTimestamp(
@@ -477,10 +477,10 @@ class AstronomyLibrary
                         )->timezone($timezone)->minute;
                     }
                     if ($sun_info['nautical_twilight_end'] === true) {
-                        $nautsetHour   = 24;
+                        $nautsetHour = 24;
                         $nautsetMinute = 0;
                     } elseif ($sun_info['nautical_twilight_end'] === false) {
-                        $nautsetHour   = 12;
+                        $nautsetHour = 12;
                         $nautsetMinute = 0;
                     } else {
                         $nautsetHour = Carbon::createFromTimestamp(
@@ -491,10 +491,10 @@ class AstronomyLibrary
                         )->timezone($timezone)->minute;
                     }
                     if ($sun_info['astronomical_twilight_end'] === true) {
-                        $astrosetHour   = 24;
+                        $astrosetHour = 24;
                         $astrosetMinute = 0;
                     } elseif ($sun_info['astronomical_twilight_end'] === false) {
-                        $astrosetHour   = 12;
+                        $astrosetHour = 12;
                         $astrosetMinute = 0;
                     } else {
                         $astrosetHour = Carbon::createFromTimestamp(
@@ -527,7 +527,7 @@ class AstronomyLibrary
                         $civilriseHour -= 12;
                     }
                     if ($sunriseHour > 12) {
-                        $sunriseHour   = 12;
+                        $sunriseHour = 12;
                         $sunriseMinute = 0;
                     }
 
@@ -686,7 +686,7 @@ class AstronomyLibrary
                 );
             }
             // Date line
-            $red          = imagecolorallocate($image, 255, 0, 0);
+            $red = imagecolorallocate($image, 255, 0, 0);
             $datelocation = 2 * ($this->getDate()->dayOfYear);
             imageline($image, $datelocation + 70, 5, $datelocation + 70, 365, $red);
 
@@ -721,7 +721,7 @@ class AstronomyLibrary
             $rawImageBytes = ob_get_clean();
 
             $this->_lengthOfNightChart = "<img src='data:image/jpeg;base64,"
-                . base64_encode($rawImageBytes) . "' />";
+                .base64_encode($rawImageBytes)."' />";
         }
 
         return $this->_lengthOfNightChart;
@@ -812,6 +812,7 @@ class AstronomyLibrary
         if ($this->_earthsGlobe == null) {
             $this->_earthsGlobe = $this->_coordinates->earthsGlobe($this->_height);
         }
+
         return $this->_earthsGlobe;
     }
 }
