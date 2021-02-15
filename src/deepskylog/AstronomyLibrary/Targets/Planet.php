@@ -223,4 +223,35 @@ class Planet extends Target
 
         return $equa_coords;
     }
+
+    /**
+     * Calculates the illuminated fraction of the planet.
+     *
+     * @param Carbon $date The date for which to calculate the fraction
+
+     * @return float The illuminated fraction
+     *
+     * See chapter 41 of Astronomical Algorithms
+     */
+    public function illuminatedFraction(Carbon $date): float
+    {
+        $helio_coords       = $this->calculateHeliocentricCoordinates($date);
+        $R                  = $helio_coords[2];
+
+        $earth              = new Earth();
+        $helio_coords_earth = $earth->calculateHeliocentricCoordinates($date);
+        $R0                 = $helio_coords_earth[2];
+
+        $x = $helio_coords[2] * cos(deg2rad($helio_coords[1])) * cos(deg2rad($helio_coords[0])) -
+            $helio_coords_earth[2] * cos(deg2rad($helio_coords_earth[1])) * cos(deg2rad($helio_coords_earth[0]));
+        $y = $helio_coords[2] * cos(deg2rad($helio_coords[1])) * sin(deg2rad($helio_coords[0])) -
+            $helio_coords_earth[2] * cos(deg2rad($helio_coords_earth[1])) * sin(deg2rad($helio_coords_earth[0]));
+        $z = $helio_coords[2] * sin(deg2rad($helio_coords[1])) -
+            $helio_coords_earth[2] * sin(deg2rad($helio_coords_earth[1]));
+        $delta = sqrt($x ** 2 + $y ** 2 + $z ** 2);
+
+        $k     = (($R + $delta) ** 2 - $R0 ** 2) / (4 * $R * $delta);
+
+        return round($k, 3);
+    }
 }

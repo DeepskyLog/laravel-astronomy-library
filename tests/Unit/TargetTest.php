@@ -885,4 +885,48 @@ class TargetTest extends BaseTestCase
         $this->assertEqualsWithDelta(22.64075, $coordinates->getRA()->getCoordinate(), 0.00001);
         $this->assertEqualsWithDelta(-15.775, $coordinates->getDeclination()->getCoordinate(), 0.001);
     }
+
+    /**
+     * Test the illuminated fraction of Venus
+     *
+     * @return void
+     */
+    public function testIlluminatedFractionVenus()
+    {
+        $date   = Carbon::create(1992, 12, 20, 0, 0, 0, 'UTC');
+        $venus  = new Venus();
+
+        $fraction = $venus->illuminatedFraction($date);
+        $this->assertEqualsWithDelta(0.647, $fraction, 0.001);
+    }
+
+    /**
+     * Test the magnitude of Venus
+     *
+     * @return void
+     */
+    public function testMagnitudeVenus()
+    {
+        $date   = Carbon::create(1992, 12, 20, 0, 0, 0, 'UTC');
+        $venus  = new Venus();
+
+        $magnitude = $venus->magnitude($date);
+        $this->assertEqualsWithDelta(-3.8, $magnitude, 0.1);
+    }
+
+    /**
+     * Test the magnitude of Saturn
+     *
+     * @return void
+     */
+    public function testMagnitudeSaturn()
+    {
+        $date    = Carbon::create(1992, 12, 16, 0, 0, 0, 'UTC');
+        $saturn  = new Saturn();
+
+        $magnitude = $saturn->magnitude($date);
+        // TODO: Use 0.9 after taking care of the ring of Saturn
+        // $this->assertEqualsWithDelta(0.9, $magnitude, 0.1);
+        $this->assertEqualsWithDelta(1.4, $magnitude, 0.1);
+    }
 }

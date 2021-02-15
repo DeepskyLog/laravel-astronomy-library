@@ -14,8 +14,8 @@
 namespace deepskylog\AstronomyLibrary\Targets;
 
 use Carbon\Carbon;
-use deepskylog\AstronomyLibrary\Coordinates\Coordinate;
 use deepskylog\AstronomyLibrary\Time;
+use deepskylog\AstronomyLibrary\Coordinates\Coordinate;
 
 /**
  * The target class describing Mars.
@@ -47,15 +47,15 @@ class Mars extends Planet
     public function calculateMeanOrbitalElements(Carbon $date)
     {
         $jd = Time::getJd($date);
-        $T = ($jd - 2451545.0) / 36525.0;
+        $T  = ($jd - 2451545.0) / 36525.0;
 
-        $L = (new Coordinate(355.433000 + 19141.6964471 * $T + 0.00031052 * $T ** 2 + 0.000000016 * $T ** 3, 0, 360))->getCoordinate();
-        $a = 1.523679342;
-        $e = 0.09340065 + 0.000090484 * $T - 0.0000000806 * $T ** 2 - 0.00000000025 * $T ** 3;
-        $i = (new Coordinate(1.849726 - 0.0006011 * $T + 0.00001276 * $T ** 2 - 0.000000007 * $T ** 3, 0, 360))->getCoordinate();
+        $L     = (new Coordinate(355.433000 + 19141.6964471 * $T + 0.00031052 * $T ** 2 + 0.000000016 * $T ** 3, 0, 360))->getCoordinate();
+        $a     = 1.523679342;
+        $e     = 0.09340065 + 0.000090484 * $T - 0.0000000806 * $T ** 2 - 0.00000000025 * $T ** 3;
+        $i     = (new Coordinate(1.849726 - 0.0006011 * $T + 0.00001276 * $T ** 2 - 0.000000007 * $T ** 3, 0, 360))->getCoordinate();
         $omega = (new Coordinate(49.558093 + 0.7720959 * $T + 0.00001557 * $T ** 2 + 0.000002267 * $T ** 3, 0, 360))->getCoordinate();
-        $pi = (new Coordinate(336.060234 + 1.8410449 * $T - 0.00013477 * $T ** 2 + 0.000000536 * $T ** 3, 0, 360))->getCoordinate();
-        $M = $L - $pi;
+        $pi    = (new Coordinate(336.060234 + 1.8410449 * $T - 0.00013477 * $T ** 2 + 0.000000536 * $T ** 3, 0, 360))->getCoordinate();
+        $M     = $L - $pi;
 
         return [$L, $a, $e, $i, $omega, $pi, $M];
     }
@@ -78,15 +78,15 @@ class Mars extends Planet
     public function calculateMeanOrbitalElementsJ2000(Carbon $date)
     {
         $jd = Time::getJd($date);
-        $T = ($jd - 2451545.0) / 36525.0;
+        $T  = ($jd - 2451545.0) / 36525.0;
 
-        $L = (new Coordinate(355.433000 + 19140.2993039 * $T + 0.00000262 * $T ** 2 - 0.000000003 * $T ** 3, 0, 360))->getCoordinate();
-        $a = 1.523679342;
-        $e = 0.09340065 + 0.000090484 * $T - 0.0000000806 * $T ** 2 - 0.00000000025 * $T ** 3;
-        $i = (new Coordinate(1.849726 - 0.0081477 * $T - 0.00002255 * $T ** 2 - 0.000000029 * $T ** 3, 0, 360))->getCoordinate();
+        $L     = (new Coordinate(355.433000 + 19140.2993039 * $T + 0.00000262 * $T ** 2 - 0.000000003 * $T ** 3, 0, 360))->getCoordinate();
+        $a     = 1.523679342;
+        $e     = 0.09340065 + 0.000090484 * $T - 0.0000000806 * $T ** 2 - 0.00000000025 * $T ** 3;
+        $i     = (new Coordinate(1.849726 - 0.0081477 * $T - 0.00002255 * $T ** 2 - 0.000000029 * $T ** 3, 0, 360))->getCoordinate();
         $omega = (new Coordinate(49.558093 - 0.2950250 * $T - 0.00064048 * $T ** 2 - 0.000001964 * $T ** 3, 0, 360))->getCoordinate();
-        $pi = (new Coordinate(336.060234 + 0.4439016 * $T - 0.00017313 * $T ** 2 + 0.000000518 * $T ** 3, 0, 360))->getCoordinate();
-        $M = $L - $pi;
+        $pi    = (new Coordinate(336.060234 + 0.4439016 * $T - 0.00017313 * $T ** 2 + 0.000000518 * $T ** 3, 0, 360))->getCoordinate();
+        $M     = $L - $pi;
 
         return [$L, $a, $e, $i, $omega, $pi, $M];
     }
@@ -5628,17 +5628,17 @@ class Mars extends Planet
      */
     public function opposition(Carbon $date): Carbon
     {
-        $A = 2452097.382;
-        $B = 779.936104;
+        $A  = 2452097.382;
+        $B  = 779.936104;
         $M0 = 181.9573;
         $M1 = 48.705244;
 
         $Y = $date->year + $date->dayOfYear / (365 + $date->format('L'));
 
-        $k = ceil((365.2425 * $Y + 1721060 - $A) / ($B));
+        $k    = ceil((365.2425 * $Y + 1721060 - $A) / ($B));
         $JDE0 = $A + $k * $B;
-        $M = deg2rad($M0 + $k * $M1);
-        $T = ($JDE0 - 2451545) / 36525;
+        $M    = deg2rad($M0 + $k * $M1);
+        $T    = ($JDE0 - 2451545) / 36525;
 
         $diff = -0.3088 + 0.0000 * $T + 0.00002 * $T * $T
             + (-17.6965 + 0.0363 * $T + 0.00005 * $T * $T) * sin($M)
@@ -5668,17 +5668,17 @@ class Mars extends Planet
      */
     public function conjunction(Carbon $date): Carbon
     {
-        $A = 2451707.414;
-        $B = 779.936104;
+        $A  = 2451707.414;
+        $B  = 779.936104;
         $M0 = 157.6047;
         $M1 = 48.705244;
 
         $Y = $date->year + $date->dayOfYear / (365 + $date->format('L'));
 
-        $k = ceil((365.2425 * $Y + 1721060 - $A) / ($B));
+        $k    = ceil((365.2425 * $Y + 1721060 - $A) / ($B));
         $JDE0 = $A + $k * $B;
-        $M = deg2rad($M0 + $k * $M1);
-        $T = ($JDE0 - 2451545) / 36525;
+        $M    = deg2rad($M0 + $k * $M1);
+        $T    = ($JDE0 - 2451545) / 36525;
 
         $diff = 0.3102 - 0.0001 * $T + 0.00001 * $T * $T
             + (9.7273 - 0.0156 * $T + 0.00001 * $T * $T) * sin($M)
@@ -5737,5 +5737,36 @@ class Mars extends Planet
         $JDE = 2452195.026 + 686.9957857 * $k - 0.0000001187 * $k * $k;
 
         return Time::fromJd($JDE);
+    }
+
+    /**
+     * Calculates the magnitude at the given date.
+     *
+     * @param Carbon $date The date for which we want to calculate the magnitude
+     *
+     * @return float The magnitude
+     *
+     * Chapter 41 of Astronomical Algorithms
+     */
+    public function magnitude(Carbon $date): float
+    {
+        $helio_coords       = $this->calculateHeliocentricCoordinates($date);
+        $R                  = $helio_coords[2];
+
+        $earth              = new Earth();
+        $helio_coords_earth = $earth->calculateHeliocentricCoordinates($date);
+        $R0                 = $helio_coords_earth[2];
+
+        $x = $helio_coords[2] * cos(deg2rad($helio_coords[1])) * cos(deg2rad($helio_coords[0])) -
+            $helio_coords_earth[2] * cos(deg2rad($helio_coords_earth[1])) * cos(deg2rad($helio_coords_earth[0]));
+        $y = $helio_coords[2] * cos(deg2rad($helio_coords[1])) * sin(deg2rad($helio_coords[0])) -
+            $helio_coords_earth[2] * cos(deg2rad($helio_coords_earth[1])) * sin(deg2rad($helio_coords_earth[0]));
+        $z = $helio_coords[2] * sin(deg2rad($helio_coords[1])) -
+            $helio_coords_earth[2] * sin(deg2rad($helio_coords_earth[1]));
+        $delta = sqrt($x ** 2 + $y ** 2 + $z ** 2);
+
+        $i     = rad2deg(acos(($R - $R0 * cos(deg2rad($helio_coords[1])) * cos(deg2rad($helio_coords[0] - $helio_coords_earth[0]))) / $delta));
+
+        return round(-1.3 + 5 * log10($R * $delta) + 0.01486 * $i, 1);
     }
 }
