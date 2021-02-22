@@ -1317,16 +1317,16 @@
         },
         {
             "name": "nesbot/carbon",
-            "version": "2.45.0",
+            "version": "2.45.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/briannesbitt/Carbon.git",
-                "reference": "e2ba3174ce869da1713c38340dbb36572dfacd5a"
+                "reference": "528783b188bdb853eb21239b1722831e0f000a8d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/briannesbitt/Carbon/zipball/e2ba3174ce869da1713c38340dbb36572dfacd5a",
-                "reference": "e2ba3174ce869da1713c38340dbb36572dfacd5a",
+                "url": "https://api.github.com/repos/briannesbitt/Carbon/zipball/528783b188bdb853eb21239b1722831e0f000a8d",
+                "reference": "528783b188bdb853eb21239b1722831e0f000a8d",
                 "shasum": ""
             },
             "require": {
@@ -1406,7 +1406,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-02-07T21:35:59+00:00"
+            "time": "2021-02-11T18:30:17+00:00"
         },
         {
             "name": "opis/closure",
@@ -5575,22 +5575,22 @@
         },
         {
             "name": "orchestra/testbench",
-            "version": "v5.17.0",
+            "version": "v5.17.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/orchestral/testbench.git",
-                "reference": "3c545420c6995188bdaeab6abbad2378ce159256"
+                "reference": "6ad64ba59b5d74b4113591d892b778d2f56a2e63"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/orchestral/testbench/zipball/3c545420c6995188bdaeab6abbad2378ce159256",
-                "reference": "3c545420c6995188bdaeab6abbad2378ce159256",
+                "url": "https://api.github.com/repos/orchestral/testbench/zipball/6ad64ba59b5d74b4113591d892b778d2f56a2e63",
+                "reference": "6ad64ba59b5d74b4113591d892b778d2f56a2e63",
                 "shasum": ""
             },
             "require": {
                 "laravel/framework": "^7.30.3",
                 "mockery/mockery": "^1.3.3 || ^1.4.2",
-                "orchestra/testbench-core": "^5.18",
+                "orchestra/testbench-core": "^5.18.1",
                 "php": "^7.2.5 || ^8.0",
                 "phpunit/phpunit": "^8.4 || ^9.0"
             },
@@ -5623,7 +5623,7 @@
             ],
             "support": {
                 "issues": "https://github.com/orchestral/testbench/issues",
-                "source": "https://github.com/orchestral/testbench/tree/v5.17.0"
+                "source": "https://github.com/orchestral/testbench/tree/v5.17.1"
             },
             "funding": [
                 {
@@ -5635,20 +5635,20 @@
                     "type": "liberapay"
                 }
             ],
-            "time": "2021-02-09T13:26:43+00:00"
+            "time": "2021-02-13T09:51:56+00:00"
         },
         {
             "name": "orchestra/testbench-core",
-            "version": "v5.18.0",
+            "version": "v5.18.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/orchestral/testbench-core.git",
-                "reference": "1671d17bff3151e06079014f002232843c224009"
+                "reference": "18e539c6e8fad26af23fbfaf49d329bae806c80e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/orchestral/testbench-core/zipball/1671d17bff3151e06079014f002232843c224009",
-                "reference": "1671d17bff3151e06079014f002232843c224009",
+                "url": "https://api.github.com/repos/orchestral/testbench-core/zipball/18e539c6e8fad26af23fbfaf49d329bae806c80e",
+                "reference": "18e539c6e8fad26af23fbfaf49d329bae806c80e",
                 "shasum": ""
             },
             "require": {
@@ -5720,7 +5720,7 @@
                     "type": "liberapay"
                 }
             ],
-            "time": "2021-02-09T11:49:50+00:00"
+            "time": "2021-02-13T09:28:18+00:00"
         },
         {
             "name": "phar-io/manifest",
