@@ -925,8 +925,6 @@ class TargetTest extends BaseTestCase
         $saturn = new Saturn();
 
         $magnitude = $saturn->magnitude($date);
-        // TODO: Use 0.9 after taking care of the ring of Saturn
-        // $this->assertEqualsWithDelta(0.9, $magnitude, 0.1);
-        $this->assertEqualsWithDelta(1.4, $magnitude, 0.1);
+        $this->assertEqualsWithDelta(0.9, $magnitude, 0.1);
     }
 }

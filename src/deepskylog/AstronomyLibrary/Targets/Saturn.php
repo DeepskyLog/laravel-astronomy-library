@@ -6040,7 +6040,7 @@ class Saturn extends Planet
      *
      * @return float The magnitude
      *
-     * Chapter 41 of Astronomical Algorithms
+     * Chapter 41 and 45 of Astronomical Algorithms
      */
     public function magnitude(Carbon $date): float
     {
@@ -6059,11 +6059,44 @@ class Saturn extends Planet
             $helio_coords_earth[2] * sin(deg2rad($helio_coords_earth[1]));
         $delta = sqrt($x ** 2 + $y ** 2 + $z ** 2);
 
-        return round(-8.68 + 5 * log10($R * $delta), 1);
+        // Calculate deltaU and B to take the ring into account
+        // Step 1
+        $T = (Time::getJd($date) + Time::deltaT($date) / 60 / 60 / 24 - 2451545) / 36525;
+        $i = 28.075216 - 0.012998 * $T + 0.000004 * $T ** 2;
+        $omega = 169.508470 + 1.394681 * $T + 0.000412 * $T ** 2;
 
-        // TODO: Take ring into account
-        // return -8.68 + 5 * log10($R * $delta) + 0.044 * abs($deltaU) - 2.60 * sin(abs(deg2rad($B))) + 1.25 * sin(deg2rad($B)) ** 2;
+        // Step 2
+        $helio_coords_earth = $earth->calculateHeliocentricCoordinates(Time::fromJd(Time::getJd($date) + Time::deltaT($date) / 60 / 60 / 24));
+
+        // Step 3
+        $tau = 0.0057755183 * $delta;
+        // Step 5
+        $lambda = rad2deg(atan($y / $x));
+        $beta = rad2deg(atan($z / sqrt($x ** 2 + $y ** 2)));
+
+        // Step 6
+        $B = asin(sin(deg2rad($i)) * cos(deg2rad($beta)) * sin(deg2rad($lambda - $omega)) - cos(deg2rad($i)) * sin(deg2rad($beta)));
+
+        // Step 7
+        $N = 113.6655 + 0.8771 * $T;
+        $laccent = $helio_coords[0] - 0.01759 / $helio_coords[2];
+        $baccent = $helio_coords[1] - 0.000764 * cos(deg2rad($helio_coords[0] - $N)) / $helio_coords[2];
+
+        // Step 9
+        $U1 = rad2deg(
+            atan2(
+                (sin(deg2rad($i)) * sin(deg2rad($baccent)) + cos(deg2rad($i)) * cos(deg2rad($baccent)) * sin(deg2rad($laccent - $omega))),
+                (cos(deg2rad($baccent)) * cos(deg2rad($laccent - $omega)))
+            )
+        );
+        $U2 = rad2deg(
+            atan2(
+                (sin(deg2rad($i)) * sin(deg2rad($beta)) + cos(deg2rad($i)) * cos(deg2rad($beta)) * sin(deg2rad($lambda - $omega))),
+                (cos(deg2rad($beta)) * cos(deg2rad($lambda - $omega)))
+            )
+        );
+        $deltaU = abs($U1 - $U2);
+
+        return -8.68 + 5 * log10($R * $delta) + 0.044 * abs($deltaU) - 2.60 * sin(abs($B)) + 1.25 * sin($B) ** 2;
     }
-
-    // TODO: Calculate the angle of the ring and use this in the calculation of the magnitude. See chapter 45 of Astronomical Algorithms. Also adapt the test in TargetTest.php
 }

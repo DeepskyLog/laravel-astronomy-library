@@ -2,6 +2,12 @@
 
 All notable changes to `laravel-astronomy-library` will be documented in this file.
 
+## Version 5.2
+
+### Changed
+
+- Take into account the ring of Saturn to calculate the magnitude of the planet.
+
 ## Version 5.1
 
 ### Added
