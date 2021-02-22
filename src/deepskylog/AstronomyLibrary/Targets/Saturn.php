@@ -14,8 +14,8 @@
 namespace deepskylog\AstronomyLibrary\Targets;
 
 use Carbon\Carbon;
-use deepskylog\AstronomyLibrary\Time;
 use deepskylog\AstronomyLibrary\Coordinates\Coordinate;
+use deepskylog\AstronomyLibrary\Time;
 
 /**
  * The target class describing Saturn.
@@ -47,15 +47,15 @@ class Saturn extends Planet
     public function calculateMeanOrbitalElements(Carbon $date)
     {
         $jd = Time::getJd($date);
-        $T  = ($jd - 2451545.0) / 36525.0;
+        $T = ($jd - 2451545.0) / 36525.0;
 
-        $L     = (new Coordinate(50.077444 + 1223.5110686 * $T + 0.00051908 * $T ** 2 - 0.000000030 * $T ** 3, 0, 360))->getCoordinate();
-        $a     = 9.554909192 - 0.0000021390 * $T + 0.000000004 * $T ** 2;
-        $e     = 0.05554814 - 0.000346641 * $T - 0.0000006436 * $T ** 2 + 0.00000000340 * $T ** 3;
-        $i     = (new Coordinate(2.488879 - 0.0037362 * $T - 0.00001519 * $T ** 2 + 0.000000087 * $T ** 3, 0, 360))->getCoordinate();
+        $L = (new Coordinate(50.077444 + 1223.5110686 * $T + 0.00051908 * $T ** 2 - 0.000000030 * $T ** 3, 0, 360))->getCoordinate();
+        $a = 9.554909192 - 0.0000021390 * $T + 0.000000004 * $T ** 2;
+        $e = 0.05554814 - 0.000346641 * $T - 0.0000006436 * $T ** 2 + 0.00000000340 * $T ** 3;
+        $i = (new Coordinate(2.488879 - 0.0037362 * $T - 0.00001519 * $T ** 2 + 0.000000087 * $T ** 3, 0, 360))->getCoordinate();
         $omega = (new Coordinate(113.665503 + 0.8770880 * $T - 0.00012176 * $T ** 2 - 0.000002249 * $T ** 3, 0, 360))->getCoordinate();
-        $pi    = (new Coordinate(93.057237 + 1.9637613 * $T + 0.00083753 * $T ** 2 + 0.000004928 * $T ** 3, 0, 360))->getCoordinate();
-        $M     = $L - $pi;
+        $pi = (new Coordinate(93.057237 + 1.9637613 * $T + 0.00083753 * $T ** 2 + 0.000004928 * $T ** 3, 0, 360))->getCoordinate();
+        $M = $L - $pi;
 
         return [$L, $a, $e, $i, $omega, $pi, $M];
     }
@@ -78,15 +78,15 @@ class Saturn extends Planet
     public function calculateMeanOrbitalElementsJ2000(Carbon $date)
     {
         $jd = Time::getJd($date);
-        $T  = ($jd - 2451545.0) / 36525.0;
+        $T = ($jd - 2451545.0) / 36525.0;
 
-        $L     = (new Coordinate(50.077444 + 1222.1138488 * $T + 0.00021004 * $T ** 2 - 0.000000046 * $T ** 3, 0, 360))->getCoordinate();
-        $a     = 9.554909192 - 0.0000021390 * $T + 0.000000004 * $T ** 2;
-        $e     = 0.05554814 - 0.000346641 * $T - 0.0000006436 * $T ** 2 + 0.00000000340 * $T ** 3;
-        $i     = (new Coordinate(2.488879 + 0.0025514 * $T - 0.00004906 * $T ** 2 + 0.000000017 * $T ** 3, 0, 360))->getCoordinate();
+        $L = (new Coordinate(50.077444 + 1222.1138488 * $T + 0.00021004 * $T ** 2 - 0.000000046 * $T ** 3, 0, 360))->getCoordinate();
+        $a = 9.554909192 - 0.0000021390 * $T + 0.000000004 * $T ** 2;
+        $e = 0.05554814 - 0.000346641 * $T - 0.0000006436 * $T ** 2 + 0.00000000340 * $T ** 3;
+        $i = (new Coordinate(2.488879 + 0.0025514 * $T - 0.00004906 * $T ** 2 + 0.000000017 * $T ** 3, 0, 360))->getCoordinate();
         $omega = (new Coordinate(113.665503 - 0.2566722 * $T - 0.00018399 * $T ** 2 + 0.000000480 * $T ** 3, 0, 360))->getCoordinate();
-        $pi    = (new Coordinate(93.057237 + 0.5665415 * $T + 0.00052850 * $T ** 2 + 0.000004912 * $T ** 3, 0, 360))->getCoordinate();
-        $M     = $L - $pi;
+        $pi = (new Coordinate(93.057237 + 0.5665415 * $T + 0.00052850 * $T ** 2 + 0.000004912 * $T ** 3, 0, 360))->getCoordinate();
+        $M = $L - $pi;
 
         return [$L, $a, $e, $i, $omega, $pi, $M];
     }
@@ -5904,17 +5904,17 @@ class Saturn extends Planet
      */
     public function opposition(Carbon $date): Carbon
     {
-        $A  = 2451870.170;
-        $B  = 378.091904;
+        $A = 2451870.170;
+        $B = 378.091904;
         $M0 = 318.0172;
         $M1 = 12.647487;
 
         $Y = $date->year + $date->dayOfYear / (365 + $date->format('L'));
 
-        $k    = ceil((365.2425 * $Y + 1721060 - $A) / ($B));
+        $k = ceil((365.2425 * $Y + 1721060 - $A) / ($B));
         $JDE0 = $A + $k * $B;
-        $M    = deg2rad($M0 + $k * $M1);
-        $T    = ($JDE0 - 2451545) / 36525;
+        $M = deg2rad($M0 + $k * $M1);
+        $T = ($JDE0 - 2451545) / 36525;
 
         $a = deg2rad(82.74 + 40.76 * $T);
         $b = deg2rad(29.86 + 1181.36 * $T);
@@ -5953,17 +5953,17 @@ class Saturn extends Planet
      */
     public function conjunction(Carbon $date): Carbon
     {
-        $A  = 2451681.124;
-        $B  = 378.091904;
+        $A = 2451681.124;
+        $B = 378.091904;
         $M0 = 131.6934;
         $M1 = 12.647487;
 
         $Y = $date->year + $date->dayOfYear / (365 + $date->format('L'));
 
-        $k    = ceil((365.2425 * $Y + 1721060 - $A) / ($B));
+        $k = ceil((365.2425 * $Y + 1721060 - $A) / ($B));
         $JDE0 = $A + $k * $B;
-        $M    = deg2rad($M0 + $k * $M1);
-        $T    = ($JDE0 - 2451545) / 36525;
+        $M = deg2rad($M0 + $k * $M1);
+        $T = ($JDE0 - 2451545) / 36525;
 
         $a = deg2rad(82.74 + 40.76 * $T);
         $b = deg2rad(29.86 + 1181.36 * $T);
@@ -6045,11 +6045,11 @@ class Saturn extends Planet
     public function magnitude(Carbon $date): float
     {
         $helio_coords = $this->calculateHeliocentricCoordinates($date);
-        $R            = $helio_coords[2];
+        $R = $helio_coords[2];
 
-        $earth              = new Earth();
+        $earth = new Earth();
         $helio_coords_earth = $earth->calculateHeliocentricCoordinates($date);
-        $R0                 = $helio_coords_earth[2];
+        $R0 = $helio_coords_earth[2];
 
         $x = $helio_coords[2] * cos(deg2rad($helio_coords[1])) * cos(deg2rad($helio_coords[0])) -
             $helio_coords_earth[2] * cos(deg2rad($helio_coords_earth[1])) * cos(deg2rad($helio_coords_earth[0]));
@@ -6061,24 +6061,24 @@ class Saturn extends Planet
 
         // Calculate deltaU and B to take the ring into account
         // Step 1
-        $T     = (Time::getJd($date) + Time::deltaT($date) / 60 / 60 / 24 - 2451545) / 36525;
-        $i     = 28.075216 - 0.012998 * $T + 0.000004 * $T ** 2;
+        $T = (Time::getJd($date) + Time::deltaT($date) / 60 / 60 / 24 - 2451545) / 36525;
+        $i = 28.075216 - 0.012998 * $T + 0.000004 * $T ** 2;
         $omega = 169.508470 + 1.394681 * $T + 0.000412 * $T ** 2;
 
         // Step 2
         $helio_coords_earth = $earth->calculateHeliocentricCoordinates(Time::fromJd(Time::getJd($date) + Time::deltaT($date) / 60 / 60 / 24));
 
         // Step 3
-        $tau   =  0.0057755183 * $delta;
+        $tau = 0.0057755183 * $delta;
         // Step 5
         $lambda = rad2deg(atan($y / $x));
-        $beta   = rad2deg(atan($z / sqrt($x ** 2 + $y ** 2)));
+        $beta = rad2deg(atan($z / sqrt($x ** 2 + $y ** 2)));
 
         // Step 6
-        $B     = asin(sin(deg2rad($i)) * cos(deg2rad($beta)) * sin(deg2rad($lambda - $omega)) - cos(deg2rad($i)) * sin(deg2rad($beta)));
+        $B = asin(sin(deg2rad($i)) * cos(deg2rad($beta)) * sin(deg2rad($lambda - $omega)) - cos(deg2rad($i)) * sin(deg2rad($beta)));
 
         // Step 7
-        $N       = 113.6655 + 0.8771 * $T;
+        $N = 113.6655 + 0.8771 * $T;
         $laccent = $helio_coords[0] - 0.01759 / $helio_coords[2];
         $baccent = $helio_coords[1] - 0.000764 * cos(deg2rad($helio_coords[0] - $N)) / $helio_coords[2];
 
