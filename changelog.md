@@ -2,6 +2,12 @@
 
 All notable changes to `laravel-astronomy-library` will be documented in this file.
 
+## Version 5.3
+
+### Added
+
+- Added methods to calculate the coordinates and the distance of the moon.
+
 ## Version 5.2
 
 ### Changed
