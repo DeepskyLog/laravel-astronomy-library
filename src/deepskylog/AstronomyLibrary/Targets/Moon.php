@@ -14,11 +14,11 @@
 namespace deepskylog\AstronomyLibrary\Targets;
 
 use Carbon\Carbon;
-use deepskylog\AstronomyLibrary\Time;
 use deepskylog\AstronomyLibrary\Coordinates\Coordinate;
 use deepskylog\AstronomyLibrary\Coordinates\EclipticalCoordinates;
 use deepskylog\AstronomyLibrary\Coordinates\EquatorialCoordinates;
 use deepskylog\AstronomyLibrary\Coordinates\GeographicalCoordinates;
+use deepskylog\AstronomyLibrary\Time;
 
 /**
  * The target class describing the moon.
@@ -85,7 +85,7 @@ class Moon extends Target
 
         $A1 = (new Coordinate(119.75 + 131.849 * $T))->getCoordinate();
 
-        $A2 =  (new Coordinate(53.09 + 479264.290 * $T))->getCoordinate();
+        $A2 = (new Coordinate(53.09 + 479264.290 * $T))->getCoordinate();
 
         $A3 = (new Coordinate(313.45 + 481266.484 * $T))->getCoordinate();
 
@@ -323,10 +323,10 @@ class Moon extends Target
 
     private function _calculateApparentEquatorialCoordinates(Carbon $date): EquatorialCoordinates
     {
-        $helio_coords       = $this->calculateHeliocentricCoordinates($date);
-        $jd                 = Time::getJd($date);
-        $pi                 = rad2deg(asin(6378.14 / $helio_coords[2]));
-        $nutation           = Time::nutation($jd);
+        $helio_coords = $this->calculateHeliocentricCoordinates($date);
+        $jd = Time::getJd($date);
+        $pi = rad2deg(asin(6378.14 / $helio_coords[2]));
+        $nutation = Time::nutation($jd);
 
         $helio_coords[0] += $nutation[0] / 3600.0;
         $ecl = new EclipticalCoordinates($helio_coords[0], $helio_coords[1]);
@@ -336,9 +336,9 @@ class Moon extends Target
 
     private function _calculateEquatorialCoordinates(Carbon $date, GeographicalCoordinates $geo_coords, float $height): EquatorialCoordinates
     {
-        $helio_coords       = $this->calculateHeliocentricCoordinates($date);
-        $jd                 = Time::getJd($date);
-        $nutation           = Time::nutation($jd);
+        $helio_coords = $this->calculateHeliocentricCoordinates($date);
+        $jd = Time::getJd($date);
+        $nutation = Time::nutation($jd);
 
         $helio_coords[0] += $nutation[0] / 3600.0;
         $ecl = new EclipticalCoordinates($helio_coords[0], $helio_coords[1]);
@@ -346,7 +346,7 @@ class Moon extends Target
         $equa_coords = $ecl->convertToEquatorial($nutation[3]);
 
         // Calculate corrections for parallax
-        $pi                 = rad2deg(asin(6378.14 / $helio_coords[2]));
+        $pi = rad2deg(asin(6378.14 / $helio_coords[2]));
 
         $siderial_time = Time::apparentSiderialTime($date, new GeographicalCoordinates(0.0, 0.0));
 
@@ -355,7 +355,7 @@ class Moon extends Target
         $earthsGlobe = $geo_coords->earthsGlobe($height);
 
         $deltara = rad2deg(atan(-$earthsGlobe[1] * sin(deg2rad($pi / 3600.0)) * sin(deg2rad($hour_angle)) / (cos(deg2rad($equa_coords->getDeclination()->getCoordinate())) - $earthsGlobe[1] * sin(deg2rad($pi / 3600.0)) * sin(deg2rad($hour_angle)))));
-        $dec     = rad2deg(atan((sin(deg2rad($equa_coords->getDeclination()->getCoordinate())) - $earthsGlobe[0] * sin(deg2rad($pi / 3600.0))) * cos(deg2rad($deltara / 3600.0))
+        $dec = rad2deg(atan((sin(deg2rad($equa_coords->getDeclination()->getCoordinate())) - $earthsGlobe[0] * sin(deg2rad($pi / 3600.0))) * cos(deg2rad($deltara / 3600.0))
                         / (cos(deg2rad($equa_coords->getDeclination()->getCoordinate())) - $earthsGlobe[1] * sin(deg2rad($pi / 3600.0)) * cos(deg2rad($height)))));
 
         $equa_coords->setRA($equa_coords->getRA()->getCoordinate() + $deltara);
