@@ -6097,6 +6097,6 @@ class Saturn extends Planet
         );
         $deltaU = abs($U1 - $U2);
 
-        return -8.68 + 5 * log10($R * $delta) + 0.044 * abs($deltaU) - 2.60 * sin(abs($B)) + 1.25 * sin($B) ** 2;
+        return round(-8.68 + 5 * log10($R * $delta) + 0.044 * abs($deltaU) - 2.60 * sin(abs($B)) + 1.25 * sin($B) ** 2, 2);
     }
 }

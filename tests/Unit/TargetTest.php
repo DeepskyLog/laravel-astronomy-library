@@ -927,4 +927,25 @@ class TargetTest extends BaseTestCase
         $magnitude = $saturn->magnitude($date);
         $this->assertEqualsWithDelta(0.9, $magnitude, 0.1);
     }
+
+    /**
+     * Test the coordinates of the moon.
+     *
+     * @return void
+     */
+    public function testMoonCoordinates()
+    {
+        $date = Carbon::create(1992, 4, 12, 0, 0, 0, 'UTC');
+        $moon = new Moon();
+        $coords = $moon->calculateHeliocentricCoordinates($date);
+
+        $this->assertEqualsWithDelta(133.162655, $coords[0], 0.000001);
+        $this->assertEqualsWithDelta(-3.229126, $coords[1], 0.000001);
+        $this->assertEqualsWithDelta(368409.7, $coords[2], 0.1);
+
+        $moon->calculateApparentEquatorialCoordinates($date);
+        $equa_coords = $moon->getEquatorialCoordinates();
+        $this->assertEqualsWithDelta(134.688470 / 15, $equa_coords->getRA()->getCoordinate(), 0.00001);
+        $this->assertEqualsWithDelta(13.768368, $equa_coords->getDeclination()->getCoordinate(), 0.00001);
+    }
 }

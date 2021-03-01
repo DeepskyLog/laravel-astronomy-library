@@ -514,6 +514,14 @@ $fraction = $venus->illuminatedFraction($date);
 $date   = Carbon::create(1992, 12, 20, 0, 0, 0, 'UTC');
 $venus  = new Venus();
 $magnitude = $venus->magnitude($date);
+
+// Calculate the Equatorial Coordinates of the Moon
+$date   = Carbon::create(1992, 12, 20, 0, 0, 0, 'UTC');
+$moon  = new Moon();
+$moon->calculateApparentEquatorialCoordinates($date);
+// If the correction for the location on earth should be done, use the following method
+$heightOfLocation = 555;   // In meters
+$moon->calculateEquatorialCoordinates($date, $geo_coords, $heightOfLocation);
 ```
 
 ## Change log
