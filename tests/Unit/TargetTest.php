@@ -958,7 +958,7 @@ class TargetTest extends BaseTestCase
     {
         $date = Carbon::create(1992, 4, 12, 0, 0, 0, 'UTC');
         $moon = new Moon();
-        $illum = $moon->illuminatedFraction($date)[0];
+        $illum = $moon->illuminatedFraction($date);
 
         $this->assertEqualsWithDelta(0.680, $illum, 0.001);
     }

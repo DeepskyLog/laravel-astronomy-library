@@ -525,6 +525,9 @@ $moon->calculateEquatorialCoordinates($date, $geo_coords, $heightOfLocation);
 
 // Calculate the illumination of the moon
 $moon->illuminatedFraction($date);
+
+// Calculate the moon phase ration (0-1) of the moon
+$moon->getPhaseRatio($date);
 ```
 
 ## Change log
