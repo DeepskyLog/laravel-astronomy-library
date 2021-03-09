@@ -2,6 +2,12 @@
 
 All notable changes to `laravel-astronomy-library` will be documented in this file.
 
+## Version 5.4
+
+### Added
+
+- Added method to calculate the illumination of the moon.
+
 ## Version 5.3
 
 ### Added

@@ -522,6 +522,9 @@ $moon->calculateApparentEquatorialCoordinates($date);
 // If the correction for the location on earth should be done, use the following method
 $heightOfLocation = 555;   // In meters
 $moon->calculateEquatorialCoordinates($date, $geo_coords, $heightOfLocation);
+
+// Calculate the illumination of the moon
+$moon->illuminatedFraction($date);
 ```
 
 ## Change log

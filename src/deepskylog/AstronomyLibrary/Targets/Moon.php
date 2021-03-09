@@ -14,11 +14,11 @@
 namespace deepskylog\AstronomyLibrary\Targets;
 
 use Carbon\Carbon;
+use deepskylog\AstronomyLibrary\Time;
 use deepskylog\AstronomyLibrary\Coordinates\Coordinate;
 use deepskylog\AstronomyLibrary\Coordinates\EclipticalCoordinates;
 use deepskylog\AstronomyLibrary\Coordinates\EquatorialCoordinates;
 use deepskylog\AstronomyLibrary\Coordinates\GeographicalCoordinates;
-use deepskylog\AstronomyLibrary\Time;
 
 /**
  * The target class describing the moon.
@@ -324,9 +324,9 @@ class Moon extends Target
     private function _calculateApparentEquatorialCoordinates(Carbon $date): EquatorialCoordinates
     {
         $helio_coords = $this->calculateHeliocentricCoordinates($date);
-        $jd = Time::getJd($date);
-        $pi = rad2deg(asin(6378.14 / $helio_coords[2]));
-        $nutation = Time::nutation($jd);
+        $jd           = Time::getJd($date);
+        $pi           = rad2deg(asin(6378.14 / $helio_coords[2]));
+        $nutation     = Time::nutation($jd);
 
         $helio_coords[0] += $nutation[0] / 3600.0;
         $ecl = new EclipticalCoordinates($helio_coords[0], $helio_coords[1]);
@@ -337,8 +337,8 @@ class Moon extends Target
     private function _calculateEquatorialCoordinates(Carbon $date, GeographicalCoordinates $geo_coords, float $height): EquatorialCoordinates
     {
         $helio_coords = $this->calculateHeliocentricCoordinates($date);
-        $jd = Time::getJd($date);
-        $nutation = Time::nutation($jd);
+        $jd           = Time::getJd($date);
+        $nutation     = Time::nutation($jd);
 
         $helio_coords[0] += $nutation[0] / 3600.0;
         $ecl = new EclipticalCoordinates($helio_coords[0], $helio_coords[1]);
@@ -355,7 +355,7 @@ class Moon extends Target
         $earthsGlobe = $geo_coords->earthsGlobe($height);
 
         $deltara = rad2deg(atan(-$earthsGlobe[1] * sin(deg2rad($pi / 3600.0)) * sin(deg2rad($hour_angle)) / (cos(deg2rad($equa_coords->getDeclination()->getCoordinate())) - $earthsGlobe[1] * sin(deg2rad($pi / 3600.0)) * sin(deg2rad($hour_angle)))));
-        $dec = rad2deg(atan((sin(deg2rad($equa_coords->getDeclination()->getCoordinate())) - $earthsGlobe[0] * sin(deg2rad($pi / 3600.0))) * cos(deg2rad($deltara / 3600.0))
+        $dec     = rad2deg(atan((sin(deg2rad($equa_coords->getDeclination()->getCoordinate())) - $earthsGlobe[0] * sin(deg2rad($pi / 3600.0))) * cos(deg2rad($deltara / 3600.0))
                         / (cos(deg2rad($equa_coords->getDeclination()->getCoordinate())) - $earthsGlobe[1] * sin(deg2rad($pi / 3600.0)) * cos(deg2rad($height)))));
 
         $equa_coords->setRA($equa_coords->getRA()->getCoordinate() + $deltara);
@@ -373,21 +373,29 @@ class Moon extends Target
      *
      * See chapter 58 of Astronomical Algorithms
      */
-/*    public function illuminatedFraction(Carbon $date): float
+    public function illuminatedFraction(Carbon $date): float
     {
+        // T = julian centuries since epoch J2000.0
+        $T = (Time::getJd($date) - 2451545.0) / 36525.0;
 
+        // Mean elongation of the moon
+        $D = (new Coordinate(297.8501921 + 445267.1114023 * $T - 0.0018819 * $T ** 2 + $T ** 3 / 545868.0 - $T ** 4 / 113065000.0))->getCoordinate();
 
-                               i = 180 - $D - 6.289 * sin(deg2rad($M_accent))
+        // Sun's mean anomaly
+        $M = (new Coordinate(357.5291092 + 35999.0502909 * $T - 0.0001536 * $T ** 2 + $T ** 3 / 24490000.0))->getCoordinate();
+
+        // Moon's mean anomaly
+        $M_accent = (new Coordinate(134.9633964 + 477198.8675055 * $T + 0.0087414 * $T ** 2 + $T ** 3 / 69699.0 - $T ** 4 / 14712000.0))->getCoordinate();
+
+        $i = 180 - $D - 6.289 * sin(deg2rad($M_accent))
                                      + 2.100 * sin(deg2rad($M))
                                      - 1.274 * sin(deg2rad(2 * $D - $M_accent))
                                      - 0.658 * sin(deg2rad(2 * $D))
                                      - 0.214 * sin(deg2rad(2 * $M_accent))
                                      - 0.110 * sin(deg2rad($D));
 
-                               i = i - floor(i / 360.0) * 360.0;
+        $i = $i - floor($i / 360.0) * 360.0;
 
-                               coordinates.setIllumination(((1 + cos(deg2rad(i))) / 2));
-
-
-     */
+        return (1 + cos(deg2rad($i))) / 2;
+    }
 }
