@@ -2,6 +2,12 @@
 
 All notable changes to `laravel-astronomy-library` will be documented in this file.
 
+## Version 5.4.1
+
+### Added
+
+- Added the moon phase ratio to the calculation of the illumination of the moon.
+
 ## Version 5.4
 
 ### Added

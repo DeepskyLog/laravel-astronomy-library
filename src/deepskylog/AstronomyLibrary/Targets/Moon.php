@@ -369,11 +369,11 @@ class Moon extends Target
      *
      * @param Carbon $date The date for which to calculate the fraction
      *
-     * @return float The illuminated fraction
+     * @return array The illuminated fraction, the phase ratio
      *
      * See chapter 58 of Astronomical Algorithms
      */
-    public function illuminatedFraction(Carbon $date): float
+    public function illuminatedFraction(Carbon $date): array
     {
         // T = julian centuries since epoch J2000.0
         $T = (Time::getJd($date) - 2451545.0) / 36525.0;
@@ -396,6 +396,6 @@ class Moon extends Target
 
         $i = $i - floor($i / 360.0) * 360.0;
 
-        return (1 + cos(deg2rad($i))) / 2;
+        return [round((1 + cos(deg2rad($i))) / 2, 3), $i / 360];
     }
 }
