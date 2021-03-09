@@ -373,21 +373,29 @@ class Moon extends Target
      *
      * See chapter 58 of Astronomical Algorithms
      */
-/*    public function illuminatedFraction(Carbon $date): float
+    public function illuminatedFraction(Carbon $date): float
     {
+        // T = julian centuries since epoch J2000.0
+        $T = (Time::getJd($date) - 2451545.0) / 36525.0;
 
+        // Mean elongation of the moon
+        $D = (new Coordinate(297.8501921 + 445267.1114023 * $T - 0.0018819 * $T ** 2 + $T ** 3 / 545868.0 - $T ** 4 / 113065000.0))->getCoordinate();
 
-                               i = 180 - $D - 6.289 * sin(deg2rad($M_accent))
+        // Sun's mean anomaly
+        $M = (new Coordinate(357.5291092 + 35999.0502909 * $T - 0.0001536 * $T ** 2 + $T ** 3 / 24490000.0))->getCoordinate();
+
+        // Moon's mean anomaly
+        $M_accent = (new Coordinate(134.9633964 + 477198.8675055 * $T + 0.0087414 * $T ** 2 + $T ** 3 / 69699.0 - $T ** 4 / 14712000.0))->getCoordinate();
+
+        $i = 180 - $D - 6.289 * sin(deg2rad($M_accent))
                                      + 2.100 * sin(deg2rad($M))
                                      - 1.274 * sin(deg2rad(2 * $D - $M_accent))
                                      - 0.658 * sin(deg2rad(2 * $D))
                                      - 0.214 * sin(deg2rad(2 * $M_accent))
                                      - 0.110 * sin(deg2rad($D));
 
-                               i = i - floor(i / 360.0) * 360.0;
+        $i = $i - floor($i / 360.0) * 360.0;
 
-                               coordinates.setIllumination(((1 + cos(deg2rad(i))) / 2));
-
-
-     */
+        return (1 + cos(deg2rad($i))) / 2;
+    }
 }

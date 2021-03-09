@@ -948,4 +948,18 @@ class TargetTest extends BaseTestCase
         $this->assertEqualsWithDelta(134.688470 / 15, $equa_coords->getRA()->getCoordinate(), 0.00001);
         $this->assertEqualsWithDelta(13.768368, $equa_coords->getDeclination()->getCoordinate(), 0.00001);
     }
+
+    /**
+     * Test the coordinates of the moon.
+     *
+     * @return void
+     */
+    public function testMoonIllumination()
+    {
+        $date = Carbon::create(1992, 4, 12, 0, 0, 0, 'UTC');
+        $moon = new Moon();
+        $illum = $moon->illuminatedFraction($date);
+
+        $this->assertEqualsWithDelta(0.680, $illum, 0.001);
+    }
 }
