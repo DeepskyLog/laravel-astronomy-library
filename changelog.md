@@ -2,6 +2,12 @@
 
 All notable changes to `laravel-astronomy-library` will be documented in this file.
 
+## Version 5.4.3
+
+### Added
+
+- Fix error in the illumination of the moon.
+
 ## Version 5.4.2
 
 ### Added

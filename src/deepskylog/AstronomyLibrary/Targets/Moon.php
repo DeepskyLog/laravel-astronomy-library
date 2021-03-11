@@ -375,7 +375,22 @@ class Moon extends Target
      */
     public function illuminatedFraction(Carbon $date): float
     {
-        $i = $this->getPhaseRatio($date) * 360.0;
+        $moonCoords = $this->_calculateApparentEquatorialCoordinates($date);
+        $delta = $this->calculateHeliocentricCoordinates($date)[2];
+
+        $sun = new Sun();
+        $nutation = Time::nutation(Time::getJd($date));
+        $sun->calculateEquatorialCoordinatesHighAccuracy($date, $nutation);
+        $sunCoords = $sun->getEquatorialCoordinatesToday();
+
+        $earth = new Earth();
+        $R = $earth->calculateHeliocentricCoordinates($date)[2] * 149598073;
+
+        $cosPsi = sin(deg2rad($sunCoords->getDeclination()->getCoordinate())) * sin(deg2rad($moonCoords->getDeclination()->getCoordinate()))
+            + cos(deg2rad($sunCoords->getDeclination()->getCoordinate())) * cos(deg2rad($moonCoords->getDeclination()->getCoordinate())) * cos(deg2rad($sunCoords->getRA()->getCoordinate() * 15 - $moonCoords->getRA()->getCoordinate() * 15));
+        $psi = acos($cosPsi);
+        $i = rad2deg(atan2($R * sin($psi), ($delta - $R * $cosPsi)));
+        $i = $i - floor($i / 360.0) * 360.0;
 
         return round((1 + cos(deg2rad($i))) / 2, 3);
     }
