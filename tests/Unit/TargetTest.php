@@ -950,7 +950,7 @@ class TargetTest extends BaseTestCase
     }
 
     /**
-     * Test the coordinates of the moon.
+     * Test the illumination of the moon.
      *
      * @return void
      */
@@ -960,6 +960,20 @@ class TargetTest extends BaseTestCase
         $moon = new Moon();
         $illum = $moon->illuminatedFraction($date);
 
-        $this->assertEqualsWithDelta(0.680, $illum, 0.001);
+        $this->assertEqualsWithDelta(0.679, $illum, 0.001);
+    }
+
+    /**
+     * Test the phase ration of the moon.
+     *
+     * @return void
+     */
+    public function testMoonPhaseRatio()
+    {
+        $date = Carbon::create(2021, 3, 9, 0, 0, 0, 'UTC');
+        $moon = new Moon();
+        $illum = $moon->getPhaseRatio($date);
+
+        $this->assertEqualsWithDelta(0.85252071045742, $illum, 0.001);
     }
 }

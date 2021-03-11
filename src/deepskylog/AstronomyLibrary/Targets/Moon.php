@@ -375,26 +375,7 @@ class Moon extends Target
      */
     public function illuminatedFraction(Carbon $date): float
     {
-        // T = julian centuries since epoch J2000.0
-        $T = (Time::getJd($date) - 2451545.0) / 36525.0;
-
-        // Mean elongation of the moon
-        $D = (new Coordinate(297.8501921 + 445267.1114023 * $T - 0.0018819 * $T ** 2 + $T ** 3 / 545868.0 - $T ** 4 / 113065000.0))->getCoordinate();
-
-        // Sun's mean anomaly
-        $M = (new Coordinate(357.5291092 + 35999.0502909 * $T - 0.0001536 * $T ** 2 + $T ** 3 / 24490000.0))->getCoordinate();
-
-        // Moon's mean anomaly
-        $M_accent = (new Coordinate(134.9633964 + 477198.8675055 * $T + 0.0087414 * $T ** 2 + $T ** 3 / 69699.0 - $T ** 4 / 14712000.0))->getCoordinate();
-
-        $i = 180 - $D - 6.289 * sin(deg2rad($M_accent))
-                                     + 2.100 * sin(deg2rad($M))
-                                     - 1.274 * sin(deg2rad(2 * $D - $M_accent))
-                                     - 0.658 * sin(deg2rad(2 * $D))
-                                     - 0.214 * sin(deg2rad(2 * $M_accent))
-                                     - 0.110 * sin(deg2rad($D));
-
-        $i = $i - floor($i / 360.0) * 360.0;
+        $i = $this->getPhaseRatio($date) * 360.0;
 
         return round((1 + cos(deg2rad($i))) / 2, 3);
     }
@@ -410,25 +391,21 @@ class Moon extends Target
      */
     public function getPhaseRatio(Carbon $date): float
     {
-        // T = julian centuries since epoch J2000.0
-        $T = (Time::getJd($date) - 2451545.0) / 36525.0;
+        $moonCoords = $this->_calculateApparentEquatorialCoordinates($date);
+        $delta = $this->calculateHeliocentricCoordinates($date)[2];
 
-        // Mean elongation of the moon
-        $D = (new Coordinate(297.8501921 + 445267.1114023 * $T - 0.0018819 * $T ** 2 + $T ** 3 / 545868.0 - $T ** 4 / 113065000.0))->getCoordinate();
+        $sun = new Sun();
+        $nutation = Time::nutation(Time::getJd($date));
+        $sun->calculateEquatorialCoordinatesHighAccuracy($date, $nutation);
+        $sunCoords = $sun->getEquatorialCoordinatesToday();
 
-        // Sun's mean anomaly
-        $M = (new Coordinate(357.5291092 + 35999.0502909 * $T - 0.0001536 * $T ** 2 + $T ** 3 / 24490000.0))->getCoordinate();
+        $earth = new Earth();
+        $R = $earth->calculateHeliocentricCoordinates($date)[2] * 149598073;
 
-        // Moon's mean anomaly
-        $M_accent = (new Coordinate(134.9633964 + 477198.8675055 * $T + 0.0087414 * $T ** 2 + $T ** 3 / 69699.0 - $T ** 4 / 14712000.0))->getCoordinate();
-
-        $i = 180 - $D - 6.289 * sin(deg2rad($M_accent))
-                                     + 2.100 * sin(deg2rad($M))
-                                     - 1.274 * sin(deg2rad(2 * $D - $M_accent))
-                                     - 0.658 * sin(deg2rad(2 * $D))
-                                     - 0.214 * sin(deg2rad(2 * $M_accent))
-                                     - 0.110 * sin(deg2rad($D));
-
+        $cosPsi = sin(deg2rad($sunCoords->getDeclination()->getCoordinate())) * sin(deg2rad($moonCoords->getDeclination()->getCoordinate()))
+            + cos(deg2rad($sunCoords->getDeclination()->getCoordinate())) * cos(deg2rad($moonCoords->getDeclination()->getCoordinate())) * cos(deg2rad($sunCoords->getRA()->getCoordinate() * 15 - $moonCoords->getRA()->getCoordinate() * 15));
+        $psi = acos($cosPsi);
+        $i = rad2deg(atan($R * sin($psi) / ($delta - $R * $cosPsi)));
         $i = $i - floor($i / 360.0) * 360.0;
 
         return $i / 360;
