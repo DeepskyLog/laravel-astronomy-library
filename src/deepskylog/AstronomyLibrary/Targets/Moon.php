@@ -14,11 +14,11 @@
 namespace deepskylog\AstronomyLibrary\Targets;
 
 use Carbon\Carbon;
-use deepskylog\AstronomyLibrary\Time;
 use deepskylog\AstronomyLibrary\Coordinates\Coordinate;
 use deepskylog\AstronomyLibrary\Coordinates\EclipticalCoordinates;
 use deepskylog\AstronomyLibrary\Coordinates\EquatorialCoordinates;
 use deepskylog\AstronomyLibrary\Coordinates\GeographicalCoordinates;
+use deepskylog\AstronomyLibrary\Time;
 
 /**
  * The target class describing the moon.
@@ -324,9 +324,9 @@ class Moon extends Target
     private function _calculateApparentEquatorialCoordinates(Carbon $date): EquatorialCoordinates
     {
         $helio_coords = $this->calculateHeliocentricCoordinates($date);
-        $jd           = Time::getJd($date);
-        $pi           = rad2deg(asin(6378.14 / $helio_coords[2]));
-        $nutation     = Time::nutation($jd);
+        $jd = Time::getJd($date);
+        $pi = rad2deg(asin(6378.14 / $helio_coords[2]));
+        $nutation = Time::nutation($jd);
 
         $helio_coords[0] += $nutation[0] / 3600.0;
         $ecl = new EclipticalCoordinates($helio_coords[0], $helio_coords[1]);
@@ -337,8 +337,8 @@ class Moon extends Target
     private function _calculateEquatorialCoordinates(Carbon $date, GeographicalCoordinates $geo_coords, float $height): EquatorialCoordinates
     {
         $helio_coords = $this->calculateHeliocentricCoordinates($date);
-        $jd           = Time::getJd($date);
-        $nutation     = Time::nutation($jd);
+        $jd = Time::getJd($date);
+        $nutation = Time::nutation($jd);
 
         $helio_coords[0] += $nutation[0] / 3600.0;
         $ecl = new EclipticalCoordinates($helio_coords[0], $helio_coords[1]);
@@ -355,7 +355,7 @@ class Moon extends Target
         $earthsGlobe = $geo_coords->earthsGlobe($height);
 
         $deltara = rad2deg(atan(-$earthsGlobe[1] * sin(deg2rad($pi / 3600.0)) * sin(deg2rad($hour_angle)) / (cos(deg2rad($equa_coords->getDeclination()->getCoordinate())) - $earthsGlobe[1] * sin(deg2rad($pi / 3600.0)) * sin(deg2rad($hour_angle)))));
-        $dec     = rad2deg(atan((sin(deg2rad($equa_coords->getDeclination()->getCoordinate())) - $earthsGlobe[0] * sin(deg2rad($pi / 3600.0))) * cos(deg2rad($deltara / 3600.0))
+        $dec = rad2deg(atan((sin(deg2rad($equa_coords->getDeclination()->getCoordinate())) - $earthsGlobe[0] * sin(deg2rad($pi / 3600.0))) * cos(deg2rad($deltara / 3600.0))
                         / (cos(deg2rad($equa_coords->getDeclination()->getCoordinate())) - $earthsGlobe[1] * sin(deg2rad($pi / 3600.0)) * cos(deg2rad($height)))));
 
         $equa_coords->setRA($equa_coords->getRA()->getCoordinate() + $deltara);
@@ -376,21 +376,21 @@ class Moon extends Target
     public function illuminatedFraction(Carbon $date): float
     {
         $moonCoords = $this->_calculateApparentEquatorialCoordinates($date);
-        $delta      = $this->calculateHeliocentricCoordinates($date)[2];
+        $delta = $this->calculateHeliocentricCoordinates($date)[2];
 
-        $sun      = new Sun();
+        $sun = new Sun();
         $nutation = Time::nutation(Time::getJd($date));
         $sun->calculateEquatorialCoordinatesHighAccuracy($date, $nutation);
         $sunCoords = $sun->getEquatorialCoordinatesToday();
 
         $earth = new Earth();
-        $R     = $earth->calculateHeliocentricCoordinates($date)[2] * 149598073;
+        $R = $earth->calculateHeliocentricCoordinates($date)[2] * 149598073;
 
         $cosPsi = sin(deg2rad($sunCoords->getDeclination()->getCoordinate())) * sin(deg2rad($moonCoords->getDeclination()->getCoordinate()))
             + cos(deg2rad($sunCoords->getDeclination()->getCoordinate())) * cos(deg2rad($moonCoords->getDeclination()->getCoordinate())) * cos(deg2rad($sunCoords->getRA()->getCoordinate() * 15 - $moonCoords->getRA()->getCoordinate() * 15));
         $psi = acos($cosPsi);
-        $i   = rad2deg(atan2($R * sin($psi), ($delta - $R * $cosPsi)));
-        $i   = $i - floor($i / 360.0) * 360.0;
+        $i = rad2deg(atan2($R * sin($psi), ($delta - $R * $cosPsi)));
+        $i = $i - floor($i / 360.0) * 360.0;
 
         return round((1 + cos(deg2rad($i))) / 2, 3);
     }
@@ -407,21 +407,21 @@ class Moon extends Target
     public function getPhaseRatio(Carbon $date): float
     {
         $moonCoords = $this->_calculateApparentEquatorialCoordinates($date);
-        $delta      = $this->calculateHeliocentricCoordinates($date)[2];
+        $delta = $this->calculateHeliocentricCoordinates($date)[2];
 
-        $sun      = new Sun();
+        $sun = new Sun();
         $nutation = Time::nutation(Time::getJd($date));
         $sun->calculateEquatorialCoordinatesHighAccuracy($date, $nutation);
         $sunCoords = $sun->getEquatorialCoordinatesToday();
 
         $earth = new Earth();
-        $R     = $earth->calculateHeliocentricCoordinates($date)[2] * 149598073;
+        $R = $earth->calculateHeliocentricCoordinates($date)[2] * 149598073;
 
         $cosPsi = sin(deg2rad($sunCoords->getDeclination()->getCoordinate())) * sin(deg2rad($moonCoords->getDeclination()->getCoordinate()))
             + cos(deg2rad($sunCoords->getDeclination()->getCoordinate())) * cos(deg2rad($moonCoords->getDeclination()->getCoordinate())) * cos(deg2rad($sunCoords->getRA()->getCoordinate() * 15 - $moonCoords->getRA()->getCoordinate() * 15));
         $psi = acos($cosPsi);
-        $i   = rad2deg(atan($R * sin($psi) / ($delta - $R * $cosPsi)));
-        $i   = $i - floor($i / 360.0) * 360.0;
+        $i = rad2deg(atan($R * sin($psi) / ($delta - $R * $cosPsi)));
+        $i = $i - floor($i / 360.0) * 360.0;
 
         return $i / 360;
     }
