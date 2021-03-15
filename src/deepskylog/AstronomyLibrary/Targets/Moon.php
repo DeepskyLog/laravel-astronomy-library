@@ -371,7 +371,7 @@ class Moon extends Target
      *
      * @return float The illuminated fraction, the phase ratio
      *
-     * See chapter 58 of Astronomical Algorithms
+     * See chapter 48 of Astronomical Algorithms
      */
     public function illuminatedFraction(Carbon $date): float
     {
@@ -396,33 +396,387 @@ class Moon extends Target
     }
 
     /**
-     * Calculates the phase ration of the moon (0 - 1).
+     * Calculates the phase ration of the moon (0 - 1), where 0=new, 0.5=full, 1=new
      *
      * @param Carbon $date The date for which to calculate the phase ration
      *
      * @return float The phase ratio
      *
-     * See chapter 58 of Astronomical Algorithms
+     * See chapter 49 of Astronomical Algorithms
      */
     public function getPhaseRatio(Carbon $date): float
     {
-        $moonCoords = $this->_calculateApparentEquatorialCoordinates($date);
-        $delta      = $this->calculateHeliocentricCoordinates($date)[2];
+        $nextNewMoon     = $this->newMoonDate($date);
+        $prevMonth       = $nextNewMoon->copy()->subDays(32);
+        $previousNewMoon = $this->newMoonDate($prevMonth);
 
-        $sun      = new Sun();
-        $nutation = Time::nutation(Time::getJd($date));
-        $sun->calculateEquatorialCoordinatesHighAccuracy($date, $nutation);
-        $sunCoords = $sun->getEquatorialCoordinatesToday();
+        $lunation = (Time::getJd($date) - Time::getJd($previousNewMoon)) / (Time::getJd($nextNewMoon) - Time::getJd($previousNewMoon));
 
-        $earth = new Earth();
-        $R     = $earth->calculateHeliocentricCoordinates($date)[2] * 149598073;
+        return $lunation;
+    }
 
-        $cosPsi = sin(deg2rad($sunCoords->getDeclination()->getCoordinate())) * sin(deg2rad($moonCoords->getDeclination()->getCoordinate()))
-            + cos(deg2rad($sunCoords->getDeclination()->getCoordinate())) * cos(deg2rad($moonCoords->getDeclination()->getCoordinate())) * cos(deg2rad($sunCoords->getRA()->getCoordinate() * 15 - $moonCoords->getRA()->getCoordinate() * 15));
-        $psi = acos($cosPsi);
-        $i   = rad2deg(atan($R * sin($psi) / ($delta - $R * $cosPsi)));
-        $i   = $i - floor($i / 360.0) * 360.0;
+    /**
+     * Return the date for the new moon after the given date
+     *
+     * @param Carbon $date The date after which we search the new moon
+     *
+     * @return Carbon The date of the new moon after the given date.
+     */
+    public function newMoonDate(Carbon $date): Carbon
+    {
+        $k     = (($date->year + $date->dayOfYear / $date->daysInYear - 2000) * 12.3685);
+        if ($k > 0) {
+            $k = floor($k);
+        } else {
+            $k = ceil($k);
+        }
+        $T     = $k / 1236.85;
+        $JDE   = 2451550.09766 + 29.530588861 * $k + 0.00015437 * $T ** 2 - 0.000000150 * $T ** 3 + 0.00000000073 * $T ** 4;
 
-        return $i / 360;
+        if ($JDE < Time::getJd($date)) {
+            $k++;
+            $T     = $k / 1236.85;
+            $JDE   = 2451550.09766 + 29.530588861 * $k + 0.00015437 * $T ** 2 - 0.000000150 * $T ** 3 + 0.00000000073 * $T ** 4;
+        }
+
+        $E        = 1 - 0.002516 * $T - 0.0000074 * $T ** 2;
+        $M        = (new Coordinate(2.5534 + 29.10535670 * $k - 0.0000014 * $T ** 2 - 0.00000011 * $T ** 3, 0, 360))->getCoordinate();
+        $M_accent = (new Coordinate(201.5643 + 385.81693528 * $k + 0.0107582 * $T ** 2 + 0.00001238 * $T ** 3 - 0.000000058 * $T ** 4, 0, 360))->getCoordinate();
+        $F        = (new Coordinate(160.7108 + 390.67050284 * $k - 0.0016118 * $T ** 2 - 0.00000227 * $T ** 3 + 0.000000011 * $T ** 4, 0, 360))->getCoordinate();
+        $omega    = (new Coordinate(124.7746 - 1.56375588 * $k + 0.0020672 * $T ** 2 + 0.00000215 * $T ** 3, 0, 360))->getCoordinate();
+
+        $corr1 = -0.40720 * sin(deg2rad($M_accent))
+                + 0.17241 * $E * sin(deg2rad($M))
+                + 0.01608 * sin(deg2rad(2 * $M_accent))
+                + 0.01039 * sin(deg2rad(2 * $F))
+                + 0.00739 * $E * sin(deg2rad($M_accent - $M))
+                - 0.00514 * $E * sin(deg2rad($M_accent + $M))
+                + 0.00208 * $E ** 2 * sin(deg2rad(2 * $M))
+                - 0.00111 * sin(deg2rad($M_accent - 2 * $F))
+                - 0.00057 * sin(deg2rad($M_accent + 2 * $F))
+                + 0.00056 * $E * sin(deg2rad(2 * $M_accent + $M))
+                - 0.00042 * sin(deg2rad(3 * $M_accent))
+                + 0.00042 * $E * sin(deg2rad($M + 2 * $F))
+                + 0.00038 * $E * sin(deg2rad($M - 2 * $F))
+                - 0.00024 * $E * sin(deg2rad(2 * $M_accent - $M))
+                - 0.00017 * sin(deg2rad($omega))
+                - 0.00007 * sin(deg2rad($M_accent + 2 * $M))
+                + 0.00004 * sin(deg2rad(2 * $M_accent - 2 * $F))
+                + 0.00004 * sin(deg2rad(3 * $M))
+                + 0.00003 * sin(deg2rad($M_accent + $M - 2 * $F))
+                + 0.00003 * sin(deg2rad(2 * $M_accent + 2 * $F))
+                - 0.00003 * sin(deg2rad($M_accent + $M + 2 * $F))
+                + 0.00003 * sin(deg2rad($M_accent - $M + 2 * $F))
+                - 0.00002 * sin(deg2rad($M_accent - $M - 2 * $F))
+                - 0.00002 * sin(deg2rad(3 * $M_accent + $M))
+                + 0.00002 * sin(deg2rad(4 * $M_accent));
+
+        $A1     = deg2rad(299.77 + 0.107408 * $k - 0.009173 * $T ** 2);
+        $A2     = deg2rad(251.88 + 0.016321 * $k);
+        $A3     = deg2rad(251.83 + 26.651886 * $k);
+        $A4     = deg2rad(349.42 + 36.412478 * $k);
+        $A5     = deg2rad(84.66 + 18.206239 * $k);
+        $A6     = deg2rad(141.74 + 53.303771 * $k);
+        $A7     = deg2rad(207.14 + 2.453732 * $k);
+        $A8     = deg2rad(154.84 + 7.306860 * $k);
+        $A9     = deg2rad(34.52 + 27.261239 * $k);
+        $A10    = deg2rad(207.19 + 0.121824 * $k);
+        $A11    = deg2rad(291.34 + 1.844379 * $k);
+        $A12    = deg2rad(161.72 + 24.198154 * $k);
+        $A13    = deg2rad(239.56 + 25.513099 * $k);
+        $A14    = deg2rad(331.55 + 3.592518 * $k);
+
+        $corr2 = 0.000325 * sin($A1)
+                 + 0.000165 * sin($A2)
+                 + 0.000164 * sin($A3)
+                 + 0.000126 * sin($A4)
+                 + 0.000110 * sin($A5)
+                 + 0.000062 * sin($A6)
+                 + 0.000060 * sin($A7)
+                 + 0.000056 * sin($A8)
+                 + 0.000047 * sin($A9)
+                 + 0.000042 * sin($A10)
+                 + 0.000040 * sin($A11)
+                 + 0.000037 * sin($A12)
+                 + 0.000035 * sin($A13)
+                 + 0.000023 * sin($A14);
+
+        $JDE   = $JDE + $corr1 + $corr2;
+
+        return Time::fromJd($JDE);
+    }
+
+    /**
+     * Return the date for the full moon after the given date
+     *
+     * @param Carbon $date The date after which we search the full moon
+     *
+     * @return Carbon The date of the full moon after the given date.
+     */
+    public function fullMoonDate(Carbon $date): Carbon
+    {
+        $k     = (($date->year + $date->dayOfYear / $date->daysInYear - 2000) * 12.3685);
+        if ($k < 0) {
+            $k = round($k) - 0.5;
+        } else {
+            $k = round($k) + 0.5;
+        }
+        $T     = $k / 1236.85;
+        $JDE   = 2451550.09766 + 29.530588861 * $k + 0.00015437 * $T ** 2 - 0.000000150 * $T ** 3 + 0.00000000073 * $T ** 4;
+        if ($JDE < Time::getJd($date)) {
+            $k++;
+            $T     = $k / 1236.85;
+            $JDE   = 2451550.09766 + 29.530588861 * $k + 0.00015437 * $T ** 2 - 0.000000150 * $T ** 3 + 0.00000000073 * $T ** 4;
+        }
+
+        $E        = 1 - 0.002516 * $T - 0.0000074 * $T ** 2;
+        $M        = (new Coordinate(2.5534 + 29.10535670 * $k - 0.0000014 * $T ** 2 - 0.00000011 * $T ** 3, 0, 360))->getCoordinate();
+        $M_accent = (new Coordinate(201.5643 + 385.81693528 * $k + 0.0107582 * $T ** 2 + 0.00001238 * $T ** 3 - 0.000000058 * $T ** 4, 0, 360))->getCoordinate();
+        $F        = (new Coordinate(160.7108 + 390.67050284 * $k - 0.0016118 * $T ** 2 - 0.00000227 * $T ** 3 + 0.000000011 * $T ** 4, 0, 360))->getCoordinate();
+        $omega    = (new Coordinate(124.7746 - 1.56375588 * $k + 0.0020672 * $T ** 2 + 0.00000215 * $T ** 3, 0, 360))->getCoordinate();
+
+        $corr1 = -0.40614 * sin(deg2rad($M_accent))
+                + 0.17302 * $E * sin(deg2rad($M))
+                + 0.01614 * sin(deg2rad(2 * $M_accent))
+                + 0.01043 * sin(deg2rad(2 * $F))
+                + 0.00734 * $E * sin(deg2rad($M_accent - $M))
+                - 0.00515 * $E * sin(deg2rad($M_accent + $M))
+                + 0.00209 * $E ** 2 * sin(deg2rad(2 * $M))
+                - 0.00111 * sin(deg2rad($M_accent - 2 * $F))
+                - 0.00057 * sin(deg2rad($M_accent + 2 * $F))
+                + 0.00056 * $E * sin(deg2rad(2 * $M_accent + $M))
+                - 0.00042 * sin(deg2rad(3 * $M_accent))
+                + 0.00042 * $E * sin(deg2rad($M + 2 * $F))
+                + 0.00038 * $E * sin(deg2rad($M - 2 * $F))
+                - 0.00024 * $E * sin(deg2rad(2 * $M_accent - $M))
+                - 0.00017 * sin(deg2rad($omega))
+                - 0.00007 * sin(deg2rad($M_accent + 2 * $M))
+                + 0.00004 * sin(deg2rad(2 * $M_accent - 2 * $F))
+                + 0.00004 * sin(deg2rad(3 * $M))
+                + 0.00003 * sin(deg2rad($M_accent + $M - 2 * $F))
+                + 0.00003 * sin(deg2rad(2 * $M_accent + 2 * $F))
+                - 0.00003 * sin(deg2rad($M_accent + $M + 2 * $F))
+                + 0.00003 * sin(deg2rad($M_accent - $M + 2 * $F))
+                - 0.00002 * sin(deg2rad($M_accent - $M - 2 * $F))
+                - 0.00002 * sin(deg2rad(3 * $M_accent + $M))
+                + 0.00002 * sin(deg2rad(4 * $M_accent));
+
+        $A1     = deg2rad(299.77 + 0.107408 * $k - 0.009173 * $T ** 2);
+        $A2     = deg2rad(251.88 + 0.016321 * $k);
+        $A3     = deg2rad(251.83 + 26.651886 * $k);
+        $A4     = deg2rad(349.42 + 36.412478 * $k);
+        $A5     = deg2rad(84.66 + 18.206239 * $k);
+        $A6     = deg2rad(141.74 + 53.303771 * $k);
+        $A7     = deg2rad(207.14 + 2.453732 * $k);
+        $A8     = deg2rad(154.84 + 7.306860 * $k);
+        $A9     = deg2rad(34.52 + 27.261239 * $k);
+        $A10    = deg2rad(207.19 + 0.121824 * $k);
+        $A11    = deg2rad(291.34 + 1.844379 * $k);
+        $A12    = deg2rad(161.72 + 24.198154 * $k);
+        $A13    = deg2rad(239.56 + 25.513099 * $k);
+        $A14    = deg2rad(331.55 + 3.592518 * $k);
+
+        $corr2 = 0.000325 * sin($A1)
+                 + 0.000165 * sin($A2)
+                 + 0.000164 * sin($A3)
+                 + 0.000126 * sin($A4)
+                 + 0.000110 * sin($A5)
+                 + 0.000062 * sin($A6)
+                 + 0.000060 * sin($A7)
+                 + 0.000056 * sin($A8)
+                 + 0.000047 * sin($A9)
+                 + 0.000042 * sin($A10)
+                 + 0.000040 * sin($A11)
+                 + 0.000037 * sin($A12)
+                 + 0.000035 * sin($A13)
+                 + 0.000023 * sin($A14);
+
+        $JDE   = $JDE + $corr1 + $corr2;
+
+        return Time::fromJd($JDE);
+    }
+
+    /**
+     * Return the date for the first quarter moon after the given date
+     *
+     * @param Carbon $date The date after which we search the first quarter moon
+     *
+     * @return Carbon The date of the first quarter moon after the given date.
+     */
+    public function firstQuarterMoonDate(Carbon $date): Carbon
+    {
+        $k     = (($date->year + $date->dayOfYear / $date->daysInYear - 2000) * 12.3685);
+        if ($k < 0) {
+            $k = round($k + 0.25) - 0.25;
+        } else {
+            $k = round($k + 0.25) + 0.25;
+        }
+        $T     = $k / 1236.85;
+        $JDE   = 2451550.09766 + 29.530588861 * $k + 0.00015437 * $T ** 2 - 0.000000150 * $T ** 3 + 0.00000000073 * $T ** 4;
+        if ($JDE < Time::getJd($date)) {
+            $k++;
+            $T     = $k / 1236.85;
+            $JDE   = 2451550.09766 + 29.530588861 * $k + 0.00015437 * $T ** 2 - 0.000000150 * $T ** 3 + 0.00000000073 * $T ** 4;
+        }
+
+        $E        = 1 - 0.002516 * $T - 0.0000074 * $T ** 2;
+        $M        = (new Coordinate(2.5534 + 29.10535670 * $k - 0.0000014 * $T ** 2 - 0.00000011 * $T ** 3, 0, 360))->getCoordinate();
+        $M_accent = (new Coordinate(201.5643 + 385.81693528 * $k + 0.0107582 * $T ** 2 + 0.00001238 * $T ** 3 - 0.000000058 * $T ** 4, 0, 360))->getCoordinate();
+        $F        = (new Coordinate(160.7108 + 390.67050284 * $k - 0.0016118 * $T ** 2 - 0.00000227 * $T ** 3 + 0.000000011 * $T ** 4, 0, 360))->getCoordinate();
+        $omega    = (new Coordinate(124.7746 - 1.56375588 * $k + 0.0020672 * $T ** 2 + 0.00000215 * $T ** 3, 0, 360))->getCoordinate();
+
+        $corr1 = -0.62801 * sin(deg2rad($M_accent))
+                + 0.17172 * $E * sin(deg2rad($M))
+                - 0.01183 * $E * sin(deg2rad($M_accent + $M))
+                + 0.00862 * sin(deg2rad(2 * $M_accent))
+                + 0.00804 * sin(deg2rad(2 * $F))
+                + 0.00454 * $E * sin(deg2rad($M_accent - $M))
+                + 0.00204 * $E ** 2 * sin(deg2rad(2 * $M))
+                - 0.00180 * sin(deg2rad($M_accent - 2 * $F))
+                - 0.00070 * sin(deg2rad($M_accent + 2 * $F))
+                - 0.00040 * $E * sin(deg2rad(3 * $M_accent))
+                - 0.00034 * $E * sin(deg2rad(2 * $M_accent - $M))
+                + 0.00032 * $E * sin(deg2rad($M + 2 * $F))
+                + 0.00032 * $E * sin(deg2rad($M - 2 * $F))
+                - 0.00028 * $E * sin(deg2rad($M_accent + 2 * $M))
+                + 0.00027 * $E * sin(deg2rad(2 * $M_accent + $M))
+                - 0.00017 * sin(deg2rad($omega))
+                - 0.00005 * sin(deg2rad($M_accent - $M - 2 * $F))
+                + 0.00004 * sin(deg2rad(2 * $M_accent + 2 * $F))
+                - 0.00004 * sin(deg2rad($M_accent + $M + 2 * $F))
+                + 0.00004 * sin(deg2rad($M_accent - 2 * $M))
+                + 0.00003 * sin(deg2rad($M_accent + $M - 2 * $F))
+                + 0.00003 * sin(deg2rad(3 * $M))
+                + 0.00002 * sin(deg2rad(2 * $M_accent - 2 * $F))
+                + 0.00002 * sin(deg2rad($M_accent - $M + 2 * $F))
+                - 0.00002 * sin(deg2rad(3 * $M_accent + $M));
+
+        $W     = 0.00306 - 0.00038 * $E * cos(deg2rad($M)) + 0.00026 * cos(deg2rad($M_accent)) - 0.00002 * cos(deg2rad($M_accent - $M)) + 0.00002 * cos(deg2rad($M_accent + $M)) + 0.00002 * cos(deg2rad(2 * $F));
+
+        $A1     = deg2rad(299.77 + 0.107408 * $k - 0.009173 * $T ** 2);
+        $A2     = deg2rad(251.88 + 0.016321 * $k);
+        $A3     = deg2rad(251.83 + 26.651886 * $k);
+        $A4     = deg2rad(349.42 + 36.412478 * $k);
+        $A5     = deg2rad(84.66 + 18.206239 * $k);
+        $A6     = deg2rad(141.74 + 53.303771 * $k);
+        $A7     = deg2rad(207.14 + 2.453732 * $k);
+        $A8     = deg2rad(154.84 + 7.306860 * $k);
+        $A9     = deg2rad(34.52 + 27.261239 * $k);
+        $A10    = deg2rad(207.19 + 0.121824 * $k);
+        $A11    = deg2rad(291.34 + 1.844379 * $k);
+        $A12    = deg2rad(161.72 + 24.198154 * $k);
+        $A13    = deg2rad(239.56 + 25.513099 * $k);
+        $A14    = deg2rad(331.55 + 3.592518 * $k);
+
+        $corr2 = 0.000325 * sin($A1)
+                 + 0.000165 * sin($A2)
+                 + 0.000164 * sin($A3)
+                 + 0.000126 * sin($A4)
+                 + 0.000110 * sin($A5)
+                 + 0.000062 * sin($A6)
+                 + 0.000060 * sin($A7)
+                 + 0.000056 * sin($A8)
+                 + 0.000047 * sin($A9)
+                 + 0.000042 * sin($A10)
+                 + 0.000040 * sin($A11)
+                 + 0.000037 * sin($A12)
+                 + 0.000035 * sin($A13)
+                 + 0.000023 * sin($A14);
+
+        $JDE   = $JDE + $corr1 + $corr2 + $W;
+
+        return Time::fromJd($JDE);
+    }
+
+    /**
+     * Return the date for the last quarter moon after the given date
+     *
+     * @param Carbon $date The date after which we search the last quarter moon
+     *
+     * @return Carbon The date of the last quarter moon after the given date.
+     */
+    public function lastQuarterMoonDate(Carbon $date): Carbon
+    {
+        $k     = (($date->year + $date->dayOfYear / $date->daysInYear - 2000) * 12.3685);
+        if ($k < 0) {
+            $k = round($k - 0.25) - 0.75;
+        } else {
+            $k = round($k - 0.25) + 0.75;
+        }
+        $T     = $k / 1236.85;
+        $JDE   = 2451550.09766 + 29.530588861 * $k + 0.00015437 * $T ** 2 - 0.000000150 * $T ** 3 + 0.00000000073 * $T ** 4;
+        if ($JDE < Time::getJd($date)) {
+            $k++;
+            $T     = $k / 1236.85;
+            $JDE   = 2451550.09766 + 29.530588861 * $k + 0.00015437 * $T ** 2 - 0.000000150 * $T ** 3 + 0.00000000073 * $T ** 4;
+        }
+
+        $E        = 1 - 0.002516 * $T - 0.0000074 * $T ** 2;
+        $M        = (new Coordinate(2.5534 + 29.10535670 * $k - 0.0000014 * $T ** 2 - 0.00000011 * $T ** 3, 0, 360))->getCoordinate();
+        $M_accent = (new Coordinate(201.5643 + 385.81693528 * $k + 0.0107582 * $T ** 2 + 0.00001238 * $T ** 3 - 0.000000058 * $T ** 4, 0, 360))->getCoordinate();
+        $F        = (new Coordinate(160.7108 + 390.67050284 * $k - 0.0016118 * $T ** 2 - 0.00000227 * $T ** 3 + 0.000000011 * $T ** 4, 0, 360))->getCoordinate();
+        $omega    = (new Coordinate(124.7746 - 1.56375588 * $k + 0.0020672 * $T ** 2 + 0.00000215 * $T ** 3, 0, 360))->getCoordinate();
+
+        $corr1 = -0.62801 * sin(deg2rad($M_accent))
+                + 0.17172 * $E * sin(deg2rad($M))
+                - 0.01183 * $E * sin(deg2rad($M_accent + $M))
+                + 0.00862 * sin(deg2rad(2 * $M_accent))
+                + 0.00804 * sin(deg2rad(2 * $F))
+                + 0.00454 * $E * sin(deg2rad($M_accent - $M))
+                + 0.00204 * $E ** 2 * sin(deg2rad(2 * $M))
+                - 0.00180 * sin(deg2rad($M_accent - 2 * $F))
+                - 0.00070 * sin(deg2rad($M_accent + 2 * $F))
+                - 0.00040 * $E * sin(deg2rad(3 * $M_accent))
+                - 0.00034 * $E * sin(deg2rad(2 * $M_accent - $M))
+                + 0.00032 * $E * sin(deg2rad($M + 2 * $F))
+                + 0.00032 * $E * sin(deg2rad($M - 2 * $F))
+                - 0.00028 * $E * sin(deg2rad($M_accent + 2 * $M))
+                + 0.00027 * $E * sin(deg2rad(2 * $M_accent + $M))
+                - 0.00017 * sin(deg2rad($omega))
+                - 0.00005 * sin(deg2rad($M_accent - $M - 2 * $F))
+                + 0.00004 * sin(deg2rad(2 * $M_accent + 2 * $F))
+                - 0.00004 * sin(deg2rad($M_accent + $M + 2 * $F))
+                + 0.00004 * sin(deg2rad($M_accent - 2 * $M))
+                + 0.00003 * sin(deg2rad($M_accent + $M - 2 * $F))
+                + 0.00003 * sin(deg2rad(3 * $M))
+                + 0.00002 * sin(deg2rad(2 * $M_accent - 2 * $F))
+                + 0.00002 * sin(deg2rad($M_accent - $M + 2 * $F))
+                - 0.00002 * sin(deg2rad(3 * $M_accent + $M));
+
+        $W     = 0.00306 - 0.00038 * $E * cos(deg2rad($M)) + 0.00026 * cos(deg2rad($M_accent)) - 0.00002 * cos(deg2rad($M_accent - $M)) + 0.00002 * cos(deg2rad($M_accent + $M)) + 0.00002 * cos(deg2rad(2 * $F));
+
+        $A1     = deg2rad(299.77 + 0.107408 * $k - 0.009173 * $T ** 2);
+        $A2     = deg2rad(251.88 + 0.016321 * $k);
+        $A3     = deg2rad(251.83 + 26.651886 * $k);
+        $A4     = deg2rad(349.42 + 36.412478 * $k);
+        $A5     = deg2rad(84.66 + 18.206239 * $k);
+        $A6     = deg2rad(141.74 + 53.303771 * $k);
+        $A7     = deg2rad(207.14 + 2.453732 * $k);
+        $A8     = deg2rad(154.84 + 7.306860 * $k);
+        $A9     = deg2rad(34.52 + 27.261239 * $k);
+        $A10    = deg2rad(207.19 + 0.121824 * $k);
+        $A11    = deg2rad(291.34 + 1.844379 * $k);
+        $A12    = deg2rad(161.72 + 24.198154 * $k);
+        $A13    = deg2rad(239.56 + 25.513099 * $k);
+        $A14    = deg2rad(331.55 + 3.592518 * $k);
+
+        $corr2 = 0.000325 * sin($A1)
+                 + 0.000165 * sin($A2)
+                 + 0.000164 * sin($A3)
+                 + 0.000126 * sin($A4)
+                 + 0.000110 * sin($A5)
+                 + 0.000062 * sin($A6)
+                 + 0.000060 * sin($A7)
+                 + 0.000056 * sin($A8)
+                 + 0.000047 * sin($A9)
+                 + 0.000042 * sin($A10)
+                 + 0.000040 * sin($A11)
+                 + 0.000037 * sin($A12)
+                 + 0.000035 * sin($A13)
+                 + 0.000023 * sin($A14);
+
+        $JDE   = $JDE + $corr1 + $corr2 - $W;
+
+        return Time::fromJd($JDE);
     }
 }

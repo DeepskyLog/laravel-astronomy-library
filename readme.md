@@ -528,6 +528,12 @@ $moon->illuminatedFraction($date);
 
 // Calculate the moon phase ration (0-1) of the moon
 $moon->getPhaseRatio($date);
+
+// Calculate the next moon phases
+$moon->newMoonDate($date);
+$moon->firstQuarterMoonDate($date);
+$moon->fullMoonDate($date);
+$moon->lastQuarterMoonDate($date);
 ```
 
 ## Change log
