@@ -976,7 +976,7 @@ class TargetTest extends BaseTestCase
     }
 
     /**
-     * Test the phase ration of the moon.
+     * Test the phase ratio of the moon.
      *
      * @return void
      */
@@ -986,6 +986,62 @@ class TargetTest extends BaseTestCase
         $moon = new Moon();
         $illum = $moon->getPhaseRatio($date);
 
-        $this->assertEqualsWithDelta(0.85252071045742, $illum, 0.001);
+        $this->assertEqualsWithDelta(0.850445572, $illum, 0.001);
+
+        $date = Carbon::create(2021, 3, 22, 0, 0, 0, 'UTC');
+        $moon = new Moon();
+        $illum = $moon->getPhaseRatio($date);
+
+        $this->assertEqualsWithDelta(0.2887386, $illum, 0.001);
+
+        $date = Carbon::create(2021, 3, 23, 0, 0, 0, 'UTC');
+        $moon = new Moon();
+        $illum = $moon->getPhaseRatio($date);
+
+        $this->assertEqualsWithDelta(0.32243887, $illum, 0.001);
+
+        $date = Carbon::create(2021, 3, 27, 0, 0, 0, 'UTC');
+        $moon = new Moon();
+        $illum = $moon->getPhaseRatio($date);
+
+        $this->assertEqualsWithDelta(0.45723988, $illum, 0.001);
+    }
+
+    /**
+     * Test the date of the new moon.
+     *
+     * @return void
+     */
+    public function testNewMoonDate()
+    {
+        $date = Carbon::create(1977, 2, 1, 0, 0, 0, 'UTC');
+        $moon = new Moon();
+        $newMoon = $moon->newMoonDate($date);
+
+        $this->assertEquals(1977, $newMoon->year);
+        $this->assertEquals(2, $newMoon->month);
+        $this->assertEquals(18, $newMoon->day);
+        $this->assertEquals(3, $newMoon->hour);
+        $this->assertEquals(37, $newMoon->minute);
+        $this->assertEquals(42, $newMoon->second);
+    }
+
+    /**
+     * Test the date of the last quarter moon.
+     *
+     * @return void
+     */
+    public function testLastQuarterMoonDate()
+    {
+        $date = Carbon::create(2044, 1, 1, 0, 0, 0, 'UTC');
+        $moon = new Moon();
+        $newMoon = $moon->lastQuarterMoonDate($date);
+
+        $this->assertEquals(2044, $newMoon->year);
+        $this->assertEquals(1, $newMoon->month);
+        $this->assertEquals(21, $newMoon->day);
+        $this->assertEquals(23, $newMoon->hour);
+        $this->assertEquals(48, $newMoon->minute);
+        $this->assertEquals(17, $newMoon->second);
     }
 }

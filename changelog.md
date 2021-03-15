@@ -2,15 +2,21 @@
 
 All notable changes to `laravel-astronomy-library` will be documented in this file.
 
-## Version 5.4.3
+## Version 5.5
 
 ### Added
+
+- Methods to calculate the next new moon (newMoonDate), the next first quarter (firstQuarterMoonDate), the next last quarter (lastQuarterMoonDate) and the next full moon (fullMoonDate).
+
+## Version 5.4.3
+
+### Changed
 
 - Fix error in the illumination of the moon.
 
 ## Version 5.4.2
 
-### Added
+### Changed
 
 - Use higher precision for the moon phase ratio and illumination of the moon.
 
