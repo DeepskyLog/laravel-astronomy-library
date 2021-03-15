@@ -14,11 +14,11 @@
 namespace deepskylog\AstronomyLibrary\Targets;
 
 use Carbon\Carbon;
-use deepskylog\AstronomyLibrary\Time;
 use deepskylog\AstronomyLibrary\Coordinates\Coordinate;
 use deepskylog\AstronomyLibrary\Coordinates\EclipticalCoordinates;
 use deepskylog\AstronomyLibrary\Coordinates\EquatorialCoordinates;
 use deepskylog\AstronomyLibrary\Coordinates\GeographicalCoordinates;
+use deepskylog\AstronomyLibrary\Time;
 
 /**
  * The target class describing the moon.
@@ -324,9 +324,9 @@ class Moon extends Target
     private function _calculateApparentEquatorialCoordinates(Carbon $date): EquatorialCoordinates
     {
         $helio_coords = $this->calculateHeliocentricCoordinates($date);
-        $jd           = Time::getJd($date);
-        $pi           = rad2deg(asin(6378.14 / $helio_coords[2]));
-        $nutation     = Time::nutation($jd);
+        $jd = Time::getJd($date);
+        $pi = rad2deg(asin(6378.14 / $helio_coords[2]));
+        $nutation = Time::nutation($jd);
 
         $helio_coords[0] += $nutation[0] / 3600.0;
         $ecl = new EclipticalCoordinates($helio_coords[0], $helio_coords[1]);
@@ -337,8 +337,8 @@ class Moon extends Target
     private function _calculateEquatorialCoordinates(Carbon $date, GeographicalCoordinates $geo_coords, float $height): EquatorialCoordinates
     {
         $helio_coords = $this->calculateHeliocentricCoordinates($date);
-        $jd           = Time::getJd($date);
-        $nutation     = Time::nutation($jd);
+        $jd = Time::getJd($date);
+        $nutation = Time::nutation($jd);
 
         $helio_coords[0] += $nutation[0] / 3600.0;
         $ecl = new EclipticalCoordinates($helio_coords[0], $helio_coords[1]);
@@ -355,7 +355,7 @@ class Moon extends Target
         $earthsGlobe = $geo_coords->earthsGlobe($height);
 
         $deltara = rad2deg(atan(-$earthsGlobe[1] * sin(deg2rad($pi / 3600.0)) * sin(deg2rad($hour_angle)) / (cos(deg2rad($equa_coords->getDeclination()->getCoordinate())) - $earthsGlobe[1] * sin(deg2rad($pi / 3600.0)) * sin(deg2rad($hour_angle)))));
-        $dec     = rad2deg(atan((sin(deg2rad($equa_coords->getDeclination()->getCoordinate())) - $earthsGlobe[0] * sin(deg2rad($pi / 3600.0))) * cos(deg2rad($deltara / 3600.0))
+        $dec = rad2deg(atan((sin(deg2rad($equa_coords->getDeclination()->getCoordinate())) - $earthsGlobe[0] * sin(deg2rad($pi / 3600.0))) * cos(deg2rad($deltara / 3600.0))
                         / (cos(deg2rad($equa_coords->getDeclination()->getCoordinate())) - $earthsGlobe[1] * sin(deg2rad($pi / 3600.0)) * cos(deg2rad($height)))));
 
         $equa_coords->setRA($equa_coords->getRA()->getCoordinate() + $deltara);
@@ -376,27 +376,27 @@ class Moon extends Target
     public function illuminatedFraction(Carbon $date): float
     {
         $moonCoords = $this->_calculateApparentEquatorialCoordinates($date);
-        $delta      = $this->calculateHeliocentricCoordinates($date)[2];
+        $delta = $this->calculateHeliocentricCoordinates($date)[2];
 
-        $sun      = new Sun();
+        $sun = new Sun();
         $nutation = Time::nutation(Time::getJd($date));
         $sun->calculateEquatorialCoordinatesHighAccuracy($date, $nutation);
         $sunCoords = $sun->getEquatorialCoordinatesToday();
 
         $earth = new Earth();
-        $R     = $earth->calculateHeliocentricCoordinates($date)[2] * 149598073;
+        $R = $earth->calculateHeliocentricCoordinates($date)[2] * 149598073;
 
         $cosPsi = sin(deg2rad($sunCoords->getDeclination()->getCoordinate())) * sin(deg2rad($moonCoords->getDeclination()->getCoordinate()))
             + cos(deg2rad($sunCoords->getDeclination()->getCoordinate())) * cos(deg2rad($moonCoords->getDeclination()->getCoordinate())) * cos(deg2rad($sunCoords->getRA()->getCoordinate() * 15 - $moonCoords->getRA()->getCoordinate() * 15));
         $psi = acos($cosPsi);
-        $i   = rad2deg(atan2($R * sin($psi), ($delta - $R * $cosPsi)));
-        $i   = $i - floor($i / 360.0) * 360.0;
+        $i = rad2deg(atan2($R * sin($psi), ($delta - $R * $cosPsi)));
+        $i = $i - floor($i / 360.0) * 360.0;
 
         return round((1 + cos(deg2rad($i))) / 2, 3);
     }
 
     /**
-     * Calculates the phase ration of the moon (0 - 1), where 0=new, 0.5=full, 1=new
+     * Calculates the phase ration of the moon (0 - 1), where 0=new, 0.5=full, 1=new.
      *
      * @param Carbon $date The date for which to calculate the phase ration
      *
@@ -406,8 +406,8 @@ class Moon extends Target
      */
     public function getPhaseRatio(Carbon $date): float
     {
-        $nextNewMoon     = $this->newMoonDate($date);
-        $prevMonth       = $nextNewMoon->copy()->subDays(32);
+        $nextNewMoon = $this->newMoonDate($date);
+        $prevMonth = $nextNewMoon->copy()->subDays(32);
         $previousNewMoon = $this->newMoonDate($prevMonth);
 
         $lunation = (Time::getJd($date) - Time::getJd($previousNewMoon)) / (Time::getJd($nextNewMoon) - Time::getJd($previousNewMoon));
@@ -416,7 +416,7 @@ class Moon extends Target
     }
 
     /**
-     * Return the date for the new moon after the given date
+     * Return the date for the new moon after the given date.
      *
      * @param Carbon $date The date after which we search the new moon
      *
@@ -424,26 +424,26 @@ class Moon extends Target
      */
     public function newMoonDate(Carbon $date): Carbon
     {
-        $k     = (($date->year + $date->dayOfYear / $date->daysInYear - 2000) * 12.3685);
+        $k = (($date->year + $date->dayOfYear / $date->daysInYear - 2000) * 12.3685);
         if ($k > 0) {
             $k = floor($k);
         } else {
             $k = ceil($k);
         }
-        $T     = $k / 1236.85;
-        $JDE   = 2451550.09766 + 29.530588861 * $k + 0.00015437 * $T ** 2 - 0.000000150 * $T ** 3 + 0.00000000073 * $T ** 4;
+        $T = $k / 1236.85;
+        $JDE = 2451550.09766 + 29.530588861 * $k + 0.00015437 * $T ** 2 - 0.000000150 * $T ** 3 + 0.00000000073 * $T ** 4;
 
         if ($JDE < Time::getJd($date)) {
             $k++;
-            $T     = $k / 1236.85;
-            $JDE   = 2451550.09766 + 29.530588861 * $k + 0.00015437 * $T ** 2 - 0.000000150 * $T ** 3 + 0.00000000073 * $T ** 4;
+            $T = $k / 1236.85;
+            $JDE = 2451550.09766 + 29.530588861 * $k + 0.00015437 * $T ** 2 - 0.000000150 * $T ** 3 + 0.00000000073 * $T ** 4;
         }
 
-        $E        = 1 - 0.002516 * $T - 0.0000074 * $T ** 2;
-        $M        = (new Coordinate(2.5534 + 29.10535670 * $k - 0.0000014 * $T ** 2 - 0.00000011 * $T ** 3, 0, 360))->getCoordinate();
+        $E = 1 - 0.002516 * $T - 0.0000074 * $T ** 2;
+        $M = (new Coordinate(2.5534 + 29.10535670 * $k - 0.0000014 * $T ** 2 - 0.00000011 * $T ** 3, 0, 360))->getCoordinate();
         $M_accent = (new Coordinate(201.5643 + 385.81693528 * $k + 0.0107582 * $T ** 2 + 0.00001238 * $T ** 3 - 0.000000058 * $T ** 4, 0, 360))->getCoordinate();
-        $F        = (new Coordinate(160.7108 + 390.67050284 * $k - 0.0016118 * $T ** 2 - 0.00000227 * $T ** 3 + 0.000000011 * $T ** 4, 0, 360))->getCoordinate();
-        $omega    = (new Coordinate(124.7746 - 1.56375588 * $k + 0.0020672 * $T ** 2 + 0.00000215 * $T ** 3, 0, 360))->getCoordinate();
+        $F = (new Coordinate(160.7108 + 390.67050284 * $k - 0.0016118 * $T ** 2 - 0.00000227 * $T ** 3 + 0.000000011 * $T ** 4, 0, 360))->getCoordinate();
+        $omega = (new Coordinate(124.7746 - 1.56375588 * $k + 0.0020672 * $T ** 2 + 0.00000215 * $T ** 3, 0, 360))->getCoordinate();
 
         $corr1 = -0.40720 * sin(deg2rad($M_accent))
                 + 0.17241 * $E * sin(deg2rad($M))
@@ -471,20 +471,20 @@ class Moon extends Target
                 - 0.00002 * sin(deg2rad(3 * $M_accent + $M))
                 + 0.00002 * sin(deg2rad(4 * $M_accent));
 
-        $A1     = deg2rad(299.77 + 0.107408 * $k - 0.009173 * $T ** 2);
-        $A2     = deg2rad(251.88 + 0.016321 * $k);
-        $A3     = deg2rad(251.83 + 26.651886 * $k);
-        $A4     = deg2rad(349.42 + 36.412478 * $k);
-        $A5     = deg2rad(84.66 + 18.206239 * $k);
-        $A6     = deg2rad(141.74 + 53.303771 * $k);
-        $A7     = deg2rad(207.14 + 2.453732 * $k);
-        $A8     = deg2rad(154.84 + 7.306860 * $k);
-        $A9     = deg2rad(34.52 + 27.261239 * $k);
-        $A10    = deg2rad(207.19 + 0.121824 * $k);
-        $A11    = deg2rad(291.34 + 1.844379 * $k);
-        $A12    = deg2rad(161.72 + 24.198154 * $k);
-        $A13    = deg2rad(239.56 + 25.513099 * $k);
-        $A14    = deg2rad(331.55 + 3.592518 * $k);
+        $A1 = deg2rad(299.77 + 0.107408 * $k - 0.009173 * $T ** 2);
+        $A2 = deg2rad(251.88 + 0.016321 * $k);
+        $A3 = deg2rad(251.83 + 26.651886 * $k);
+        $A4 = deg2rad(349.42 + 36.412478 * $k);
+        $A5 = deg2rad(84.66 + 18.206239 * $k);
+        $A6 = deg2rad(141.74 + 53.303771 * $k);
+        $A7 = deg2rad(207.14 + 2.453732 * $k);
+        $A8 = deg2rad(154.84 + 7.306860 * $k);
+        $A9 = deg2rad(34.52 + 27.261239 * $k);
+        $A10 = deg2rad(207.19 + 0.121824 * $k);
+        $A11 = deg2rad(291.34 + 1.844379 * $k);
+        $A12 = deg2rad(161.72 + 24.198154 * $k);
+        $A13 = deg2rad(239.56 + 25.513099 * $k);
+        $A14 = deg2rad(331.55 + 3.592518 * $k);
 
         $corr2 = 0.000325 * sin($A1)
                  + 0.000165 * sin($A2)
@@ -501,13 +501,13 @@ class Moon extends Target
                  + 0.000035 * sin($A13)
                  + 0.000023 * sin($A14);
 
-        $JDE   = $JDE + $corr1 + $corr2;
+        $JDE = $JDE + $corr1 + $corr2;
 
         return Time::fromJd($JDE);
     }
 
     /**
-     * Return the date for the full moon after the given date
+     * Return the date for the full moon after the given date.
      *
      * @param Carbon $date The date after which we search the full moon
      *
@@ -515,25 +515,25 @@ class Moon extends Target
      */
     public function fullMoonDate(Carbon $date): Carbon
     {
-        $k     = (($date->year + $date->dayOfYear / $date->daysInYear - 2000) * 12.3685);
+        $k = (($date->year + $date->dayOfYear / $date->daysInYear - 2000) * 12.3685);
         if ($k < 0) {
             $k = round($k) - 0.5;
         } else {
             $k = round($k) + 0.5;
         }
-        $T     = $k / 1236.85;
-        $JDE   = 2451550.09766 + 29.530588861 * $k + 0.00015437 * $T ** 2 - 0.000000150 * $T ** 3 + 0.00000000073 * $T ** 4;
+        $T = $k / 1236.85;
+        $JDE = 2451550.09766 + 29.530588861 * $k + 0.00015437 * $T ** 2 - 0.000000150 * $T ** 3 + 0.00000000073 * $T ** 4;
         if ($JDE < Time::getJd($date)) {
             $k++;
-            $T     = $k / 1236.85;
-            $JDE   = 2451550.09766 + 29.530588861 * $k + 0.00015437 * $T ** 2 - 0.000000150 * $T ** 3 + 0.00000000073 * $T ** 4;
+            $T = $k / 1236.85;
+            $JDE = 2451550.09766 + 29.530588861 * $k + 0.00015437 * $T ** 2 - 0.000000150 * $T ** 3 + 0.00000000073 * $T ** 4;
         }
 
-        $E        = 1 - 0.002516 * $T - 0.0000074 * $T ** 2;
-        $M        = (new Coordinate(2.5534 + 29.10535670 * $k - 0.0000014 * $T ** 2 - 0.00000011 * $T ** 3, 0, 360))->getCoordinate();
+        $E = 1 - 0.002516 * $T - 0.0000074 * $T ** 2;
+        $M = (new Coordinate(2.5534 + 29.10535670 * $k - 0.0000014 * $T ** 2 - 0.00000011 * $T ** 3, 0, 360))->getCoordinate();
         $M_accent = (new Coordinate(201.5643 + 385.81693528 * $k + 0.0107582 * $T ** 2 + 0.00001238 * $T ** 3 - 0.000000058 * $T ** 4, 0, 360))->getCoordinate();
-        $F        = (new Coordinate(160.7108 + 390.67050284 * $k - 0.0016118 * $T ** 2 - 0.00000227 * $T ** 3 + 0.000000011 * $T ** 4, 0, 360))->getCoordinate();
-        $omega    = (new Coordinate(124.7746 - 1.56375588 * $k + 0.0020672 * $T ** 2 + 0.00000215 * $T ** 3, 0, 360))->getCoordinate();
+        $F = (new Coordinate(160.7108 + 390.67050284 * $k - 0.0016118 * $T ** 2 - 0.00000227 * $T ** 3 + 0.000000011 * $T ** 4, 0, 360))->getCoordinate();
+        $omega = (new Coordinate(124.7746 - 1.56375588 * $k + 0.0020672 * $T ** 2 + 0.00000215 * $T ** 3, 0, 360))->getCoordinate();
 
         $corr1 = -0.40614 * sin(deg2rad($M_accent))
                 + 0.17302 * $E * sin(deg2rad($M))
@@ -561,20 +561,20 @@ class Moon extends Target
                 - 0.00002 * sin(deg2rad(3 * $M_accent + $M))
                 + 0.00002 * sin(deg2rad(4 * $M_accent));
 
-        $A1     = deg2rad(299.77 + 0.107408 * $k - 0.009173 * $T ** 2);
-        $A2     = deg2rad(251.88 + 0.016321 * $k);
-        $A3     = deg2rad(251.83 + 26.651886 * $k);
-        $A4     = deg2rad(349.42 + 36.412478 * $k);
-        $A5     = deg2rad(84.66 + 18.206239 * $k);
-        $A6     = deg2rad(141.74 + 53.303771 * $k);
-        $A7     = deg2rad(207.14 + 2.453732 * $k);
-        $A8     = deg2rad(154.84 + 7.306860 * $k);
-        $A9     = deg2rad(34.52 + 27.261239 * $k);
-        $A10    = deg2rad(207.19 + 0.121824 * $k);
-        $A11    = deg2rad(291.34 + 1.844379 * $k);
-        $A12    = deg2rad(161.72 + 24.198154 * $k);
-        $A13    = deg2rad(239.56 + 25.513099 * $k);
-        $A14    = deg2rad(331.55 + 3.592518 * $k);
+        $A1 = deg2rad(299.77 + 0.107408 * $k - 0.009173 * $T ** 2);
+        $A2 = deg2rad(251.88 + 0.016321 * $k);
+        $A3 = deg2rad(251.83 + 26.651886 * $k);
+        $A4 = deg2rad(349.42 + 36.412478 * $k);
+        $A5 = deg2rad(84.66 + 18.206239 * $k);
+        $A6 = deg2rad(141.74 + 53.303771 * $k);
+        $A7 = deg2rad(207.14 + 2.453732 * $k);
+        $A8 = deg2rad(154.84 + 7.306860 * $k);
+        $A9 = deg2rad(34.52 + 27.261239 * $k);
+        $A10 = deg2rad(207.19 + 0.121824 * $k);
+        $A11 = deg2rad(291.34 + 1.844379 * $k);
+        $A12 = deg2rad(161.72 + 24.198154 * $k);
+        $A13 = deg2rad(239.56 + 25.513099 * $k);
+        $A14 = deg2rad(331.55 + 3.592518 * $k);
 
         $corr2 = 0.000325 * sin($A1)
                  + 0.000165 * sin($A2)
@@ -591,13 +591,13 @@ class Moon extends Target
                  + 0.000035 * sin($A13)
                  + 0.000023 * sin($A14);
 
-        $JDE   = $JDE + $corr1 + $corr2;
+        $JDE = $JDE + $corr1 + $corr2;
 
         return Time::fromJd($JDE);
     }
 
     /**
-     * Return the date for the first quarter moon after the given date
+     * Return the date for the first quarter moon after the given date.
      *
      * @param Carbon $date The date after which we search the first quarter moon
      *
@@ -605,25 +605,25 @@ class Moon extends Target
      */
     public function firstQuarterMoonDate(Carbon $date): Carbon
     {
-        $k     = (($date->year + $date->dayOfYear / $date->daysInYear - 2000) * 12.3685);
+        $k = (($date->year + $date->dayOfYear / $date->daysInYear - 2000) * 12.3685);
         if ($k < 0) {
             $k = round($k + 0.25) - 0.25;
         } else {
             $k = round($k + 0.25) + 0.25;
         }
-        $T     = $k / 1236.85;
-        $JDE   = 2451550.09766 + 29.530588861 * $k + 0.00015437 * $T ** 2 - 0.000000150 * $T ** 3 + 0.00000000073 * $T ** 4;
+        $T = $k / 1236.85;
+        $JDE = 2451550.09766 + 29.530588861 * $k + 0.00015437 * $T ** 2 - 0.000000150 * $T ** 3 + 0.00000000073 * $T ** 4;
         if ($JDE < Time::getJd($date)) {
             $k++;
-            $T     = $k / 1236.85;
-            $JDE   = 2451550.09766 + 29.530588861 * $k + 0.00015437 * $T ** 2 - 0.000000150 * $T ** 3 + 0.00000000073 * $T ** 4;
+            $T = $k / 1236.85;
+            $JDE = 2451550.09766 + 29.530588861 * $k + 0.00015437 * $T ** 2 - 0.000000150 * $T ** 3 + 0.00000000073 * $T ** 4;
         }
 
-        $E        = 1 - 0.002516 * $T - 0.0000074 * $T ** 2;
-        $M        = (new Coordinate(2.5534 + 29.10535670 * $k - 0.0000014 * $T ** 2 - 0.00000011 * $T ** 3, 0, 360))->getCoordinate();
+        $E = 1 - 0.002516 * $T - 0.0000074 * $T ** 2;
+        $M = (new Coordinate(2.5534 + 29.10535670 * $k - 0.0000014 * $T ** 2 - 0.00000011 * $T ** 3, 0, 360))->getCoordinate();
         $M_accent = (new Coordinate(201.5643 + 385.81693528 * $k + 0.0107582 * $T ** 2 + 0.00001238 * $T ** 3 - 0.000000058 * $T ** 4, 0, 360))->getCoordinate();
-        $F        = (new Coordinate(160.7108 + 390.67050284 * $k - 0.0016118 * $T ** 2 - 0.00000227 * $T ** 3 + 0.000000011 * $T ** 4, 0, 360))->getCoordinate();
-        $omega    = (new Coordinate(124.7746 - 1.56375588 * $k + 0.0020672 * $T ** 2 + 0.00000215 * $T ** 3, 0, 360))->getCoordinate();
+        $F = (new Coordinate(160.7108 + 390.67050284 * $k - 0.0016118 * $T ** 2 - 0.00000227 * $T ** 3 + 0.000000011 * $T ** 4, 0, 360))->getCoordinate();
+        $omega = (new Coordinate(124.7746 - 1.56375588 * $k + 0.0020672 * $T ** 2 + 0.00000215 * $T ** 3, 0, 360))->getCoordinate();
 
         $corr1 = -0.62801 * sin(deg2rad($M_accent))
                 + 0.17172 * $E * sin(deg2rad($M))
@@ -651,22 +651,22 @@ class Moon extends Target
                 + 0.00002 * sin(deg2rad($M_accent - $M + 2 * $F))
                 - 0.00002 * sin(deg2rad(3 * $M_accent + $M));
 
-        $W     = 0.00306 - 0.00038 * $E * cos(deg2rad($M)) + 0.00026 * cos(deg2rad($M_accent)) - 0.00002 * cos(deg2rad($M_accent - $M)) + 0.00002 * cos(deg2rad($M_accent + $M)) + 0.00002 * cos(deg2rad(2 * $F));
+        $W = 0.00306 - 0.00038 * $E * cos(deg2rad($M)) + 0.00026 * cos(deg2rad($M_accent)) - 0.00002 * cos(deg2rad($M_accent - $M)) + 0.00002 * cos(deg2rad($M_accent + $M)) + 0.00002 * cos(deg2rad(2 * $F));
 
-        $A1     = deg2rad(299.77 + 0.107408 * $k - 0.009173 * $T ** 2);
-        $A2     = deg2rad(251.88 + 0.016321 * $k);
-        $A3     = deg2rad(251.83 + 26.651886 * $k);
-        $A4     = deg2rad(349.42 + 36.412478 * $k);
-        $A5     = deg2rad(84.66 + 18.206239 * $k);
-        $A6     = deg2rad(141.74 + 53.303771 * $k);
-        $A7     = deg2rad(207.14 + 2.453732 * $k);
-        $A8     = deg2rad(154.84 + 7.306860 * $k);
-        $A9     = deg2rad(34.52 + 27.261239 * $k);
-        $A10    = deg2rad(207.19 + 0.121824 * $k);
-        $A11    = deg2rad(291.34 + 1.844379 * $k);
-        $A12    = deg2rad(161.72 + 24.198154 * $k);
-        $A13    = deg2rad(239.56 + 25.513099 * $k);
-        $A14    = deg2rad(331.55 + 3.592518 * $k);
+        $A1 = deg2rad(299.77 + 0.107408 * $k - 0.009173 * $T ** 2);
+        $A2 = deg2rad(251.88 + 0.016321 * $k);
+        $A3 = deg2rad(251.83 + 26.651886 * $k);
+        $A4 = deg2rad(349.42 + 36.412478 * $k);
+        $A5 = deg2rad(84.66 + 18.206239 * $k);
+        $A6 = deg2rad(141.74 + 53.303771 * $k);
+        $A7 = deg2rad(207.14 + 2.453732 * $k);
+        $A8 = deg2rad(154.84 + 7.306860 * $k);
+        $A9 = deg2rad(34.52 + 27.261239 * $k);
+        $A10 = deg2rad(207.19 + 0.121824 * $k);
+        $A11 = deg2rad(291.34 + 1.844379 * $k);
+        $A12 = deg2rad(161.72 + 24.198154 * $k);
+        $A13 = deg2rad(239.56 + 25.513099 * $k);
+        $A14 = deg2rad(331.55 + 3.592518 * $k);
 
         $corr2 = 0.000325 * sin($A1)
                  + 0.000165 * sin($A2)
@@ -683,13 +683,13 @@ class Moon extends Target
                  + 0.000035 * sin($A13)
                  + 0.000023 * sin($A14);
 
-        $JDE   = $JDE + $corr1 + $corr2 + $W;
+        $JDE = $JDE + $corr1 + $corr2 + $W;
 
         return Time::fromJd($JDE);
     }
 
     /**
-     * Return the date for the last quarter moon after the given date
+     * Return the date for the last quarter moon after the given date.
      *
      * @param Carbon $date The date after which we search the last quarter moon
      *
@@ -697,25 +697,25 @@ class Moon extends Target
      */
     public function lastQuarterMoonDate(Carbon $date): Carbon
     {
-        $k     = (($date->year + $date->dayOfYear / $date->daysInYear - 2000) * 12.3685);
+        $k = (($date->year + $date->dayOfYear / $date->daysInYear - 2000) * 12.3685);
         if ($k < 0) {
             $k = round($k - 0.25) - 0.75;
         } else {
             $k = round($k - 0.25) + 0.75;
         }
-        $T     = $k / 1236.85;
-        $JDE   = 2451550.09766 + 29.530588861 * $k + 0.00015437 * $T ** 2 - 0.000000150 * $T ** 3 + 0.00000000073 * $T ** 4;
+        $T = $k / 1236.85;
+        $JDE = 2451550.09766 + 29.530588861 * $k + 0.00015437 * $T ** 2 - 0.000000150 * $T ** 3 + 0.00000000073 * $T ** 4;
         if ($JDE < Time::getJd($date)) {
             $k++;
-            $T     = $k / 1236.85;
-            $JDE   = 2451550.09766 + 29.530588861 * $k + 0.00015437 * $T ** 2 - 0.000000150 * $T ** 3 + 0.00000000073 * $T ** 4;
+            $T = $k / 1236.85;
+            $JDE = 2451550.09766 + 29.530588861 * $k + 0.00015437 * $T ** 2 - 0.000000150 * $T ** 3 + 0.00000000073 * $T ** 4;
         }
 
-        $E        = 1 - 0.002516 * $T - 0.0000074 * $T ** 2;
-        $M        = (new Coordinate(2.5534 + 29.10535670 * $k - 0.0000014 * $T ** 2 - 0.00000011 * $T ** 3, 0, 360))->getCoordinate();
+        $E = 1 - 0.002516 * $T - 0.0000074 * $T ** 2;
+        $M = (new Coordinate(2.5534 + 29.10535670 * $k - 0.0000014 * $T ** 2 - 0.00000011 * $T ** 3, 0, 360))->getCoordinate();
         $M_accent = (new Coordinate(201.5643 + 385.81693528 * $k + 0.0107582 * $T ** 2 + 0.00001238 * $T ** 3 - 0.000000058 * $T ** 4, 0, 360))->getCoordinate();
-        $F        = (new Coordinate(160.7108 + 390.67050284 * $k - 0.0016118 * $T ** 2 - 0.00000227 * $T ** 3 + 0.000000011 * $T ** 4, 0, 360))->getCoordinate();
-        $omega    = (new Coordinate(124.7746 - 1.56375588 * $k + 0.0020672 * $T ** 2 + 0.00000215 * $T ** 3, 0, 360))->getCoordinate();
+        $F = (new Coordinate(160.7108 + 390.67050284 * $k - 0.0016118 * $T ** 2 - 0.00000227 * $T ** 3 + 0.000000011 * $T ** 4, 0, 360))->getCoordinate();
+        $omega = (new Coordinate(124.7746 - 1.56375588 * $k + 0.0020672 * $T ** 2 + 0.00000215 * $T ** 3, 0, 360))->getCoordinate();
 
         $corr1 = -0.62801 * sin(deg2rad($M_accent))
                 + 0.17172 * $E * sin(deg2rad($M))
@@ -743,22 +743,22 @@ class Moon extends Target
                 + 0.00002 * sin(deg2rad($M_accent - $M + 2 * $F))
                 - 0.00002 * sin(deg2rad(3 * $M_accent + $M));
 
-        $W     = 0.00306 - 0.00038 * $E * cos(deg2rad($M)) + 0.00026 * cos(deg2rad($M_accent)) - 0.00002 * cos(deg2rad($M_accent - $M)) + 0.00002 * cos(deg2rad($M_accent + $M)) + 0.00002 * cos(deg2rad(2 * $F));
+        $W = 0.00306 - 0.00038 * $E * cos(deg2rad($M)) + 0.00026 * cos(deg2rad($M_accent)) - 0.00002 * cos(deg2rad($M_accent - $M)) + 0.00002 * cos(deg2rad($M_accent + $M)) + 0.00002 * cos(deg2rad(2 * $F));
 
-        $A1     = deg2rad(299.77 + 0.107408 * $k - 0.009173 * $T ** 2);
-        $A2     = deg2rad(251.88 + 0.016321 * $k);
-        $A3     = deg2rad(251.83 + 26.651886 * $k);
-        $A4     = deg2rad(349.42 + 36.412478 * $k);
-        $A5     = deg2rad(84.66 + 18.206239 * $k);
-        $A6     = deg2rad(141.74 + 53.303771 * $k);
-        $A7     = deg2rad(207.14 + 2.453732 * $k);
-        $A8     = deg2rad(154.84 + 7.306860 * $k);
-        $A9     = deg2rad(34.52 + 27.261239 * $k);
-        $A10    = deg2rad(207.19 + 0.121824 * $k);
-        $A11    = deg2rad(291.34 + 1.844379 * $k);
-        $A12    = deg2rad(161.72 + 24.198154 * $k);
-        $A13    = deg2rad(239.56 + 25.513099 * $k);
-        $A14    = deg2rad(331.55 + 3.592518 * $k);
+        $A1 = deg2rad(299.77 + 0.107408 * $k - 0.009173 * $T ** 2);
+        $A2 = deg2rad(251.88 + 0.016321 * $k);
+        $A3 = deg2rad(251.83 + 26.651886 * $k);
+        $A4 = deg2rad(349.42 + 36.412478 * $k);
+        $A5 = deg2rad(84.66 + 18.206239 * $k);
+        $A6 = deg2rad(141.74 + 53.303771 * $k);
+        $A7 = deg2rad(207.14 + 2.453732 * $k);
+        $A8 = deg2rad(154.84 + 7.306860 * $k);
+        $A9 = deg2rad(34.52 + 27.261239 * $k);
+        $A10 = deg2rad(207.19 + 0.121824 * $k);
+        $A11 = deg2rad(291.34 + 1.844379 * $k);
+        $A12 = deg2rad(161.72 + 24.198154 * $k);
+        $A13 = deg2rad(239.56 + 25.513099 * $k);
+        $A14 = deg2rad(331.55 + 3.592518 * $k);
 
         $corr2 = 0.000325 * sin($A1)
                  + 0.000165 * sin($A2)
@@ -775,7 +775,7 @@ class Moon extends Target
                  + 0.000035 * sin($A13)
                  + 0.000023 * sin($A14);
 
-        $JDE   = $JDE + $corr1 + $corr2 - $W;
+        $JDE = $JDE + $corr1 + $corr2 - $W;
 
         return Time::fromJd($JDE);
     }
