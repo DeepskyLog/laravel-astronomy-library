@@ -534,6 +534,12 @@ $moon->newMoonDate($date);
 $moon->firstQuarterMoonDate($date);
 $moon->fullMoonDate($date);
 $moon->lastQuarterMoonDate($date);
+
+// Calculate the diameter of the sun, moon, planets
+$mercury = new Mercury();
+$date   = Carbon::create(1992, 12, 20, 0, 0, 0, 'UTC');
+$mercury->calculateDiameter($date);
+$diameter = $mercury->getDiameter();
 ```
 
 ## Change log

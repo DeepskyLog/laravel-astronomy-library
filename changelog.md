@@ -2,6 +2,16 @@
 
 All notable changes to `laravel-astronomy-library` will be documented in this file.
 
+## Version 5.6
+
+### Added
+
+- Methods to calculate the diameter of the Sun, Moon and planets.
+
+### Changed
+
+- Corrected calculation of coordinates of Mercury.
+
 ## Version 5.5
 
 ### Added
