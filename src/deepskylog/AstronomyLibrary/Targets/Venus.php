@@ -2034,4 +2034,31 @@ class Venus extends Planet
 
         return round(-4.0 + 5 * log10($R * $delta) + 0.01322 * $i + 0.0000004247 * $i ** 3, 1);
     }
+
+    /**
+     * Calculate the diameter of Venus.  You can get the diamter
+     * by using the getDiameter method.
+     *
+     * @param Carbon $date The date
+     *
+     * @return None
+     *
+     * Chapter 55 of Astronomical Algorithms
+     */
+    public function calculateDiameter(Carbon $date)
+    {
+        $helio_coords = $this->calculateHeliocentricCoordinates($date);
+
+        $earth = new Earth();
+        $helio_coords_earth = $earth->calculateHeliocentricCoordinates($date);
+        $x = $helio_coords[2] * cos(deg2rad($helio_coords[1])) * cos(deg2rad($helio_coords[0])) -
+                    $helio_coords_earth[2] * cos(deg2rad($helio_coords_earth[1])) * cos(deg2rad($helio_coords_earth[0]));
+        $y = $helio_coords[2] * cos(deg2rad($helio_coords[1])) * sin(deg2rad($helio_coords[0])) -
+                    $helio_coords_earth[2] * cos(deg2rad($helio_coords_earth[1])) * sin(deg2rad($helio_coords_earth[0]));
+        $z = $helio_coords[2] * sin(deg2rad($helio_coords[1])) -
+                    $helio_coords_earth[2] * sin(deg2rad($helio_coords_earth[1]));
+        $delta = sqrt($x ** 2 + $y ** 2 + $z ** 2);
+
+        $this->setDiameter(round(2 * 8.34 / $delta, 1));
+    }
 }

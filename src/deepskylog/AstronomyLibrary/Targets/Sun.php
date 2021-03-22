@@ -805,4 +805,23 @@ class Sun extends Target
 
         return [$P, $B0, $L0];
     }
+
+    /**
+     * Calculate the diameter of the Sun.  You can get the diamter
+     * by using the getDiameter method.
+     *
+     * @param Carbon $date The date
+     *
+     * @return None
+     *
+     * Chapter 55 of Astronomical Algorithms
+     */
+    public function calculateDiameter(Carbon $date)
+    {
+        $earth = new Earth();
+        $helio_coords_earth = $earth->calculateHeliocentricCoordinates($date);
+        $R = $helio_coords_earth[2];
+
+        $this->setDiameter(round(2 * 959.63 / $R, 1));
+    }
 }

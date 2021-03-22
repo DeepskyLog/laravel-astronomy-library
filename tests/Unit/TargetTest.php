@@ -25,6 +25,7 @@ use deepskylog\AstronomyLibrary\Targets\Neptune;
 use deepskylog\AstronomyLibrary\Targets\Parabolic;
 use deepskylog\AstronomyLibrary\Targets\Planet;
 use deepskylog\AstronomyLibrary\Targets\Saturn;
+use deepskylog\AstronomyLibrary\Targets\Sun;
 use deepskylog\AstronomyLibrary\Targets\Target;
 use deepskylog\AstronomyLibrary\Targets\Uranus;
 use deepskylog\AstronomyLibrary\Targets\Venus;
@@ -1043,5 +1044,76 @@ class TargetTest extends BaseTestCase
         $this->assertEquals(23, $newMoon->hour);
         $this->assertEquals(48, $newMoon->minute);
         $this->assertEquals(17, $newMoon->second);
+    }
+
+    /**
+     * Test the diameter of the solar system objects.
+     *
+     * @return void
+     */
+    public function testDiameter()
+    {
+        $date = Carbon::create(2021, 3, 22, 0, 0, 0, 'UTC');
+        // Sun
+        $sun = new Sun();
+        $sun->calculateDiameter($date);
+
+        $this->assertEqualsWithDelta(1926.3, $sun->getDiameter()[0], 0.1);
+
+        // Mercury: 5.81''
+        $date = Carbon::create(2021, 3, 22, 0, 0, 0, 'UTC');
+        $mercury = new Mercury();
+        $mercury->calculateDiameter($date);
+
+        $this->assertEqualsWithDelta(5.81, $mercury->getDiameter()[0], 0.1);
+
+        // Venus: 9.69''
+        $date = Carbon::create(2021, 3, 22, 0, 0, 0, 'UTC');
+        $venus = new Venus();
+        $venus->calculateDiameter($date);
+
+        $this->assertEqualsWithDelta(9.69, $venus->getDiameter()[0], 0.1);
+
+        // Mars: 5.60''
+        $date = Carbon::create(2021, 3, 22, 0, 0, 0, 'UTC');
+        $mars = new Mars();
+        $mars->calculateDiameter($date);
+
+        $this->assertEqualsWithDelta(5.6, $mars->getDiameter()[0], 0.1);
+
+        // Jupiter: 34.09''
+        $date = Carbon::create(2021, 3, 22, 0, 0, 0, 'UTC');
+        $jupiter = new Jupiter();
+        $jupiter->calculateDiameter($date);
+
+        $this->assertEqualsWithDelta(34.0, $jupiter->getDiameter()[0], 0.1);
+
+        // Saturn: 15.73'' - with rings: 36.65''
+        $date = Carbon::create(2021, 3, 22, 0, 0, 0, 'UTC');
+        $saturn = new Saturn();
+        $saturn->calculateDiameter($date);
+
+        $this->assertEqualsWithDelta(15.6, $saturn->getDiameter()[0], 0.1);
+
+        // Uranus: 3.43''
+        $date = Carbon::create(2021, 3, 22, 0, 0, 0, 'UTC');
+        $uranus = new Uranus();
+        $uranus->calculateDiameter($date);
+
+        $this->assertEqualsWithDelta(3.43, $uranus->getDiameter()[0], 0.1);
+
+        // Neptune: 2.21''
+        $date = Carbon::create(2021, 3, 22, 0, 0, 0, 'UTC');
+        $neptune = new Neptune();
+        $neptune->calculateDiameter($date);
+
+        $this->assertEqualsWithDelta(2.21, $neptune->getDiameter()[0], 0.1);
+
+        // Moon: 30'15.57''
+        $date = Carbon::create(2021, 3, 22, 0, 0, 0, 'UTC');
+        $moon = new Moon();
+        $moon->calculateDiameter($date);
+
+        $this->assertEqualsWithDelta(1806.5, $moon->getDiameter()[0], 0.1);
     }
 }

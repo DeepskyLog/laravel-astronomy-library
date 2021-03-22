@@ -779,4 +779,21 @@ class Moon extends Target
 
         return Time::fromJd($JDE);
     }
+
+    /**
+     * Calculate the diameter of the Moon.  You can get the diamter
+     * by using the getDiameter method.
+     *
+     * @param Carbon $date The date
+     *
+     * @return None
+     *
+     * Chapter 55 of Astronomical Algorithms
+     */
+    public function calculateDiameter(Carbon $date)
+    {
+        $distance = $this->calculateHeliocentricCoordinates($date)[2];
+
+        $this->setDiameter(round(2 * 358473400 / $distance, 1));
+    }
 }
