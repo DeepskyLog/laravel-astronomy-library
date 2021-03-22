@@ -3784,9 +3784,9 @@ class Jupiter extends Planet
     {
         $helio_coords = $this->calculateHeliocentricCoordinates($date);
 
-        $earth              = new Earth();
+        $earth = new Earth();
         $helio_coords_earth = $earth->calculateHeliocentricCoordinates($date);
-        $x                  = $helio_coords[2] * cos(deg2rad($helio_coords[1])) * cos(deg2rad($helio_coords[0])) -
+        $x = $helio_coords[2] * cos(deg2rad($helio_coords[1])) * cos(deg2rad($helio_coords[0])) -
                     $helio_coords_earth[2] * cos(deg2rad($helio_coords_earth[1])) * cos(deg2rad($helio_coords_earth[0]));
         $y = $helio_coords[2] * cos(deg2rad($helio_coords[1])) * sin(deg2rad($helio_coords[0])) -
                     $helio_coords_earth[2] * cos(deg2rad($helio_coords_earth[1])) * sin(deg2rad($helio_coords_earth[0]));
