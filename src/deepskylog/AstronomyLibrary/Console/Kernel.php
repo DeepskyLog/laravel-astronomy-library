@@ -17,7 +17,11 @@ class Kernel extends ConsoleKernel
         parent::schedule($schedule);
 
         $schedule->command(
-            'deltat:update'
+            'astronomy:updateDeltat'
         )->quarterly();
+
+        $schedule->command(
+            'astronomy:updateOrbitalElements'
+        )->weeklyOn(1, '4:30');
     }
 }

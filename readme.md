@@ -27,11 +27,21 @@ php artisan migrate
 
 The database table with the delta t values can be updated using the following command:
 
-``` bash
-php artisan deltat:update
+```bash
+php artisan astronomy:updateDeltat
 ```
 
-A job is automatically scheduled every 4 months to update the delta t value. This job can be executed using:
+A job is automatically scheduled every 4 months to update the delta t value.
+
+The database tables with the orbital elements of the comets and the asteroids can be updated using the followong command:
+
+```bash
+php artisan astronomy:updateOrbitalElements
+```
+
+A job is automatically scheduled every Monday at 04:30 to update the orbital elements of the comets and the asteroids.
+
+These jobs can be executed using:
 
 ``` bash
 php artisan schedule:run
@@ -541,6 +551,40 @@ $date   = Carbon::create(1992, 12, 20, 0, 0, 0, 'UTC');
 $mercury->calculateDiameter($date);
 $diameter = $mercury->getDiameter();
 ```
+
+## Orbital elements of comets and asteroids
+
+The orbital elements of comets and asteroids are kept in the database tables:
+
++ asteroids_orbital_elements
++ comets_orbital_elements
+
+The orbital elements for the comets can be accessed from laravel using the **CometsOrbitalElements** class.  The information available in the class is:
+
++ name
++ epoch
++ q: The perihelion distance in AU
++ e: The eccentricity of the orbit
++ i: The inclination of the orbit
++ w: The argument of perihelion
++ node: Longitude of the ascending node
++ Tp: Time of perihelion passage in YYYYMMDD.DDD
++ Ref: The orbital solution reference
+
+The orbital elements for the asteroids can be accessed from laravel using the **AsteroidsOrbitalElements** class.  The information available in the class is:
+
++ number
++ name
++ epoch
++ a: The semi-major axis in AU
++ e: The eccentricity of the orbit
++ i: The inclination of the orbit
++ w: The argument of perihelion
++ node: Longitude of the ascending node
++ M: Mean anomaly
++ H: Absolute magnitude
++ G: Magnitude slope parameter
++ Ref: The orbital solution reference
 
 ## Change log
 
