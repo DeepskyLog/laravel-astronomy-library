@@ -2,9 +2,9 @@
 
 namespace deepskylog\AstronomyLibrary\Commands;
 
-use Illuminate\Console\Command;
-use deepskylog\AstronomyLibrary\Models\CometsOrbitalElements;
 use deepskylog\AstronomyLibrary\Models\AsteroidsOrbitalElements;
+use deepskylog\AstronomyLibrary\Models\CometsOrbitalElements;
+use Illuminate\Console\Command;
 
 class UpdateOrbitalElements extends Command
 {
@@ -45,20 +45,20 @@ class UpdateOrbitalElements extends Command
         // Remove the old entries
         CometsOrbitalElements::truncate();
 
-        $cnt   = 0;
+        $cnt = 0;
         // Loop over the orbital elements line by line
         foreach (preg_split("/((\r?\n)|(\r\n?))/", $contents) as $line) {
             if ($cnt > 1) {
                 // The first 43 characters are the name
-                $name  = trim(substr($line, 0, 43));
+                $name = trim(substr($line, 0, 43));
                 // Character 44 - 51 is the epoch
                 $epoch = intval(substr($line, 44, 8)) + 2400000.5;
                 // Character 52 - 63 is q: perihelion distance in AU
-                $q     = floatval(substr($line, 52, 12));
+                $q = floatval(substr($line, 52, 12));
                 // Character 64 - 75 is e, the eccentricity of the orbit
-                $e     = floatval(substr($line, 64, 11));
+                $e = floatval(substr($line, 64, 11));
                 // Character 75 - 85 is i, the inclination of the orbit
-                $i     = floatval(substr($line, 75, 10));
+                $i = floatval(substr($line, 75, 10));
                 // w: The argument of perihelion
                 $w = floatval(substr($line, 85, 10));
                 // node: Longitude of the ascending node
@@ -95,22 +95,22 @@ class UpdateOrbitalElements extends Command
         // Remove the old entries
         AsteroidsOrbitalElements::truncate();
 
-        $cnt   = 0;
+        $cnt = 0;
         // Loop over the orbital elements line by line
         foreach (preg_split("/((\r?\n)|(\r\n?))/", $contents) as $line) {
             if ($cnt > 1) {
                 // Character 0 - 6 is the number
                 $number = intval(substr($line, 0, 6));
                 // Characters 7 - 25 is the name
-                $name  = trim(substr($line, 7, 18));
+                $name = trim(substr($line, 7, 18));
                 // Character 25 - 31 is the epoch
                 $epoch = intval(substr($line, 25, 6)) + 2400000.5;
                 // Character 31 - 42 is a: semi-major axis in AU
-                $a     = floatval(substr($line, 31, 11));
+                $a = floatval(substr($line, 31, 11));
                 // Character 42 - 53 is e, the eccentricity of the orbit
-                $e     = floatval(substr($line, 42, 11));
+                $e = floatval(substr($line, 42, 11));
                 // Character 53 - 63 is i, the inclination of the orbit
-                $i     = floatval(substr($line, 53, 10));
+                $i = floatval(substr($line, 53, 10));
                 // w: The argument of perihelion
                 $w = floatval(substr($line, 63, 10));
                 // node: Longitude of the ascending node

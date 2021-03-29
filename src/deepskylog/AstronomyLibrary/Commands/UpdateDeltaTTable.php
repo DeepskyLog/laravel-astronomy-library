@@ -2,10 +2,10 @@
 
 namespace deepskylog\AstronomyLibrary\Commands;
 
+use deepskylog\AstronomyLibrary\Imports\DeltaTImport;
+use deepskylog\AstronomyLibrary\Models\DeltaT;
 use Illuminate\Console\Command;
 use Maatwebsite\Excel\Facades\Excel;
-use deepskylog\AstronomyLibrary\Models\DeltaT;
-use deepskylog\AstronomyLibrary\Imports\DeltaTImport;
 
 class UpdateDeltaTTable extends Command
 {
