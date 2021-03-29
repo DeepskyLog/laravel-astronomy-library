@@ -2,6 +2,26 @@
 
 All notable changes to `laravel-astronomy-library` will be documented in this file.
 
+## Version 6.0
+
+### Added
+
+- Methods and classes to download the orbital elements of comets and asteroids.
+
+### Changed
+
+- Renamed the console command
+
+```bash
+php artisan deltat:update
+```
+
+to
+
+```bash
+php artisan astronomy:updateDeltat
+```
+
 ## Version 5.6
 
 ### Added

@@ -14,7 +14,7 @@ class UpdateDeltaTTable extends Command
      *
      * @var string
      */
-    protected $signature = 'deltat:update';
+    protected $signature = 'astronomy:updateDeltat';
 
     /**
      * The console command description.

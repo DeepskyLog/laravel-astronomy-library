@@ -3,6 +3,7 @@
 namespace deepskylog\AstronomyLibrary;
 
 use deepskylog\AstronomyLibrary\Commands\UpdateDeltaTTable;
+use deepskylog\AstronomyLibrary\Commands\UpdateOrbitalElements;
 use Illuminate\Support\ServiceProvider;
 
 class AstronomyLibraryServiceProvider extends ServiceProvider
@@ -30,6 +31,24 @@ class AstronomyLibraryServiceProvider extends ServiceProvider
             [
                 __DIR__.'/../../../data/deltat.csv' => database_path(
                     'deltat.csv'
+                ),
+            ],
+            'migrations'
+        );
+        $this->publishes(
+            [
+                __DIR__.'/../../database/migrations/create_comets_orbital_elements_table.php.stub' => database_path(
+                    'migrations/'.date('Y_m_d_His', time())
+                    .'_create_comets_orbital_elements_table.php'
+                ),
+            ],
+            'migrations'
+        );
+        $this->publishes(
+            [
+                __DIR__.'/../../database/migrations/create_asteroids_orbital_elements_table.php.stub' => database_path(
+                    'migrations/'.date('Y_m_d_His', time())
+                    .'_create_asteroids_orbital_elements_table.php'
                 ),
             ],
             'migrations'
@@ -118,5 +137,6 @@ class AstronomyLibraryServiceProvider extends ServiceProvider
 
         // Registering package commands.
         $this->commands([UpdateDeltaTTable::class]);
+        $this->commands([UpdateOrbitalElements::class]);
     }
 }
