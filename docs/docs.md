@@ -53,6 +53,6 @@ The formulae to convert between NELM and SQM are taken from the Telescope Limiti
 | 0.50 | < 1.0 | The detection of the object is easy |
 | 1.00 |  | The detection of the object is very easy |
 
-# Orbital elements
+## Orbital elements
 
 The orbital elements of the comets and the asteroids are downloaded from the [JPL site](https://ssd.jpl.nasa.gov/?sb_elem).
