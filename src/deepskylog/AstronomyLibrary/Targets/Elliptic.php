@@ -14,8 +14,9 @@
 namespace deepskylog\AstronomyLibrary\Targets;
 
 use Carbon\Carbon;
-use deepskylog\AstronomyLibrary\Coordinates\EquatorialCoordinates;
 use deepskylog\AstronomyLibrary\Time;
+use deepskylog\AstronomyLibrary\Coordinates\EquatorialCoordinates;
+use deepskylog\AstronomyLibrary\Coordinates\GeographicalCoordinates;
 
 /**
  * The target class describing an object moving in an elliptic orbit.
@@ -57,44 +58,50 @@ class Elliptic extends Target
      */
     public function setOrbitalElements(float $a, float $e, float $i, float $omega, float $longitude_ascending_node, Carbon $perihelion_date): void
     {
-        $this->_a = $a;
-        $this->_e = $e;
-        $this->_i = $i;
-        $this->_omega = $omega;
+        $this->_a                        = $a;
+        $this->_e                        = $e;
+        $this->_i                        = $i;
+        $this->_omega                    = $omega;
         $this->_longitude_ascending_node = $longitude_ascending_node;
-        $this->_n = 0.9856076686 / ($a * sqrt($a));
-        $this->_perihelion_date = $perihelion_date;
+        $this->_n                        = 0.9856076686 / ($a * sqrt($a));
+        $this->_perihelion_date          = $perihelion_date;
     }
 
     /**
      * Calculates the equatorial coordinates of the planet.
      *
      * @param Carbon $date      The date for which to calculate the coordinates
+     * @param float  $epoch        The ep
      *
      * See chapter 33 of Astronomical Algorithms
      */
-    public function calculateEquatorialCoordinates(Carbon $date): void
+    public function calculateEquatorialCoordinates(Carbon $date, $epoch = 2451545.0, GeographicalCoordinates $geo_coords, float $height = 0.0): void
     {
         $this->setEquatorialCoordinatesToday(
-            $this->_calculateEquatorialCoordinates($date)
+            $this->_calculateEquatorialCoordinates($date, $epoch, $geo_coords, $height)
         );
         $this->setEquatorialCoordinatesTomorrow(
-            $this->_calculateEquatorialCoordinates($date->addDay())
+            $this->_calculateEquatorialCoordinates($date->addDay(), $epoch, $geo_coords, $height)
         );
         $this->setEquatorialCoordinatesYesterday(
-            $this->_calculateEquatorialCoordinates($date->subDays(2))
+            $this->_calculateEquatorialCoordinates($date->subDays(2), $epoch, $geo_coords, $height)
         );
     }
 
-    public function _calculateEquatorialCoordinates(Carbon $date): EquatorialCoordinates
+    public function _calculateEquatorialCoordinates(Carbon $date, float $epoch, GeographicalCoordinates $geo_coords, float $height): EquatorialCoordinates
     {
+        $nutation = Time::nutation($epoch);
+
+        $sine  = sin(deg2rad($nutation[2]));
+        $cose  = cos(deg2rad($nutation[2]));
+
         $F = cos(deg2rad($this->_longitude_ascending_node));
-        $G = sin(deg2rad($this->_longitude_ascending_node)) * 0.917482062;
-        $H = sin(deg2rad($this->_longitude_ascending_node)) * 0.397777156;
+        $G = sin(deg2rad($this->_longitude_ascending_node)) * $cose;
+        $H = sin(deg2rad($this->_longitude_ascending_node)) * $sine;
 
         $P = -sin(deg2rad($this->_longitude_ascending_node)) * cos(deg2rad($this->_i));
-        $Q = cos(deg2rad($this->_longitude_ascending_node)) * cos(deg2rad($this->_i)) * 0.917482062 - sin(deg2rad($this->_i)) * 0.397777156;
-        $R = cos(deg2rad($this->_longitude_ascending_node)) * cos(deg2rad($this->_i)) * 0.397777156 + sin(deg2rad($this->_i)) * 0.917482062;
+        $Q = cos(deg2rad($this->_longitude_ascending_node)) * cos(deg2rad($this->_i)) * $cose - sin(deg2rad($this->_i)) * $sine;
+        $R = cos(deg2rad($this->_longitude_ascending_node)) * cos(deg2rad($this->_i)) * $sine + sin(deg2rad($this->_i)) * $cose;
 
         $A = rad2deg(atan2($F, $P));
         $B = rad2deg(atan2($G, $Q));
@@ -105,7 +112,7 @@ class Elliptic extends Target
         $c = sqrt($H ** 2 + $R ** 2);
 
         $diff_in_date = $this->_perihelion_date->diffInSeconds($date) / 3600.0 / 24.0;
-        $M = -$diff_in_date * 0.300171252;
+        $M            = -$diff_in_date * 0.300171252;
 
         $E = $this->eccentricAnomaly($this->_e, $M, 0.000001);
 
@@ -118,19 +125,19 @@ class Elliptic extends Target
         $sun = new Sun();
         $XYZ = $sun->calculateGeometricCoordinates($date);
 
-        $ksi = $XYZ->getX()->getCoordinate() + $x;
-        $eta = $XYZ->getY()->getCoordinate() + $y;
+        $ksi  = $XYZ->getX()->getCoordinate() + $x;
+        $eta  = $XYZ->getY()->getCoordinate() + $y;
         $zeta = $XYZ->getZ()->getCoordinate() + $z;
 
         $delta = sqrt($ksi ** 2 + $eta ** 2 + $zeta ** 2);
-        $tau = 0.0057755183 * $delta;
+        $tau   = 0.0057755183 * $delta;
 
         // Do the calculations again for t - $tau
-        $jd = Time::getJd($date);
+        $jd      = Time::getJd($date);
         $newDate = Time::fromJd($jd - $tau);
 
         $diff_in_date = $this->_perihelion_date->diffInSeconds($newDate) / 3600.0 / 24.0;
-        $M = -$diff_in_date * 0.300171252;
+        $M            = -$diff_in_date * 0.300171252;
 
         $E = $this->eccentricAnomaly($this->_e, $M, 0.000001);
 
@@ -143,17 +150,35 @@ class Elliptic extends Target
         $sun = new Sun();
         $XYZ = $sun->calculateGeometricCoordinates($date);
 
-        $ksi = $XYZ->getX()->getCoordinate() + $x;
-        $eta = $XYZ->getY()->getCoordinate() + $y;
+        $ksi  = $XYZ->getX()->getCoordinate() + $x;
+        $eta  = $XYZ->getY()->getCoordinate() + $y;
         $zeta = $XYZ->getZ()->getCoordinate() + $z;
 
         $delta = sqrt($ksi ** 2 + $eta ** 2 + $zeta ** 2);
-        $tau = 0.0057755183 * $delta;
+        $tau   = 0.0057755183 * $delta;
 
-        $ra = rad2deg(atan2($eta, $ksi)) / 15.0;
+        $ra  = rad2deg(atan2($eta, $ksi)) / 15.0;
         $dec = rad2deg(asin($zeta / $delta));
 
-        return new EquatorialCoordinates($ra, $dec);
+        $equa_coords = new EquatorialCoordinates($ra, $dec);
+
+        // Calculate corrections for parallax
+        $pi = 8.794 / $delta;
+
+        $siderial_time = Time::apparentSiderialTime($date, new GeographicalCoordinates(0.0, 0.0));
+
+        $hour_angle = (new \deepskylog\AstronomyLibrary\Coordinates\Coordinate($equa_coords->getHourAngle($siderial_time) + $geo_coords->getLongitude()->getCoordinate() * 15.0, 0, 360))->getCoordinate();
+
+        $earthsGlobe = $geo_coords->earthsGlobe($height);
+
+        $deltara = rad2deg(atan(-$earthsGlobe[1] * sin(deg2rad($pi / 3600.0)) * sin(deg2rad($hour_angle)) / (cos(deg2rad($equa_coords->getDeclination()->getCoordinate())) - $earthsGlobe[1] * sin(deg2rad($pi / 3600.0)) * sin(deg2rad($hour_angle)))));
+        $dec     = rad2deg(atan((sin(deg2rad($equa_coords->getDeclination()->getCoordinate())) - $earthsGlobe[0] * sin(deg2rad($pi / 3600.0))) * cos(deg2rad($deltara / 3600.0))
+                                / (cos(deg2rad($equa_coords->getDeclination()->getCoordinate())) - $earthsGlobe[1] * sin(deg2rad($pi / 3600.0)) * cos(deg2rad($height)))));
+
+        $equa_coords->setRA($ra + $deltara);
+        $equa_coords->setDeclination($dec);
+
+        return $equa_coords;
     }
 
     /**
