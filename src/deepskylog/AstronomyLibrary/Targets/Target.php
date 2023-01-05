@@ -3,7 +3,7 @@
 /**
  * The target class describing an astronomical object.
  *
- * PHP Version 7
+ * PHP Version 8
  *
  * @category Target
  *
@@ -25,7 +25,7 @@ use deepskylog\AstronomyLibrary\Coordinates\GeographicalCoordinates;
 /**
  * The target class describing an astronomical object.
  *
- * PHP Version 7
+ * PHP Version 8
  *
  * @category Target
  *
@@ -42,6 +42,9 @@ class Target
     private EquatorialCoordinates $_equa2;
     // The equatorial coordinates of tomorrow
     private EquatorialCoordinates $_equa3;
+
+    // The height
+    private float $_h0 = 0.0;
 
     // The transit time of this target
     private ?Carbon $_transit = null;
@@ -898,7 +901,7 @@ class Target
      * @param float $longitude     The longitude of the location
      * @param float $alphaInterpol Description
      *
-     * @return type
+     * @return float
      */
     private function _getLocalHourAngle(
         float $theta,
