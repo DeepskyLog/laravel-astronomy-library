@@ -3,7 +3,7 @@
 /**
  * Procedures to work with magnitudes.
  *
- * PHP Version 7
+ * PHP Version 8
  *
  * @category Magnitude
  * @author   Deepsky Developers <developers@deepskylog.be>
@@ -18,7 +18,7 @@ use InvalidArgumentException;
 /**
  * Procedures to work with magnitudes.
  *
- * PHP Version 7
+ * PHP Version 8
  *
  * @category Magnitude
  * @author   Deepsky Developers <developers@deepskylog.be>

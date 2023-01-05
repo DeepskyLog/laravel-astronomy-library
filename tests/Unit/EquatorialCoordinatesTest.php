@@ -2,7 +2,7 @@
 /**
  * Tests for the EquatorialCoordinates class.
  *
- * PHP Version 7
+ * PHP Version 8
  *
  * @category Tests
  *
@@ -25,7 +25,7 @@ use deepskylog\AstronomyLibrary\Time;
 /**
  * Tests for the EquatorialCoordinates class.
  *
- * PHP Version 7
+ * PHP Version 8
  *
  * @category Tests
  *

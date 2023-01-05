@@ -3,7 +3,7 @@
 /**
  * EclipticalCoordinates class.
  *
- * PHP Version 7
+ * PHP Version 8
  *
  * @category Coordinates
  * @author   Deepsky Developers <developers@deepskylog.be>
@@ -19,7 +19,7 @@ use deepskylog\AstronomyLibrary\Time;
 /**
  * EclipticalCoordinates class.
  *
- * PHP Version 7
+ * PHP Version 8
  *
  * @category Coordinates
  * @author   Deepsky Developers <developers@deepskylog.be>

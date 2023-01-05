@@ -2,7 +2,7 @@
 /**
  * Tests for the EclipticalCoordinates class.
  *
- * PHP Version 7
+ * PHP Version 8
  *
  * @category Tests
  * @author   Deepsky Developers <developers@deepskylog.be>
@@ -19,7 +19,7 @@ use deepskylog\AstronomyLibrary\Testing\BaseTestCase;
 /**
  * Tests for the EclipticalCoordinates class.
  *
- * PHP Version 7
+ * PHP Version 8
  *
  * @category Tests
  * @author   Deepsky Developers <developers@deepskylog.be>

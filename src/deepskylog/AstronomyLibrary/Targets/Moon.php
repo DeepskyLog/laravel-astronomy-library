@@ -3,7 +3,7 @@
 /**
  * The target class describing the moon.
  *
- * PHP Version 7
+ * PHP Version 8
  *
  * @category Target
  * @author   Deepsky Developers <developers@deepskylog.be>
@@ -23,7 +23,7 @@ use deepskylog\AstronomyLibrary\Time;
 /**
  * The target class describing the moon.
  *
- * PHP Version 7
+ * PHP Version 8
  *
  * @category Target
  * @author   Deepsky Developers <developers@deepskylog.be>

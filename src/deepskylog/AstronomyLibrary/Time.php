@@ -3,7 +3,7 @@
 /**
  * Procedures to work with times.
  *
- * PHP Version 7
+ * PHP Version 8
  *
  * @category Time
  * @author   Deepsky Developers <developers@deepskylog.be>
@@ -21,7 +21,7 @@ use Exception;
 /**
  * Procedures to work with times.
  *
- * PHP Version 7
+ * PHP Version 8
  *
  * @category Time
  * @author   Deepsky Developers <developers@deepskylog.be>

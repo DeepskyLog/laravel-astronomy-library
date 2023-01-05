@@ -3,7 +3,7 @@
 /**
  * The target class describing an object moving in a parabolic orbit.
  *
- * PHP Version 7
+ * PHP Version 8
  *
  * @category Target
  * @author   Deepsky Developers <developers@deepskylog.be>
@@ -21,7 +21,7 @@ use deepskylog\AstronomyLibrary\Time;
 /**
  * The target class describing an object moving in a parabolic orbit.
  *
- * PHP Version 7
+ * PHP Version 8
  *
  * @category Target
  * @author   Deepsky Developers <developers@deepskylog.be>

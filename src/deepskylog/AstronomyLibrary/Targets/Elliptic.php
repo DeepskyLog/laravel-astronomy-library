@@ -3,7 +3,7 @@
 /**
  * The target class describing an object moving in an elliptic orbit.
  *
- * PHP Version 7
+ * PHP Version 8
  *
  * @category Target
  * @author   Deepsky Developers <developers@deepskylog.be>
@@ -21,7 +21,7 @@ use deepskylog\AstronomyLibrary\Coordinates\GeographicalCoordinates;
 /**
  * The target class describing an object moving in an elliptic orbit.
  *
- * PHP Version 7
+ * PHP Version 8
  *
  * @category Target
  * @author   Deepsky Developers <developers@deepskylog.be>

@@ -3,7 +3,7 @@
 /**
  * The target class describing the sun.
  *
- * PHP Version 7
+ * PHP Version 8
  *
  * @category Target
  *
@@ -26,7 +26,7 @@ use deepskylog\AstronomyLibrary\Time;
 /**
  * The target class describing the sun.
  *
- * PHP Version 7
+ * PHP Version 8
  *
  * @category Target
  *

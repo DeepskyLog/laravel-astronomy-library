@@ -3,7 +3,7 @@
 /**
  * GeographicalCoordinates class.
  *
- * PHP Version 7
+ * PHP Version 8
  *
  * @category Coordinates
  * @author   Deepsky Developers <developers@deepskylog.be>
@@ -16,7 +16,7 @@ namespace deepskylog\AstronomyLibrary\Coordinates;
 /**
  * GeographicalCoordinates class.
  *
- * PHP Version 7
+ * PHP Version 8
  *
  * @category Coordinates
  * @author   Deepsky Developers <developers@deepskylog.be>
