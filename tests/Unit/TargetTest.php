@@ -628,12 +628,12 @@ class TargetTest extends BaseTestCase
         $peridate = Carbon::create(1990, 10, 28, 13, 4, 50, 'UTC');
         $encke->setOrbitalElements(2.2091404, 0.8502196, 11.94524, 186.23352, 334.75006, $peridate);
 
-        $nutation = Time::nutation(Time::getJd($date));
-        $encke->calculateEquatorialCoordinates($date, $nutation[3]);
+        $geo_coords = new GeographicalCoordinates(0, 0);
+        $encke->calculateEquatorialCoordinates($date, $geo_coords);
         $coordinates = $encke->getEquatorialCoordinates();
 
-        $this->assertEqualsWithDelta(10.56228318, $coordinates->getRA()->getCoordinate(), 0.00001);
-        $this->assertEqualsWithDelta(19.18870874, $coordinates->getDeclination()->getCoordinate(), 0.00001);
+        $this->assertEqualsWithDelta(10.5641227, $coordinates->getRA()->getCoordinate(), 0.00001);
+        $this->assertEqualsWithDelta(19.1896812, $coordinates->getDeclination()->getCoordinate(), 0.00001);
     }
 
     /**
@@ -646,12 +646,12 @@ class TargetTest extends BaseTestCase
         $peridate = Carbon::create(1998, 4, 14, 10, 27, 33, 'UTC');
         $stonehouse->setOrbitalElements(1.487469, 104.69219, 1.32431, 222.10887, $peridate);
 
-        $nutation = Time::nutation(Time::getJd($date));
-        $stonehouse->calculateEquatorialCoordinates($date, $nutation[3]);
+        $geo_coords = new GeographicalCoordinates(0, 0);
+        $stonehouse->calculateEquatorialCoordinates($date, $geo_coords);
         $coordinates = $stonehouse->getEquatorialCoordinates();
 
-        $this->assertEqualsWithDelta(12.523385, $coordinates->getRA()->getCoordinate(), 0.00001);
-        $this->assertEqualsWithDelta(50.7636309, $coordinates->getDeclination()->getCoordinate(), 0.00001);
+        $this->assertEqualsWithDelta(12.5221625, $coordinates->getRA()->getCoordinate(), 0.00001);
+        $this->assertEqualsWithDelta(50.7643669, $coordinates->getDeclination()->getCoordinate(), 0.00001);
     }
 
     /**

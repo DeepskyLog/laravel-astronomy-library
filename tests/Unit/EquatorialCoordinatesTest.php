@@ -61,39 +61,39 @@ class EquatorialCoordinatesTest extends BaseTestCase
     public function testGetSetCoordinates()
     {
         $coords = new EquatorialCoordinates(15.748, -5.42);
-        $this->assertEquals(15.748, $coords->getRA()->getCoordinate());
-        $this->assertEquals(-5.42, $coords->getDeclination()->getCoordinate());
+        $this->assertEqualsWithDelta(15.748, $coords->getRA()->getCoordinate(), 0.00001);
+        $this->assertEqualsWithDelta(-5.42, $coords->getDeclination()->getCoordinate(), 0.00001);
 
         $coords->setDeclination(15.2);
-        $this->assertEquals(15.2, $coords->getDeclination()->getCoordinate());
+        $this->assertEqualsWithDelta(15.2, $coords->getDeclination()->getCoordinate(), 0.00001);
 
         $coords->setRA(4.2);
-        $this->assertEquals(4.2, $coords->getRA()->getCoordinate());
+        $this->assertEqualsWithDelta(4.2, $coords->getRA()->getCoordinate(), 0.00001);
 
         $coords = new EquatorialCoordinates(25.748, 5.42);
-        $this->assertEquals(1.748, $coords->getRA()->getCoordinate());
+        $this->assertEqualsWithDelta(1.748, $coords->getRA()->getCoordinate(), 0.00001);
 
         $coords = new EquatorialCoordinates(-1.748, -5.42);
-        $this->assertEquals(24 - 1.748, $coords->getRA()->getCoordinate());
+        $this->assertEqualsWithDelta(24 - 1.748, $coords->getRA()->getCoordinate(), 0.00001);
 
         $coords = new EquatorialCoordinates(15.748, 95.42);
-        $this->assertEquals(-84.58, $coords->getDeclination()->getCoordinate());
+        $this->assertEqualsWithDelta(-84.58, $coords->getDeclination()->getCoordinate(), 0.00001);
 
         $coords = new EquatorialCoordinates(15.748, -95.42);
-        $this->assertEquals(84.58, $coords->getDeclination()->getCoordinate());
+        $this->assertEqualsWithDelta(84.58, $coords->getDeclination()->getCoordinate(), 0.00001);
 
         $coords = new EquatorialCoordinates(5.748, 5.42);
         $coords->setDeclination(-91.2);
-        $this->assertEquals(88.8, $coords->getDeclination()->getCoordinate());
+        $this->assertEqualsWithDelta(88.8, $coords->getDeclination()->getCoordinate(), 0.00001);
 
         $coords->setDeclination(92.5);
-        $this->assertEquals(-87.5, $coords->getDeclination()->getCoordinate());
+        $this->assertEqualsWithDelta(-87.5, $coords->getDeclination()->getCoordinate(), 0.00001);
 
         $coords->setRA(-1.2);
-        $this->assertEquals(22.8, $coords->getRA()->getCoordinate());
+        $this->assertEqualsWithDelta(22.8, $coords->getRA()->getCoordinate(), 0.00001);
 
         $coords->setRA(24.2);
-        $this->assertEquals(0.2, $coords->getRA()->getCoordinate());
+        $this->assertEqualsWithDelta(0.2, $coords->getRA()->getCoordinate(), 0.00001);
     }
 
     /**

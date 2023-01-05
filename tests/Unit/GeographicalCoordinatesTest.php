@@ -52,39 +52,39 @@ class GeographicalCoordinatesTest extends BaseTestCase
     public function testGetSetCoordinates()
     {
         $coords = new GeographicalCoordinates(15.748, -5.42);
-        $this->assertEquals(15.748, $coords->getLongitude()->getCoordinate());
-        $this->assertEquals(-5.42, $coords->getLatitude()->getCoordinate());
+        $this->assertEqualsWithDelta(15.748, $coords->getLongitude()->getCoordinate(), 0.00001);
+        $this->assertEqualsWithDelta(-5.42, $coords->getLatitude()->getCoordinate(), 0.00001);
 
         $coords->setLatitude(15.2);
-        $this->assertEquals(15.2, $coords->getLatitude()->getCoordinate());
+        $this->assertEqualsWithDelta(15.2, $coords->getLatitude()->getCoordinate(), 0.00001);
 
         $coords->setLongitude(4.2);
-        $this->assertEquals(4.2, $coords->getLongitude()->getCoordinate());
+        $this->assertEqualsWithDelta(4.2, $coords->getLongitude()->getCoordinate(), 0.00001);
 
         $coords = new GeographicalCoordinates(95.748, 95.42);
-        $this->assertEquals(-84.58, $coords->getLatitude()->getCoordinate());
+        $this->assertEqualsWithDelta(-84.58, $coords->getLatitude()->getCoordinate(), 0.00001);
 
         $coords = new GeographicalCoordinates(95.748, -95.42);
-        $this->assertEquals(84.58, $coords->getLatitude()->getCoordinate());
+        $this->assertEqualsWithDelta(84.58, $coords->getLatitude()->getCoordinate(), 0.00001);
 
         $coords = new GeographicalCoordinates(195.748, -5.42);
-        $this->assertEquals(-164.252, $coords->getLongitude()->getCoordinate());
+        $this->assertEqualsWithDelta(-164.252, $coords->getLongitude()->getCoordinate(), 0.00001);
 
         $coords = new GeographicalCoordinates(-195.748, -5.42);
-        $this->assertEquals(164.252, $coords->getLongitude()->getCoordinate());
+        $this->assertEqualsWithDelta(164.252, $coords->getLongitude()->getCoordinate(), 0.00001);
 
         $coords = new GeographicalCoordinates(95.748, 5.42);
         $coords->setLatitude(-91.2);
-        $this->assertEquals(88.8, $coords->getLatitude()->getCoordinate());
+        $this->assertEqualsWithDelta(88.8, $coords->getLatitude()->getCoordinate(), 0.00001);
 
         $coords->setLatitude(92.5);
-        $this->assertEquals(-87.5, $coords->getLatitude()->getCoordinate());
+        $this->assertEqualsWithDelta(-87.5, $coords->getLatitude()->getCoordinate(), 0.00001);
 
         $coords->setLongitude(-181.2);
-        $this->assertEquals(178.8, $coords->getLongitude()->getCoordinate());
+        $this->assertEqualsWithDelta(178.8, $coords->getLongitude()->getCoordinate(), 0.00001);
 
         $coords->setLongitude(181.2);
-        $this->assertEquals(-178.8, $coords->getLongitude()->getCoordinate());
+        $this->assertEqualsWithDelta(-178.8, $coords->getLongitude()->getCoordinate(), 0.00001);
     }
 
     /**
