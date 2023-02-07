@@ -3,7 +3,7 @@
 /**
  * The target class describing a planet.
  *
- * PHP Version 7
+ * PHP Version 8
  *
  * @category Target
  * @author   Deepsky Developers <developers@deepskylog.be>
@@ -22,14 +22,14 @@ use deepskylog\AstronomyLibrary\Time;
 /**
  * The target class describing a planet.
  *
- * PHP Version 7
+ * PHP Version 8
  *
  * @category Target
  * @author   Deepsky Developers <developers@deepskylog.be>
  * @license  GPL3 <https://opensource.org/licenses/GPL-3.0>
  * @link     http://www.deepskylog.org
  */
-class Planet extends Target
+abstract class Planet extends Target
 {
     /**
      * The constructor.
@@ -46,17 +46,21 @@ class Planet extends Target
      *
      * See chapter 33 of Astronomical Algorithms
      */
-    public function calculateApparentEquatorialCoordinates(Carbon $date): void
+    public function calculateApparentEquatorialCoordinates(Carbon $date, bool $VSOP87 = false): void
     {
-        $this->setEquatorialCoordinatesToday(
-            $this->_calculateApparentEquatorialCoordinates($date)
-        );
-        $this->setEquatorialCoordinatesTomorrow(
-            $this->_calculateApparentEquatorialCoordinates($date->addDay())
-        );
-        $this->setEquatorialCoordinatesYesterday(
-            $this->_calculateApparentEquatorialCoordinates($date->subDays(2))
-        );
+        if ($VSOP87) {
+            $this->setEquatorialCoordinatesToday(
+                $this->_calculateApparentEquatorialCoordinates($date)
+            );
+            $this->setEquatorialCoordinatesTomorrow(
+                $this->_calculateApparentEquatorialCoordinates($date->addDay())
+            );
+            $this->setEquatorialCoordinatesYesterday(
+                $this->_calculateApparentEquatorialCoordinates($date->subDays(2))
+            );
+        } else {
+            print("START DE440");
+        }
     }
 
     /**
@@ -68,18 +72,24 @@ class Planet extends Target
      *
      * See chapter 40 of Astronomical Algorithms
      */
-    public function calculateEquatorialCoordinates(Carbon $date, GeographicalCoordinates $geo_coords, float $height): void
+    public function calculateEquatorialCoordinates(Carbon $date, GeographicalCoordinates $geo_coords, float $height, bool $VSOP87 = false): void
     {
-        $this->setEquatorialCoordinatesToday(
-            $this->_calculateEquatorialCoordinates($date, $geo_coords, $height)
-        );
-        $this->setEquatorialCoordinatesTomorrow(
-            $this->_calculateEquatorialCoordinates($date->addDay(), $geo_coords, $height)
-        );
-        $this->setEquatorialCoordinatesYesterday(
-            $this->_calculateEquatorialCoordinates($date->subDays(2), $geo_coords, $height)
-        );
+        if ($VSOP87) {
+            $this->setEquatorialCoordinatesToday(
+                $this->_calculateEquatorialCoordinates($date, $geo_coords, $height)
+            );
+            $this->setEquatorialCoordinatesTomorrow(
+                $this->_calculateEquatorialCoordinates($date->addDay(), $geo_coords, $height)
+            );
+            $this->setEquatorialCoordinatesYesterday(
+                $this->_calculateEquatorialCoordinates($date->subDays(2), $geo_coords, $height)
+            );
+        } else {
+            print("Downloading DE440");
+        }
     }
+
+    abstract public function calculateHeliocentricCoordinates(Carbon $date);
 
     private function _calculateApparentEquatorialCoordinates(Carbon $date): EquatorialCoordinates
     {

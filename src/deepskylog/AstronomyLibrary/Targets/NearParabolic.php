@@ -3,7 +3,7 @@
 /**
  * The target class describing an object moving in a near-parabolic orbit.
  *
- * PHP Version 7
+ * PHP Version 8
  *
  * @category Target
  * @author   Deepsky Developers <developers@deepskylog.be>
@@ -19,7 +19,7 @@ use deepskylog\AstronomyLibrary\Coordinates\EquatorialCoordinates;
 /**
  * The target class describing an object moving in a near-parabolic orbit.
  *
- * PHP Version 7
+ * PHP Version 8
  *
  * @category Target
  * @author   Deepsky Developers <developers@deepskylog.be>

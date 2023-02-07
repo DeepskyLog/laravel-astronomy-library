@@ -2,7 +2,7 @@
 /**
  * Tests for the target classes.
  *
- * PHP Version 7
+ * PHP Version 8
  *
  * @category Tests
  * @author   Deepsky Developers <developers@deepskylog.be>
@@ -35,7 +35,7 @@ use deepskylog\AstronomyLibrary\Time;
 /**
  * Tests for the target classes.
  *
- * PHP Version 7
+ * PHP Version 8
  *
  * @category Tests
  * @author   Deepsky Developers <developers@deepskylog.be>
@@ -79,7 +79,7 @@ class TargetTest extends BaseTestCase
      */
     public function testPlanetClass()
     {
-        $planet = new Planet();
+        $planet = new Mercury();
         $this->assertEqualsWithDelta(-0.5667, $planet->getH0(), 0.0001);
     }
 
@@ -107,7 +107,7 @@ class TargetTest extends BaseTestCase
         $equaTomorrow = new EquatorialCoordinates(2.852136, 18.82742);
         $equaYesterday = new EquatorialCoordinates(2.712014, 18.04761);
 
-        $target = new Planet();
+        $target = new Venus();
         $target->setEquatorialCoordinatesYesterday($equaYesterday);
         $target->setEquatorialCoordinatesToday($equaToday);
         $target->setEquatorialCoordinatesTomorrow($equaTomorrow);
@@ -161,7 +161,7 @@ class TargetTest extends BaseTestCase
         $equaTomorrow = new EquatorialCoordinates(5.3236, 26.7175);
         $equaYesterday = new EquatorialCoordinates(5.3498, 26.9984);
 
-        $target = new Planet();
+        $target = new Venus();
         $target->setEquatorialCoordinatesYesterday($equaYesterday);
         $target->setEquatorialCoordinatesToday($equaToday);
         $target->setEquatorialCoordinatesTomorrow($equaTomorrow);
@@ -619,6 +619,22 @@ class TargetTest extends BaseTestCase
     }
 
     /**
+     * Test the apparent position of Venus on 1992 December 20 at 0:00 using the VSOP87 mehod.
+     */
+    public function testApparentPositionOfVenusVSOP()
+    {
+        $date = Carbon::create(1992, 12, 20, 0, 0, 0, 'UTC');
+        $venus = new Venus();
+
+        $nutation = Time::nutation(Time::getJd($date));
+        $venus->calculateApparentEquatorialCoordinates($date, $nutation[3], true);
+        $coordinates = $venus->getEquatorialCoordinates();
+
+        $this->assertEqualsWithDelta(21.078181, $coordinates->getRA()->getCoordinate(), 0.00001);
+        $this->assertEqualsWithDelta(-18.88802, $coordinates->getDeclination()->getCoordinate(), 0.00001);
+    }
+
+    /**
      * Test the apparent position of comet Encke on 1990 October 6.
      */
     public function testEquatorialCoordinatesOfEncke()
@@ -628,12 +644,12 @@ class TargetTest extends BaseTestCase
         $peridate = Carbon::create(1990, 10, 28, 13, 4, 50, 'UTC');
         $encke->setOrbitalElements(2.2091404, 0.8502196, 11.94524, 186.23352, 334.75006, $peridate);
 
-        $nutation = Time::nutation(Time::getJd($date));
-        $encke->calculateEquatorialCoordinates($date, $nutation[3]);
+        $geo_coords = new GeographicalCoordinates(0, 0);
+        $encke->calculateEquatorialCoordinates($date, $geo_coords);
         $coordinates = $encke->getEquatorialCoordinates();
 
-        $this->assertEqualsWithDelta(10.56228318, $coordinates->getRA()->getCoordinate(), 0.00001);
-        $this->assertEqualsWithDelta(19.18870874, $coordinates->getDeclination()->getCoordinate(), 0.00001);
+        $this->assertEqualsWithDelta(10.5641227, $coordinates->getRA()->getCoordinate(), 0.00001);
+        $this->assertEqualsWithDelta(19.1896812, $coordinates->getDeclination()->getCoordinate(), 0.00001);
     }
 
     /**
@@ -646,12 +662,12 @@ class TargetTest extends BaseTestCase
         $peridate = Carbon::create(1998, 4, 14, 10, 27, 33, 'UTC');
         $stonehouse->setOrbitalElements(1.487469, 104.69219, 1.32431, 222.10887, $peridate);
 
-        $nutation = Time::nutation(Time::getJd($date));
-        $stonehouse->calculateEquatorialCoordinates($date, $nutation[3]);
+        $geo_coords = new GeographicalCoordinates(0, 0);
+        $stonehouse->calculateEquatorialCoordinates($date, $geo_coords);
         $coordinates = $stonehouse->getEquatorialCoordinates();
 
-        $this->assertEqualsWithDelta(12.523385, $coordinates->getRA()->getCoordinate(), 0.00001);
-        $this->assertEqualsWithDelta(50.7636309, $coordinates->getDeclination()->getCoordinate(), 0.00001);
+        $this->assertEqualsWithDelta(12.5221625, $coordinates->getRA()->getCoordinate(), 0.00001);
+        $this->assertEqualsWithDelta(50.7643669, $coordinates->getDeclination()->getCoordinate(), 0.00001);
     }
 
     /**
@@ -880,7 +896,7 @@ class TargetTest extends BaseTestCase
         // Get the coordinates of Mars
         $mars = new Mars();
 
-        $mars->calculateEquatorialCoordinates($date, $coords, 1706);
+        $mars->calculateEquatorialCoordinates($date, $coords, 1706, true);
         $coordinates = $mars->getEquatorialCoordinates();
 
         $this->assertEqualsWithDelta(22.64075, $coordinates->getRA()->getCoordinate(), 0.00001);

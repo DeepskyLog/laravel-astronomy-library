@@ -3,7 +3,7 @@
 /**
  * EquatorialCoordinates class.
  *
- * PHP Version 7
+ * PHP Version 8
  *
  * @category Coordinates
  *
@@ -22,7 +22,7 @@ use deepskylog\AstronomyLibrary\Time;
 /**
  * EquatorialCoordinates class.
  *
- * PHP Version 7
+ * PHP Version 8
  *
  * @category Coordinates
  *

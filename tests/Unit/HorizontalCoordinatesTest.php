@@ -2,7 +2,7 @@
 /**
  * Tests for the HorizontalCoordinates class.
  *
- * PHP Version 7
+ * PHP Version 8
  *
  * @category Tests
  * @author   Deepsky Developers <developers@deepskylog.be>
@@ -21,7 +21,7 @@ use deepskylog\AstronomyLibrary\Testing\BaseTestCase;
 /**
  * Tests for the HorizontalCoordinates class.
  *
- * PHP Version 7
+ * PHP Version 8
  *
  * @category Tests
  * @author   Deepsky Developers <developers@deepskylog.be>
@@ -56,28 +56,28 @@ class HorizontalCoordinatesTest extends BaseTestCase
     {
         $coords = new HorizontalCoordinates(15.748, -5.42);
         $this->assertEquals(15.748, $coords->getAzimuth()->getCoordinate());
-        $this->assertEquals(-5.42, $coords->getAltitude()->getCoordinate());
+        $this->assertEqualsWithDelta(-5.42, $coords->getAltitude()->getCoordinate(), 0.00001);
 
         $coords->setAzimuth(15.2);
         $this->assertEquals(15.2, $coords->getAzimuth()->getCoordinate());
 
         $coords->setAltitude(4.2);
-        $this->assertEquals(4.2, $coords->getAltitude()->getCoordinate());
+        $this->assertEqualsWithDelta(4.2, $coords->getAltitude()->getCoordinate(), 0.00001);
 
         $coords = new HorizontalCoordinates(95.748, 95.42);
-        $this->assertEquals(-84.58, $coords->getAltitude()->getCoordinate());
+        $this->assertEqualsWithDelta(-84.58, $coords->getAltitude()->getCoordinate(), 0.00001);
 
         $coords = new HorizontalCoordinates(-19.748, -95.42);
-        $this->assertEquals(84.58, $coords->getAltitude()->getCoordinate());
+        $this->assertEqualsWithDelta(84.58, $coords->getAltitude()->getCoordinate(), 0.00001);
 
         $coords = new HorizontalCoordinates(365.748, -5.42);
-        $this->assertEquals(5.748, $coords->getAzimuth()->getCoordinate());
+        $this->assertEqualsWithDelta(5.748, $coords->getAzimuth()->getCoordinate(), 0.00001);
 
         $coords = new HorizontalCoordinates(-1.748, -5.42);
         $this->assertEquals(358.252, $coords->getAzimuth()->getCoordinate());
 
         $coords->setAltitude(-91.2);
-        $this->assertEquals(88.8, $coords->getAltitude()->getCoordinate());
+        $this->assertEqualsWithDelta(88.8, $coords->getAltitude()->getCoordinate(), 0.00001);
 
         $coords->setAltitude(92.5);
         $this->assertEquals(-87.5, $coords->getAltitude()->getCoordinate());
@@ -86,7 +86,7 @@ class HorizontalCoordinatesTest extends BaseTestCase
         $this->assertEquals(358.8, $coords->getAzimuth()->getCoordinate());
 
         $coords->setAzimuth(361.2);
-        $this->assertEquals(1.2, $coords->getAzimuth()->getCoordinate());
+        $this->assertEqualsWithDelta(1.2, $coords->getAzimuth()->getCoordinate(), 0.00001);
     }
 
     /**

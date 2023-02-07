@@ -3,7 +3,7 @@
 /**
  * Tests for the sun class.
  *
- * PHP Version 7
+ * PHP Version 8
  *
  * @category Tests
  *
@@ -24,7 +24,7 @@ use deepskylog\AstronomyLibrary\Time;
 /**
  * Tests for the sun class.
  *
- * PHP Version 7
+ * PHP Version 8
  *
  * @category Tests
  *

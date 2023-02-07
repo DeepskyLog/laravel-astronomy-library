@@ -3,7 +3,7 @@
 /**
  * The target class describing an object moving in an elliptic orbit.
  *
- * PHP Version 7
+ * PHP Version 8
  *
  * @category Target
  * @author   Deepsky Developers <developers@deepskylog.be>
@@ -21,7 +21,7 @@ use deepskylog\AstronomyLibrary\Coordinates\GeographicalCoordinates;
 /**
  * The target class describing an object moving in an elliptic orbit.
  *
- * PHP Version 7
+ * PHP Version 8
  *
  * @category Target
  * @author   Deepsky Developers <developers@deepskylog.be>
@@ -75,20 +75,20 @@ class Elliptic extends Target
      *
      * See chapter 33 of Astronomical Algorithms
      */
-    public function calculateEquatorialCoordinates(Carbon $date, $epoch = 2451545.0, GeographicalCoordinates $geo_coords, float $height = 0.0): void
+    public function calculateEquatorialCoordinates(Carbon $date, GeographicalCoordinates $geo_coords, $epoch = 2451545.0, float $height = 0.0): void
     {
         $this->setEquatorialCoordinatesToday(
-            $this->_calculateEquatorialCoordinates($date, $epoch, $geo_coords, $height)
+            $this->_calculateEquatorialCoordinates($date, $geo_coords, $epoch, $height)
         );
         $this->setEquatorialCoordinatesTomorrow(
-            $this->_calculateEquatorialCoordinates($date->addDay(), $epoch, $geo_coords, $height)
+            $this->_calculateEquatorialCoordinates($date->addDay(), $geo_coords, $epoch, $height)
         );
         $this->setEquatorialCoordinatesYesterday(
-            $this->_calculateEquatorialCoordinates($date->subDays(2), $epoch, $geo_coords, $height)
+            $this->_calculateEquatorialCoordinates($date->subDays(2), $geo_coords, $epoch, $height)
         );
     }
 
-    public function _calculateEquatorialCoordinates(Carbon $date, float $epoch, GeographicalCoordinates $geo_coords, float $height): EquatorialCoordinates
+    public function _calculateEquatorialCoordinates(Carbon $date, GeographicalCoordinates $geo_coords, float $epoch, float $height): EquatorialCoordinates
     {
         $nutation = Time::nutation($epoch);
 

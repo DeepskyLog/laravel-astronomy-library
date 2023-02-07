@@ -3,7 +3,7 @@
 /**
  * The target class describing an object moving in a parabolic orbit.
  *
- * PHP Version 7
+ * PHP Version 8
  *
  * @category Target
  * @author   Deepsky Developers <developers@deepskylog.be>
@@ -15,12 +15,13 @@ namespace deepskylog\AstronomyLibrary\Targets;
 
 use Carbon\Carbon;
 use deepskylog\AstronomyLibrary\Coordinates\EquatorialCoordinates;
+use deepskylog\AstronomyLibrary\Coordinates\GeographicalCoordinates;
 use deepskylog\AstronomyLibrary\Time;
 
 /**
  * The target class describing an object moving in a parabolic orbit.
  *
- * PHP Version 7
+ * PHP Version 8
  *
  * @category Target
  * @author   Deepsky Developers <developers@deepskylog.be>
@@ -68,20 +69,20 @@ class Parabolic extends Target
      *
      * See chapter 33 of Astronomical Algorithms
      */
-    public function calculateEquatorialCoordinates(Carbon $date): void
+    public function calculateEquatorialCoordinates(Carbon $date, GeographicalCoordinates $geo_coords, float $height = 0.0): void
     {
         $this->setEquatorialCoordinatesToday(
-            $this->_calculateEquatorialCoordinates($date)
+            $this->_calculateEquatorialCoordinates($date, $geo_coords, $height)
         );
         $this->setEquatorialCoordinatesTomorrow(
-            $this->_calculateEquatorialCoordinates($date->addDay())
+            $this->_calculateEquatorialCoordinates($date->addDay(), $geo_coords, $height)
         );
         $this->setEquatorialCoordinatesYesterday(
-            $this->_calculateEquatorialCoordinates($date->subDays(2))
+            $this->_calculateEquatorialCoordinates($date->subDays(2), $geo_coords, $height)
         );
     }
 
-    public function _calculateEquatorialCoordinates(Carbon $date): EquatorialCoordinates
+    public function _calculateEquatorialCoordinates(Carbon $date, GeographicalCoordinates $geo_coords, float $height): EquatorialCoordinates
     {
         $diff_in_date = $this->_perihelion_date->diffInSeconds($date) / 3600.0 / 24.0;
 
@@ -123,10 +124,28 @@ class Parabolic extends Target
         $delta = sqrt($ksi ** 2 + $eta ** 2 + $zeta ** 2);
         $tau = 0.0057755183 * $delta;
 
-        $ra = rad2deg(atan2($eta, $ksi)) / 15.0;
+        $ra  = rad2deg(atan2($eta, $ksi)) / 15.0;
         $dec = rad2deg(asin($zeta / $delta));
 
-        return new EquatorialCoordinates($ra, $dec);
+        $equa_coords = new EquatorialCoordinates($ra, $dec);
+
+        // Calculate corrections for parallax
+        $pi = 8.794 / $delta;
+
+        $siderial_time = Time::apparentSiderialTime($date, new GeographicalCoordinates(0.0, 0.0));
+
+        $hour_angle = (new \deepskylog\AstronomyLibrary\Coordinates\Coordinate($equa_coords->getHourAngle($siderial_time) + $geo_coords->getLongitude()->getCoordinate() * 15.0, 0, 360))->getCoordinate();
+
+        $earthsGlobe = $geo_coords->earthsGlobe($height);
+
+        $deltara = rad2deg(atan(-$earthsGlobe[1] * sin(deg2rad($pi / 3600.0)) * sin(deg2rad($hour_angle)) / (cos(deg2rad($equa_coords->getDeclination()->getCoordinate())) - $earthsGlobe[1] * sin(deg2rad($pi / 3600.0)) * sin(deg2rad($hour_angle)))));
+        $dec     = rad2deg(atan((sin(deg2rad($equa_coords->getDeclination()->getCoordinate())) - $earthsGlobe[0] * sin(deg2rad($pi / 3600.0))) * cos(deg2rad($deltara / 3600.0))
+                                / (cos(deg2rad($equa_coords->getDeclination()->getCoordinate())) - $earthsGlobe[1] * sin(deg2rad($pi / 3600.0)) * cos(deg2rad($height)))));
+
+        $equa_coords->setRA($ra + $deltara);
+        $equa_coords->setDeclination($dec);
+
+        return $equa_coords;
     }
 
     /**

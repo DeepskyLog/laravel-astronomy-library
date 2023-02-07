@@ -2,7 +2,7 @@
 /**
  * The main AstronomyLibrary class.
  *
- * PHP Version 7
+ * PHP Version 8
  *
  * @category AstronomyLibrary
  * @author   Deepsky Developers <developers@deepskylog.be>
@@ -23,7 +23,7 @@ use deepskylog\AstronomyLibrary\Coordinates\HorizontalCoordinates;
 /**
  * The main AstronomyLibrary class.
  *
- * PHP Version 7
+ * PHP Version 8
  *
  * @category AstronomyLibrary
  * @author   Deepsky Developers <developers@deepskylog.be>

@@ -3,7 +3,7 @@
 /**
  * RectangularCoordinates class.
  *
- * PHP Version 7
+ * PHP Version 8
  *
  * @category Coordinates
  *
@@ -18,7 +18,7 @@ namespace deepskylog\AstronomyLibrary\Coordinates;
 /**
  * RectangularCoordinates class.
  *
- * PHP Version 7
+ * PHP Version 8
  *
  * @category Coordinates
  *
