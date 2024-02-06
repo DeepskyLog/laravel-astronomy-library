@@ -6,8 +6,10 @@
  * PHP Version 8
  *
  * @category Target
+ *
  * @author   Deepsky Developers <developers@deepskylog.be>
  * @license  GPL3 <https://opensource.org/licenses/GPL-3.0>
+ *
  * @link     http://www.deepskylog.org
  */
 
@@ -22,8 +24,10 @@ use deepskylog\AstronomyLibrary\Coordinates\EquatorialCoordinates;
  * PHP Version 8
  *
  * @category Target
+ *
  * @author   Deepsky Developers <developers@deepskylog.be>
  * @license  GPL3 <https://opensource.org/licenses/GPL-3.0>
+ *
  * @link     http://www.deepskylog.org
  */
 class NearParabolic extends Target
@@ -46,12 +50,12 @@ class NearParabolic extends Target
     /**
      * Set Orbital Elements.
      *
-     * @param float  $q                        perihelion distance, in AU
-     * @param float  $e                        Eccentricity
-     * @param float  $i                        Inclination
-     * @param float  $omega                    Argument of perihelion
-     * @param float  $longitude_ascending_node The Longitude of the Ascending Node
-     * @param Carbon $perihelion_date          The date of the perihelion
+     * @param  float  $q  perihelion distance, in AU
+     * @param  float  $e  Eccentricity
+     * @param  float  $i  Inclination
+     * @param  float  $omega  Argument of perihelion
+     * @param  float  $longitude_ascending_node  The Longitude of the Ascending Node
+     * @param  Carbon  $perihelion_date  The date of the perihelion
      */
     public function setOrbitalElements(float $q, float $e, float $i, float $omega, float $longitude_ascending_node, Carbon $perihelion_date): void
     {
@@ -66,7 +70,7 @@ class NearParabolic extends Target
     /**
      * Calculates the equatorial coordinates of the planet.
      *
-     * @param Carbon $date      The date for which to calculate the coordinates
+     * @param  Carbon  $date  The date for which to calculate the coordinates
      *
      * See chapter 33 of Astronomical Algorithms
      */

@@ -6,8 +6,10 @@
  * PHP Version 8
  *
  * @category Coordinates
+ *
  * @author   Deepsky Developers <developers@deepskylog.be>
  * @license  GPL3 <https://opensource.org/licenses/GPL-3.0>
+ *
  * @link     http://www.deepskylog.org
  */
 
@@ -19,8 +21,10 @@ namespace deepskylog\AstronomyLibrary\Coordinates;
  * PHP Version 8
  *
  * @category Coordinates
+ *
  * @author   Deepsky Developers <developers@deepskylog.be>
  * @license  GPL3 <https://opensource.org/licenses/GPL-3.0>
+ *
  * @link     http://www.deepskylog.org
  */
 class GalacticCoordinates
@@ -31,8 +35,8 @@ class GalacticCoordinates
     /**
      * The constructor.
      *
-     * @param float $longitude The galactic longitude (0, 360)
-     * @param float $latitude  The galactic latitude (-90, 90)
+     * @param  float  $longitude  The galactic longitude (0, 360)
+     * @param  float  $latitude  The galactic latitude (-90, 90)
      */
     public function __construct(float $longitude, float $latitude)
     {
@@ -43,8 +47,7 @@ class GalacticCoordinates
     /**
      * Sets the galactic longitude.
      *
-     * @param float $longitude The galactic longitude
-     *
+     * @param  float  $longitude  The galactic longitude
      * @return None
      */
     public function setLongitude(float $longitude): void
@@ -55,8 +58,7 @@ class GalacticCoordinates
     /**
      * Sets the galactic latitude.
      *
-     * @param float $latitude The galactic latitude
-     *
+     * @param  float  $latitude  The galactic latitude
      * @return None
      */
     public function setLatitude(float $latitude): void

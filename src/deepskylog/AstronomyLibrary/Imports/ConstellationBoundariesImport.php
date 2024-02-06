@@ -9,8 +9,7 @@ use Maatwebsite\Excel\Concerns\WithCustomCsvSettings;
 class ConstellationBoundariesImport implements ToModel, WithCustomCsvSettings
 {
     /**
-     * @param array $row The row of the csv file
-     *
+     * @param  array  $row  The row of the csv file
      * @return \Illuminate\Database\Eloquent\Model|null
      */
     public function model(array $row)

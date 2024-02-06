@@ -6,8 +6,10 @@
  * PHP Version 8
  *
  * @category Target
+ *
  * @author   Deepsky Developers <developers@deepskylog.be>
  * @license  GPL3 <https://opensource.org/licenses/GPL-3.0>
+ *
  * @link     http://www.deepskylog.org
  */
 
@@ -23,8 +25,10 @@ use deepskylog\AstronomyLibrary\Time;
  * PHP Version 8
  *
  * @category Target
+ *
  * @author   Deepsky Developers <developers@deepskylog.be>
  * @license  GPL3 <https://opensource.org/licenses/GPL-3.0>
+ *
  * @link     http://www.deepskylog.org
  */
 class Mars extends Planet
@@ -32,8 +36,7 @@ class Mars extends Planet
     /**
      * Calculates the mean orbital elements.
      *
-     * @param Carbon $date The needed date
-     *
+     * @param  Carbon  $date  The needed date
      * @return array L = mean longitude of the planet
      *               a = semimajor axis of the orbit
      *               e = eccentricity of the orbit
@@ -63,8 +66,7 @@ class Mars extends Planet
     /**
      * Calculates the mean orbital elements in J2000.0.
      *
-     * @param Carbon $date The needed date
-     *
+     * @param  Carbon  $date  The needed date
      * @return array L = mean longitude of the planet
      *               a = semimajor axis of the orbit
      *               e = eccentricity of the orbit
@@ -94,8 +96,7 @@ class Mars extends Planet
     /**
      * Calculates the heliocentric coordinates of Mars.
      *
-     * @param Carbon $date The date
-     *
+     * @param  Carbon  $date  The date
      * @return array L, B, R
      *
      * See chapter 32 of Astronomical Algorithms
@@ -5620,8 +5621,7 @@ class Mars extends Planet
     /**
      * Calculates the opposition closest to the given date.
      *
-     * @param Carbon $date The date for which we want to calculate the closest opposition
-     *
+     * @param  Carbon  $date  The date for which we want to calculate the closest opposition
      * @return Carbon The date of the opposition
      *
      * Chapter 36 of Astronomical Algorithms
@@ -5635,7 +5635,7 @@ class Mars extends Planet
 
         $Y = $date->year + $date->dayOfYear / (365 + $date->format('L'));
 
-        $k = ceil((365.2425 * $Y + 1721060 - $A) / ($B));
+        $k = ceil((365.2425 * $Y + 1721060 - $A) / $B);
         $JDE0 = $A + $k * $B;
         $M = deg2rad($M0 + $k * $M1);
         $T = ($JDE0 - 2451545) / 36525;
@@ -5660,8 +5660,7 @@ class Mars extends Planet
     /**
      * Calculates the conjunction closest to the given date.
      *
-     * @param Carbon $date The date for which we want to calculate the closest conjunction
-     *
+     * @param  Carbon  $date  The date for which we want to calculate the closest conjunction
      * @return Carbon The date of the conjunction
      *
      * Chapter 36 of Astronomical Algorithms
@@ -5675,7 +5674,7 @@ class Mars extends Planet
 
         $Y = $date->year + $date->dayOfYear / (365 + $date->format('L'));
 
-        $k = ceil((365.2425 * $Y + 1721060 - $A) / ($B));
+        $k = ceil((365.2425 * $Y + 1721060 - $A) / $B);
         $JDE0 = $A + $k * $B;
         $M = deg2rad($M0 + $k * $M1);
         $T = ($JDE0 - 2451545) / 36525;
@@ -5700,8 +5699,7 @@ class Mars extends Planet
     /**
      * Returns the date of perihelion closest to the given date.
      *
-     * @param Carbon $date The date for which we want to calculate the closest perihelion
-     *
+     * @param  Carbon  $date  The date for which we want to calculate the closest perihelion
      * @return Carbon The date of the perihelion
      *
      * Chapter 38 of Astronomical Algorithms
@@ -5721,8 +5719,7 @@ class Mars extends Planet
     /**
      * Returns the date of aphelion closest to the given date.
      *
-     * @param Carbon $date The date for which we want to calculate the closest aphelion
-     *
+     * @param  Carbon  $date  The date for which we want to calculate the closest aphelion
      * @return Carbon The date of the aphelion
      *
      * Chapter 38 of Astronomical Algorithms
@@ -5742,8 +5739,7 @@ class Mars extends Planet
     /**
      * Calculates the magnitude at the given date.
      *
-     * @param Carbon $date The date for which we want to calculate the magnitude
-     *
+     * @param  Carbon  $date  The date for which we want to calculate the magnitude
      * @return float The magnitude
      *
      * Chapter 41 of Astronomical Algorithms
@@ -5774,8 +5770,7 @@ class Mars extends Planet
      * Calculate the diameter of Mars.  You can get the diamter
      * by using the getDiameter method.
      *
-     * @param Carbon $date The date
-     *
+     * @param  Carbon  $date  The date
      * @return None
      *
      * Chapter 55 of Astronomical Algorithms

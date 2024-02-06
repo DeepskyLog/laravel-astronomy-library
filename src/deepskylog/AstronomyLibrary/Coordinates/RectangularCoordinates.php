@@ -36,9 +36,9 @@ class RectangularCoordinates
     /**
      * The constructor.
      *
-     * @param float $X The rectangular coordinate X (-180, 180)
-     * @param float $Y The rectangular coordinate Y (-180, 180)
-     * @param float $Z The rectangular coordinate Z (-180, 180)
+     * @param  float  $X  The rectangular coordinate X (-180, 180)
+     * @param  float  $Y  The rectangular coordinate Y (-180, 180)
+     * @param  float  $Z  The rectangular coordinate Z (-180, 180)
      */
     public function __construct(float $X, float $Y, float $Z)
     {
@@ -50,8 +50,7 @@ class RectangularCoordinates
     /**
      * Sets the rectangular coordinate X.
      *
-     * @param float $X The rectangular coordinate X
-     *
+     * @param  float  $X  The rectangular coordinate X
      * @return None
      */
     public function setX(float $X): void
@@ -62,8 +61,7 @@ class RectangularCoordinates
     /**
      * Sets the rectangular coordinate Y.
      *
-     * @param float $Y The rectangular coordinate Y
-     *
+     * @param  float  $Y  The rectangular coordinate Y
      * @return None
      */
     public function setY(float $Y): void
@@ -74,8 +72,7 @@ class RectangularCoordinates
     /**
      * Sets the rectangular coordinate Z.
      *
-     * @param float $Y The rectangular coordinate Z
-     *
+     * @param  float  $Y  The rectangular coordinate Z
      * @return None
      */
     public function setZ(float $Z): void

@@ -5,8 +5,10 @@
  * PHP Version 8
  *
  * @category Tests
+ *
  * @author   Deepsky Developers <developers@deepskylog.be>
  * @license  GPL3 <https://opensource.org/licenses/GPL-3.0>
+ *
  * @link     http://www.deepskylog.org
  */
 
@@ -22,8 +24,10 @@ use deepskylog\AstronomyLibrary\Testing\BaseTestCase;
  * PHP Version 8
  *
  * @category Tests
+ *
  * @author   Deepsky Developers <developers@deepskylog.be>
  * @license  GPL3 <https://opensource.org/licenses/GPL-3.0>
+ *
  * @link     http://www.deepskylog.org
  */
 class EclipticalCoordinatesTest extends BaseTestCase

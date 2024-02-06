@@ -2,6 +2,13 @@
 
 All notable changes to `laravel-astronomy-library` will be documented in this file.
 
+## Version 6.1.2
+
+Changed:
+
+- Added delta t value for 2024
+- Update to use laravel 11
+
 ## Version 6.1.1
 
 Changed:

@@ -6,8 +6,10 @@
  * PHP Version 8
  *
  * @category Coordinates
+ *
  * @author   Deepsky Developers <developers@deepskylog.be>
  * @license  GPL3 <https://opensource.org/licenses/GPL-3.0>
+ *
  * @link     http://www.deepskylog.org
  */
 
@@ -19,8 +21,10 @@ namespace deepskylog\AstronomyLibrary\Coordinates;
  * PHP Version 8
  *
  * @category Coordinates
+ *
  * @author   Deepsky Developers <developers@deepskylog.be>
  * @license  GPL3 <https://opensource.org/licenses/GPL-3.0>
+ *
  * @link     http://www.deepskylog.org
  */
 class GeographicalCoordinates
@@ -31,8 +35,8 @@ class GeographicalCoordinates
     /**
      * The constructor.
      *
-     * @param float $longitude The geographical longitude (-180 ,180)
-     * @param float $latitude  The geographical latitude (-90, 90)
+     * @param  float  $longitude  The geographical longitude (-180 ,180)
+     * @param  float  $latitude  The geographical latitude (-90, 90)
      */
     public function __construct(float $longitude, float $latitude)
     {
@@ -43,8 +47,7 @@ class GeographicalCoordinates
     /**
      * Sets the geographical longitude.
      *
-     * @param float $longitude The geographical longitude
-     *
+     * @param  float  $longitude  The geographical longitude
      * @return None
      */
     public function setLongitude(float $longitude): void
@@ -55,8 +58,7 @@ class GeographicalCoordinates
     /**
      * Sets the geographical latitude.
      *
-     * @param float $latitude The geographical latitude
-     *
+     * @param  float  $latitude  The geographical latitude
      * @return None
      */
     public function setLatitude(float $latitude): void
@@ -110,8 +112,7 @@ class GeographicalCoordinates
      * Returns rhoSinPhi and rhoCosPhi.
      * Needed for the calculation of the parallax.
      *
-     * @param float $height The height of the location
-     *
+     * @param  float  $height  The height of the location
      * @return array with rhoSinPhi and rhoCosPhi
      *
      * See Chapter 11 of Astronomical Algorithms
