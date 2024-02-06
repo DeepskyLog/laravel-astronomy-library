@@ -6,8 +6,10 @@
  * PHP Version 8
  *
  * @category Coordinates
+ *
  * @author   Deepsky Developers <developers@deepskylog.be>
  * @license  GPL3 <https://opensource.org/licenses/GPL-3.0>
+ *
  * @link     http://www.deepskylog.org
  */
 
@@ -21,8 +23,10 @@ use Carbon\Carbon;
  * PHP Version 8
  *
  * @category Coordinates
+ *
  * @author   Deepsky Developers <developers@deepskylog.be>
  * @license  GPL3 <https://opensource.org/licenses/GPL-3.0>
+ *
  * @link     http://www.deepskylog.org
  */
 class HorizontalCoordinates
@@ -33,8 +37,8 @@ class HorizontalCoordinates
     /**
      * The constructor.
      *
-     * @param float $azimuth  The azimuth, measured westwards from the South (0, 360)
-     * @param float $altitude The altitude, positive above the horizon (-90, 90)
+     * @param  float  $azimuth  The azimuth, measured westwards from the South (0, 360)
+     * @param  float  $altitude  The altitude, positive above the horizon (-90, 90)
      */
     public function __construct(float $azimuth, float $altitude)
     {
@@ -45,8 +49,7 @@ class HorizontalCoordinates
     /**
      * Sets the azimuth.
      *
-     * @param float $azimuth The azimuth, measured westwards from the South (0, 360)
-     *
+     * @param  float  $azimuth  The azimuth, measured westwards from the South (0, 360)
      * @return None
      */
     public function setAzimuth(float $azimuth): void
@@ -57,8 +60,7 @@ class HorizontalCoordinates
     /**
      * Sets the altitude.
      *
-     * @param float $altitude The altitude above the horizon
-     *
+     * @param  float  $altitude  The altitude above the horizon
      * @return None
      */
     public function setAltitude(float $altitude): void
@@ -112,10 +114,9 @@ class HorizontalCoordinates
      * Converts the local horizontal coordinates to equatorial coordinates.
      * Chapter 13 of Astronomical Algorithms.
      *
-     * @param GeographicalCoordinates $geo_coords    the geographical
+     * @param  GeographicalCoordinates  $geo_coords  the geographical
      *                                               coordinates
-     * @param Carbon                  $siderial_time the local siderial time
-     *
+     * @param  Carbon  $siderial_time  the local siderial time
      * @return EquatorialCoordinates The equatorial coordinates
      */
     public function convertToEquatorial(
@@ -185,14 +186,13 @@ class HorizontalCoordinates
      */
     public function calculateRefractionFromApparentAltitude(): float
     {
-        return 1 / (
+        return 1 /
             tan(
                 deg2rad(
                     $this->getAltitude()->getCoordinate()
                     + 7.31 / ($this->getAltitude()->getCoordinate() + 4.4)
                 )
-            )
-        );
+            );
     }
 
     /**
@@ -204,13 +204,12 @@ class HorizontalCoordinates
      */
     public function calculateRefractionFromTrueAltitude(): float
     {
-        return 1.02 / (
+        return 1.02 /
             tan(
                 deg2rad(
                     $this->getAltitude()->getCoordinate()
                     + 10.3 / ($this->getAltitude()->getCoordinate() + 5.11)
                 )
-            )
-        );
+            );
     }
 }

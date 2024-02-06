@@ -6,8 +6,10 @@
  * PHP Version 8
  *
  * @category Target
+ *
  * @author   Deepsky Developers <developers@deepskylog.be>
  * @license  GPL3 <https://opensource.org/licenses/GPL-3.0>
+ *
  * @link     http://www.deepskylog.org
  */
 
@@ -26,8 +28,10 @@ use deepskylog\AstronomyLibrary\Time;
  * PHP Version 8
  *
  * @category Target
+ *
  * @author   Deepsky Developers <developers@deepskylog.be>
  * @license  GPL3 <https://opensource.org/licenses/GPL-3.0>
+ *
  * @link     http://www.deepskylog.org
  */
 class Moon extends Target
@@ -57,8 +61,7 @@ class Moon extends Target
     /**
      * Calculates the heliocentric coordinates of the moon.
      *
-     * @param Carbon $date The date
-     *
+     * @param  Carbon  $date  The date
      * @return array L, B, R
      *
      * See chapter 47 of Astronomical Algorithms
@@ -282,7 +285,7 @@ class Moon extends Target
     /**
      * Calculates the apparent equatorial coordinates of the planet.
      *
-     * @param Carbon $date      The date for which to calculate the coordinates
+     * @param  Carbon  $date  The date for which to calculate the coordinates
      *
      * See chapter 33 of Astronomical Algorithms
      */
@@ -302,9 +305,9 @@ class Moon extends Target
     /**
      * Calculates the topocentric equatorial coordinates of the planet.
      *
-     * @param Carbon                  $date       The date for which to calculate the coordinates
-     * @param GeographicalCoordinates $geo_coords The geographical coordinates
-     * @param float                   $height     The height of the location
+     * @param  Carbon  $date  The date for which to calculate the coordinates
+     * @param  GeographicalCoordinates  $geo_coords  The geographical coordinates
+     * @param  float  $height  The height of the location
      *
      * See chapter 40 of Astronomical Algorithms
      */
@@ -367,8 +370,7 @@ class Moon extends Target
     /**
      * Calculates the illuminated fraction of the moon.
      *
-     * @param Carbon $date The date for which to calculate the fraction
-     *
+     * @param  Carbon  $date  The date for which to calculate the fraction
      * @return float The illuminated fraction, the phase ratio
      *
      * See chapter 48 of Astronomical Algorithms
@@ -389,7 +391,7 @@ class Moon extends Target
         $cosPsi = sin(deg2rad($sunCoords->getDeclination()->getCoordinate())) * sin(deg2rad($moonCoords->getDeclination()->getCoordinate()))
             + cos(deg2rad($sunCoords->getDeclination()->getCoordinate())) * cos(deg2rad($moonCoords->getDeclination()->getCoordinate())) * cos(deg2rad($sunCoords->getRA()->getCoordinate() * 15 - $moonCoords->getRA()->getCoordinate() * 15));
         $psi = acos($cosPsi);
-        $i = rad2deg(atan2($R * sin($psi), ($delta - $R * $cosPsi)));
+        $i = rad2deg(atan2($R * sin($psi), $delta - $R * $cosPsi));
         $i = $i - floor($i / 360.0) * 360.0;
 
         return round((1 + cos(deg2rad($i))) / 2, 3);
@@ -398,8 +400,7 @@ class Moon extends Target
     /**
      * Calculates the phase ration of the moon (0 - 1), where 0=new, 0.5=full, 1=new.
      *
-     * @param Carbon $date The date for which to calculate the phase ration
-     *
+     * @param  Carbon  $date  The date for which to calculate the phase ration
      * @return float The phase ratio
      *
      * See chapter 49 of Astronomical Algorithms
@@ -418,8 +419,7 @@ class Moon extends Target
     /**
      * Return the date for the new moon after the given date.
      *
-     * @param Carbon $date The date after which we search the new moon
-     *
+     * @param  Carbon  $date  The date after which we search the new moon
      * @return Carbon The date of the new moon after the given date.
      */
     public function newMoonDate(Carbon $date): Carbon
@@ -509,8 +509,7 @@ class Moon extends Target
     /**
      * Return the date for the full moon after the given date.
      *
-     * @param Carbon $date The date after which we search the full moon
-     *
+     * @param  Carbon  $date  The date after which we search the full moon
      * @return Carbon The date of the full moon after the given date.
      */
     public function fullMoonDate(Carbon $date): Carbon
@@ -599,8 +598,7 @@ class Moon extends Target
     /**
      * Return the date for the first quarter moon after the given date.
      *
-     * @param Carbon $date The date after which we search the first quarter moon
-     *
+     * @param  Carbon  $date  The date after which we search the first quarter moon
      * @return Carbon The date of the first quarter moon after the given date.
      */
     public function firstQuarterMoonDate(Carbon $date): Carbon
@@ -691,8 +689,7 @@ class Moon extends Target
     /**
      * Return the date for the last quarter moon after the given date.
      *
-     * @param Carbon $date The date after which we search the last quarter moon
-     *
+     * @param  Carbon  $date  The date after which we search the last quarter moon
      * @return Carbon The date of the last quarter moon after the given date.
      */
     public function lastQuarterMoonDate(Carbon $date): Carbon
@@ -784,8 +781,7 @@ class Moon extends Target
      * Calculate the diameter of the Moon.  You can get the diamter
      * by using the getDiameter method.
      *
-     * @param Carbon $date The date
-     *
+     * @param  Carbon  $date  The date
      * @return None
      *
      * Chapter 55 of Astronomical Algorithms

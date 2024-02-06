@@ -42,11 +42,11 @@ class EquatorialCoordinates
     /**
      * The constructor.
      *
-     * @param float $ra The right ascension (0, 24)
+     * @param  float  $ra  The right ascension (0, 24)
      * @param float ination The declination (-90, 90)
-     * @param float $epoch    The epoch of the target (2000.0 is standard)
-     * @param float $deltaRA  The proper motion in Right Ascension in seconds/year
-     * @param float $deltaDec The proper motion in declination in ''/year
+     * @param  float  $epoch  The epoch of the target (2000.0 is standard)
+     * @param  float  $deltaRA  The proper motion in Right Ascension in seconds/year
+     * @param  float  $deltaDec  The proper motion in declination in ''/year
      */
     public function __construct(
         float $ra,
@@ -65,8 +65,7 @@ class EquatorialCoordinates
     /**
      * Sets the right ascension.
      *
-     * @param float $ra The right ascension
-     *
+     * @param  float  $ra  The right ascension
      * @return None
      */
     public function setRA(float $ra): void
@@ -77,8 +76,7 @@ class EquatorialCoordinates
     /**
      * Sets the declination.
      *
-     * @param float $declination The declination
-     *
+     * @param  float  $declination  The declination
      * @return None
      */
     public function setDeclination(float $declination): void
@@ -89,8 +87,7 @@ class EquatorialCoordinates
     /**
      * Sets the epoch.
      *
-     * @param float $epoch The epoch
-     *
+     * @param  float  $epoch  The epoch
      * @return None
      */
     public function setEpoch(float $epoch): void
@@ -101,8 +98,7 @@ class EquatorialCoordinates
     /**
      * Sets the proper motion in RA.
      *
-     * @param float $deltaRA the proper motion in RA is seconds/year
-     *
+     * @param  float  $deltaRA  the proper motion in RA is seconds/year
      * @return None
      */
     public function setDeltaRA(float $deltaRA): void
@@ -113,8 +109,7 @@ class EquatorialCoordinates
     /**
      * Sets the proper motion in declination.
      *
-     * @param float $deltaDec the proper motion in declination in ''/year
-     *
+     * @param  float  $deltaDec  the proper motion in declination in ''/year
      * @return None
      */
     public function setDeltaDec(float $deltaDec): void
@@ -199,8 +194,7 @@ class EquatorialCoordinates
      * the current equinox.
      * Chapter 13 of Astronomical Algorithms.
      *
-     * @param float $nutObliquity The nutation in obliquity
-     *
+     * @param  float  $nutObliquity  The nutation in obliquity
      * @return EclipticalCoordinates The ecliptical coordinates
      */
     public function convertToEcliptical(float $nutObliquity): EclipticalCoordinates
@@ -256,10 +250,9 @@ class EquatorialCoordinates
      * Converts the equatorial coordinates to local horizontal coordinates.
      * Chapter 13 of Astronomical Algorithms.
      *
-     * @param GeographicalCoordinates $geo_coords    the geographical
+     * @param  GeographicalCoordinates  $geo_coords  the geographical
      *                                               coordinates
-     * @param Carbon                  $siderial_time the local siderial time
-     *
+     * @param  Carbon  $siderial_time  the local siderial time
      * @return HorizontalCoordinates The horizontal coordinates
      */
     public function convertToHorizontal(
@@ -329,10 +322,9 @@ class EquatorialCoordinates
      * meridian. This is the effect of the moon that is lying down at moonrise.
      * Chapter 14 of Astronomical Algorithms.
      *
-     * @param GeographicalCoordinates $geo_coords    the geographical
+     * @param  GeographicalCoordinates  $geo_coords  the geographical
      *                                               coordinates
-     * @param Carbon                  $siderial_time the local siderial time
-     *
+     * @param  Carbon  $siderial_time  the local siderial time
      * @return float The parallactic angle q
      */
     public function getParallacticAngle(
@@ -358,8 +350,7 @@ class EquatorialCoordinates
     /**
      * Returns the local hour angle.
      *
-     * @param Carbon $siderial_time The siderial time
-     *
+     * @param  Carbon  $siderial_time  The siderial time
      * @return float the local hour angle
      */
     public function getHourAngle(Carbon $siderial_time): float
@@ -377,8 +368,7 @@ class EquatorialCoordinates
      * equatorial coordinates.
      * Chapter 17 of Astronomical Algorithms.
      *
-     * @param EquatorialCoordinates $coords2 the coordinates of the second object
-     *
+     * @param  EquatorialCoordinates  $coords2  the coordinates of the second object
      * @return Coordinate The angular separation between the two objects
      */
     public function angularSeparation(
@@ -426,11 +416,10 @@ class EquatorialCoordinates
      * Returns true if the three bodies are in a straight line.
      * Chapter 19 of Astronomical Algorithms.
      *
-     * @param EquatorialCoordinates $coords2   The coordinates of the second object
-     * @param EquatorialCoordinates $coords3   The coordinates of the thirds object
-     * @param float                 $threshold The threshold for the method
-     *                                         (default value is 10e-06)
-     *
+     * @param  EquatorialCoordinates  $coords2  The coordinates of the second object
+     * @param  EquatorialCoordinates  $coords3  The coordinates of the thirds object
+     * @param  float  $threshold  The threshold for the method
+     *                            (default value is 10e-06)
      * @return bool True if the three bodies are in a straight line
      */
     public function isInStraightLine(
@@ -469,9 +458,8 @@ class EquatorialCoordinates
      * Returns the deviation from a straight line.
      * Chapter 19 of Astronomical Algorithms.
      *
-     * @param EquatorialCoordinates $coords2 The coordinates of the first object
-     * @param EquatorialCoordinates $coords3 The coordinates of the second object
-     *
+     * @param  EquatorialCoordinates  $coords2  The coordinates of the first object
+     * @param  EquatorialCoordinates  $coords3  The coordinates of the second object
      * @return Coordinate the deviation from the straight line
      */
     public function deviationFromStraightLine(
@@ -514,9 +502,8 @@ class EquatorialCoordinates
      * Returns the smallest circle containing three celestial bodies.
      * Chapter 20 of Astronomical Algorithms.
      *
-     * @param EquatorialCoordinates $coords2 The coordinates of the second object
-     * @param EquatorialCoordinates $coords3 The coordinates of the third object
-     *
+     * @param  EquatorialCoordinates  $coords2  The coordinates of the second object
+     * @param  EquatorialCoordinates  $coords3  The coordinates of the third object
      * @return Coordinate the diameter of the smallest circle
      */
     public function smallestCircle(
@@ -550,8 +537,7 @@ class EquatorialCoordinates
      * Returns the precession: the coordinates for another epoch and equinox.
      * Chapter 21 of Astronomical Algorithms.
      *
-     * @param Carbon $date The date for the new equinox
-     *
+     * @param  Carbon  $date  The date for the new equinox
      * @return EquatorialCoordinates the precessed coordinates
      */
     public function precession(Carbon $date): EquatorialCoordinates
@@ -593,8 +579,7 @@ class EquatorialCoordinates
     /**
      * Calculate the coordinates including the proper motion.
      *
-     * @param Carbon $date The Carbon data
-     *
+     * @param  Carbon  $date  The Carbon data
      * @return EquatorialCoordinates the coordinates including the proper motion for
      *                               the given date
      */
@@ -628,8 +613,7 @@ class EquatorialCoordinates
      * Returns the precession: the coordinates for another epoch and equinox.
      * Chapter 21 of Astronomical Algorithms.
      *
-     * @param Carbon $date The date for the new equinox
-     *
+     * @param  Carbon  $date  The date for the new equinox
      * @return EquatorialCoordinates the precessed coordinates
      */
     public function precessionHighAccuracy(
@@ -708,9 +692,8 @@ class EquatorialCoordinates
      * Returns the apparent place of a star.
      * Chapter 23 of Astronomical Algorithms.
      *
-     * @param Carbon $date     The date for the new equinox
-     * @param array  $nutation The nutation for the given data
-     *
+     * @param  Carbon  $date  The date for the new equinox
+     * @param  array  $nutation  The nutation for the given data
      * @return EquatorialCoordinates the precessed coordinates
      */
     public function apparentPlace(
@@ -744,26 +727,26 @@ class EquatorialCoordinates
             - 25 * cos($L3)
             + (6434 + 141 * $time_interval_starting_final) * sin(2 * $L3)
             + (28007 - 107 * $time_interval_starting_final) * cos(2 * $L3)
-            + (715) * sin($L5)
-            + (715) * sin($L_accent)
+            + 715 * sin($L5)
+            + 715 * sin($L_accent)
             + (486 - 5 * $time_interval_starting_final) * sin(3 * $L3)
             + (-236 - 4 * $time_interval_starting_final) * cos(3 * $L3)
-            + (159) * sin($L6)
-            + (39) * sin($L_accent + $M_accent)
-            + (33) * sin(2 * $L5)
+            + 159 * sin($L6)
+            + 39 * sin($L_accent + $M_accent)
+            + 33 * sin(2 * $L5)
             + (-10) * cos(2 * $L5)
-            + (31) * sin(2 * $L3 - $L5)
-            + (1) * cos(2 * $L3 - $L5)
-            + (8) * sin(3 * $L3 - 8 * $L4 + 3 * $L5)
+            + 31 * sin(2 * $L3 - $L5)
+            + 1 * cos(2 * $L3 - $L5)
+            + 8 * sin(3 * $L3 - 8 * $L4 + 3 * $L5)
             + (-28) * cos(3 * $L3 - 8 * $L4 + 3 * $L5)
-            + (8) * sin(5 * $L3 - 8 * $L4 + 3 * $L5)
+            + 8 * sin(5 * $L3 - 8 * $L4 + 3 * $L5)
             + (-28) * cos(5 * $L3 - 8 * $L4 + 3 * $L5)
-            + (21) * sin(2 * $L2 - $L3)
+            + 21 * sin(2 * $L2 - $L3)
             + (-19) * sin($L2)
-            + (17) * sin($L7)
-            + (16) * sin($L3 - 2 * $L5)
-            + (16) * sin($L8)
-            + (11) * sin($L3 + $L5)
+            + 17 * sin($L7)
+            + 16 * sin($L3 - 2 * $L5)
+            + 16 * sin($L8)
+            + 11 * sin($L3 + $L5)
             + (-1) * cos($L3 + $L5)
             + (-11) * cos(2 * $L2 - 2 * $L3)
             + (-11) * sin($L3 - $L5)
@@ -775,8 +758,8 @@ class EquatorialCoordinates
             + (-9) * sin(2 * $L2 - 3 * $L3)
             + (-9) * cos(2 * $L6)
             + (-9) * cos(2 * $L2 - 4 * $L3)
-            + (8) * sin(3 * $L3 - 2 * $L4)
-            + (8) * sin($L_accent + 2 * $D - $M_accent)
+            + 8 * sin(3 * $L3 - 2 * $L4)
+            + 8 * sin($L_accent + 2 * $D - $M_accent)
             + (-4) * sin(8 * $L2 - 12 * $L3)
             + (-7) * cos(8 * $L2 - 12 * $L3)
             + (-4) * sin(8 * $L2 - 14 * $L3)
@@ -785,60 +768,60 @@ class EquatorialCoordinates
             + (-5) * cos(2 * $L4)
             + (-1) * sin(3 * $L2 - 4 * $L3)
             + (-1) * cos(3 * $L2 - 4 * $L3)
-            + (4) * sin(2 * $L3 - 2 * $L5)
+            + 4 * sin(2 * $L3 - 2 * $L5)
             + (-6) * cos(2 * $L3 - 2 * $L5)
             + (-7) * cos(3 * $L2 - 3 * $L3)
-            + (5) * sin(2 * $L3 - 2 * $L4)
+            + 5 * sin(2 * $L3 - 2 * $L4)
             + (-5) * cos(2 * $L3 - 2 * $L4)
-            + (5) * sin($L_accent - 2 * $D);
+            + 5 * sin($L_accent - 2 * $D);
 
         $Y_accent = (25 - 13 * $time_interval_starting_final) * sin($L3)
             + (1578089 + 156 * $time_interval_starting_final) * cos($L3)
             + (25697 - 95 * $time_interval_starting_final) * sin(2 * $L3)
             + (-5904 - 130 * $time_interval_starting_final) * cos(2 * $L3)
-            + (6) * sin($L5)
+            + 6 * sin($L5)
             + (-657) * cos($L5)
             + (-656) * cos($L_accent)
             + (-216 - 4 * $time_interval_starting_final) * sin(3 * $L3)
             + (-446 - 5 * $time_interval_starting_final) * cos(3 * $L3)
-            + (2) * sin($L6)
+            + 2 * sin($L6)
             + (-147) * cos($L6)
-            + (26) * cos($F)
+            + 26 * cos($F)
             + (-36) * cos($L_accent + $M_accent)
             + (-9) * sin(2 * $L5)
             + (-30) * cos(2 * $L5)
-            + (1) * sin(2 * $L3 - $L5)
+            + 1 * sin(2 * $L3 - $L5)
             + (-28) * cos(2 * $L3 - $L5)
-            + (25) * sin(3 * $L3 - 8 * $L4 + 3 * $L5)
-            + (8) * cos(3 * $L3 - 8 * $L4 + 3 * $L5)
+            + 25 * sin(3 * $L3 - 8 * $L4 + 3 * $L5)
+            + 8 * cos(3 * $L3 - 8 * $L4 + 3 * $L5)
             + (-25) * sin(5 * $L3 - 8 * $L4 + 3 * $L5)
             + (-8) * cos(5 * $L3 - 8 * $L4 + 3 * $L5)
             + (-19) * cos(2 * $L2 - $L3)
-            + (17) * cos($L2)
+            + 17 * cos($L2)
             + (-16) * cos($L7)
-            + (15) * cos($L3 - 2 * $L5)
-            + (1) * sin($L8)
+            + 15 * cos($L3 - 2 * $L5)
+            + 1 * sin($L8)
             + (-15) * cos($L8)
             + (-1) * sin($L3 + $L5)
             + (-10) * cos($L3 + $L5)
             + (-10) * sin(2 * $L2 - 2 * $L3)
             + (-2) * sin($L3 - $L5)
-            + (9) * cos($L3 - $L5)
+            + 9 * cos($L3 - $L5)
             + (-8) * sin(4 * $L3)
-            + (6) * cos(4 * $L3)
-            + (9) * cos(3 * $L3 - 2 * $L5)
+            + 6 * cos(4 * $L3)
+            + 9 * cos(3 * $L3 - 2 * $L5)
             + (-9) * cos($L2 - 2 * $L3)
             + (-8) * cos(2 * $L2 - 3 * $L3)
             + (-8) * sin(2 * $L6)
-            + (8) * sin(2 * $L2 - 4 * $L3)
+            + 8 * sin(2 * $L2 - 4 * $L3)
             + (-8) * cos(3 * $L3 - 2 * $L4)
             + (-7) * cos($L_accent + 2 * $D - $M_accent)
             + (-6) * sin(8 * $L2 - 12 * $L3)
-            + (4) * cos(8 * $L2 - 12 * $L3)
-            + (6) * sin(8 * $L2 - 14 * $L3)
+            + 4 * cos(8 * $L2 - 12 * $L3)
+            + 6 * sin(8 * $L2 - 14 * $L3)
             + (-4) * cos(8 * $L2 - 14 * $L3)
             + (-4) * sin(2 * $L4)
-            + (5) * cos(2 * $L4)
+            + 5 * cos(2 * $L4)
             + (-2) * sin(3 * $L2 - 4 * $L3)
             + (-7) * cos(3 * $L2 - 4 * $L3)
             + (-5) * sin(2 * $L3 - 2 * $L5)
@@ -864,38 +847,38 @@ class EquatorialCoordinates
             + (-5) * sin(2 * $L5)
             + (-13) * cos(2 * $L5)
             + (-12) * cos(2 * $L3 - $L5)
-            + (11) * sin(3 * $L3 - 8 * $L4 + 3 * $L5)
-            + (3) * cos(3 * $L3 - 8 * $L4 + 3 * $L5)
+            + 11 * sin(3 * $L3 - 8 * $L4 + 3 * $L5)
+            + 3 * cos(3 * $L3 - 8 * $L4 + 3 * $L5)
             + (-11) * sin(5 * $L3 - 8 * $L4 + 3 * $L5)
             + (-3) * cos(5 * $L3 - 8 * $L4 + 3 * $L5)
             + (-8) * cos(2 * $L2 - $L3)
-            + (8) * cos($L2)
+            + 8 * cos($L2)
             + (-7) * cos($L7)
-            + (1) * sin($L3 - 2 * $L5)
-            + (7) * cos($L3 - 2 * $L5)
+            + 1 * sin($L3 - 2 * $L5)
+            + 7 * cos($L3 - 2 * $L5)
             + (-3) * sin($L8)
             + (-6) * cos($L8)
             + (-1) * sin($L3 + $L5)
             + (-5) * cos($L3 + $L5)
             + (-4) * sin(2 * $L2 - 2 * $L3)
             + (-1) * sin($L3 - $L5)
-            + (4) * cos($L3 - $L5)
+            + 4 * cos($L3 - $L5)
             + (-3) * sin(4 * $L3)
-            + (3) * cos(4 * $L3)
-            + (4) * cos(3 * $L3 - 2 * $L5)
+            + 3 * cos(4 * $L3)
+            + 4 * cos(3 * $L3 - 2 * $L5)
             + (-4) * cos($L2 - 2 * $L3)
             + (-4) * cos(2 * $L2 - 3 * $L3)
             + (-3) * sin(2 * $L6)
-            + (3) * sin(2 * $L2 - 4 * $L3)
+            + 3 * sin(2 * $L2 - 4 * $L3)
             + (-3) * cos(3 * $L3 - 2 * $L4)
             + (-3) * cos($L_accent + 2 * $D - $M_accent)
             + (-3) * sin(8 * $L2 - 12 * $L3)
-            + (2) * cos(8 * $L2 - 12 * $L3)
-            + (3) * sin(8 * $L2 - 14 * $L3)
+            + 2 * cos(8 * $L2 - 12 * $L3)
+            + 3 * sin(8 * $L2 - 14 * $L3)
             + (-2) * cos(8 * $L2 - 14 * $L3)
             + (-2) * sin(2 * $L4)
             + (-2) * cos(2 * $L4)
-            + (1) * sin(3 * $L2 - 4 * $L3)
+            + 1 * sin(3 * $L2 - 4 * $L3)
             + (-4) * cos(3 * $L2 - 4 * $L3)
             + (-2) * sin(2 * $L3 - 2 * $L5)
             + (-2) * cos(2 * $L3 - 2 * $L5)
@@ -1051,25 +1034,24 @@ class EquatorialCoordinates
     /**
      * Returns the page in the astronomical atlas.
      *
-     * @param string $atlas The requested atlas. Possible atlases are
-     *                      milleniumbase  : The Millenium Star Atlas
-     *                      urano          : Uranometria First Edition
-     *                      urano_new      : Uranometria Second Edition
-     *                      psa            : The Pocket Sky Atlas
-     *                      sky            : The Sky atlas
-     *                      taki           : The Taki atlas
-     *                      torresB        : The B atlas of Torres
-     *                      torresBC       : The BC atlas of Torres
-     *                      torresC        : The C atlas of Torres
-     *                      DeepskyHunter  : The DeepskyHunter atlas
-     *                      Interstellarum : The Interstellarum Deep Sky Atlas (IDSA)
-     *                      DSLOP          : The Overview atlas of DeepskyLog (in portrait)
-     *                      DSLLP          : The Lookup atlas of DeepskyLog (in portrait)
-     *                      DSLDP          : The Detail atlas of DeepskyLog (in portrait)
-     *                      DSLOL          : The Overview atlas of DeepskyLog (in landscape)
-     *                      DSLLL          : The Lookup atlas of DeepskyLog (in landscape)
-     *                      DSLDL          : The Detail atlas of DeepskyLog (in landscape)
-     *
+     * @param  string  $atlas  The requested atlas. Possible atlases are
+     *                         milleniumbase  : The Millenium Star Atlas
+     *                         urano          : Uranometria First Edition
+     *                         urano_new      : Uranometria Second Edition
+     *                         psa            : The Pocket Sky Atlas
+     *                         sky            : The Sky atlas
+     *                         taki           : The Taki atlas
+     *                         torresB        : The B atlas of Torres
+     *                         torresBC       : The BC atlas of Torres
+     *                         torresC        : The C atlas of Torres
+     *                         DeepskyHunter  : The DeepskyHunter atlas
+     *                         Interstellarum : The Interstellarum Deep Sky Atlas (IDSA)
+     *                         DSLOP          : The Overview atlas of DeepskyLog (in portrait)
+     *                         DSLLP          : The Lookup atlas of DeepskyLog (in portrait)
+     *                         DSLDP          : The Detail atlas of DeepskyLog (in portrait)
+     *                         DSLOL          : The Overview atlas of DeepskyLog (in landscape)
+     *                         DSLLL          : The Lookup atlas of DeepskyLog (in landscape)
+     *                         DSLDL          : The Detail atlas of DeepskyLog (in landscape)
      * @return string the atlas page
      */
     public function calculateAtlasPage(string $atlas): string
@@ -1143,10 +1125,10 @@ class EquatorialCoordinates
         $page = 1;
         for ($i = 0; $i < count($atlaspages[$atlastype]); $i++) {
             if (
-                ($this->getDeclination()->getCoordinate() < (90 + ((-$i) * (180 / (count($atlaspages[$atlastype]))))))
-                && ($this->getDeclination()->getCoordinate() >= (90 + ((-1 - $i) * (180 / (count($atlaspages[$atlastype]))))))
+                ($this->getDeclination()->getCoordinate() < (90 + ((-$i) * (180 / count($atlaspages[$atlastype])))))
+                && ($this->getDeclination()->getCoordinate() >= (90 + ((-1 - $i) * (180 / count($atlaspages[$atlastype])))))
             ) {
-                return $page + floor((24 - $this->getRA()->getCoordinate()) / (24 / ($atlaspages[$atlastype][$i])));
+                return $page + floor((24 - $this->getRA()->getCoordinate()) / (24 / $atlaspages[$atlastype][$i]));
             } else {
                 $page += $atlaspages[$atlastype][$i];
             }
@@ -2073,7 +2055,7 @@ class EquatorialCoordinates
         /* -84 to -73 */
         elseif ($this->getDeclination()->getCoordinate() >= -84) {
             if (($this->getRA()->getCoordinate() >= 1.0) && ($this->getRA()->getCoordinate() < 23.0)) {
-                $urano = (int) ($this->getRA()->getCoordinate()) - 1;
+                $urano = (int) $this->getRA()->getCoordinate() - 1;
                 $urano = $urano / 2;
                 $urano = $urano + 461;
             } else {

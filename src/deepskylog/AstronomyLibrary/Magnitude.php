@@ -6,8 +6,10 @@
  * PHP Version 8
  *
  * @category Magnitude
+ *
  * @author   Deepsky Developers <developers@deepskylog.be>
  * @license  GPL3 <https://opensource.org/licenses/GPL-3.0>
+ *
  * @link     http://www.deepskylog.org
  */
 
@@ -21,8 +23,10 @@ use InvalidArgumentException;
  * PHP Version 8
  *
  * @category Magnitude
+ *
  * @author   Deepsky Developers <developers@deepskylog.be>
  * @license  GPL3 <https://opensource.org/licenses/GPL-3.0>
+ *
  * @link     http://www.deepskylog.org
  */
 class Magnitude
@@ -30,10 +34,9 @@ class Magnitude
     /**
      * Calculates the Sqm if the Nelm is given.
      *
-     * @param float $nelm      The Naked Eye Limiting Magnitude
-     * @param float $fstOffset The offset between the real Nelm and the
-     *                         Nelm for the observer
-     *
+     * @param  float  $nelm  The Naked Eye Limiting Magnitude
+     * @param  float  $fstOffset  The offset between the real Nelm and the
+     *                            Nelm for the observer
      * @return float The Sqm (Sky Quality Meter) value
      */
     public static function nelmToSqm(float $nelm, float $fstOffset = 0.0): float
@@ -49,7 +52,7 @@ class Magnitude
             );
         }
         $sqm = 21.58
-            - 5 * log10(pow(10, (1.586 - ($nelm + $fstOffset) / 5.0)) - 1.0);
+            - 5 * log10(pow(10, 1.586 - ($nelm + $fstOffset) / 5.0) - 1.0);
 
         if ($sqm > 22.0) {
             return 22.0;
@@ -61,8 +64,7 @@ class Magnitude
     /**
      * Calculates the bortle scale if the Nelm is given.
      *
-     * @param float $nelm The Naked Eye Limiting Magnitude
-     *
+     * @param  float  $nelm  The Naked Eye Limiting Magnitude
      * @return int The bortle scale value
      */
     public static function nelmToBortle(float $nelm): int
@@ -101,8 +103,7 @@ class Magnitude
     /**
      * Calculates the bortle value if the sqm value is given.
      *
-     * @param float $sqm The sqm value
-     *
+     * @param  float  $sqm  The sqm value
      * @return int The bortle value
      */
     public static function sqmToBortle($sqm): int
@@ -142,10 +143,9 @@ class Magnitude
     /**
      * Calculates the naked eye limiting magnitude if the sqm value is given.
      *
-     * @param float $sqm       The sqm value
-     * @param float $fstOffset The offset between the real Nelm and the
-     *                         Nelm for the observer
-     *
+     * @param  float  $sqm  The sqm value
+     * @param  float  $fstOffset  The offset between the real Nelm and the
+     *                            Nelm for the observer
      * @return float The limiting magnitude
      */
     public static function sqmToNelm($sqm, float $fstOffset = 0.0)
@@ -173,10 +173,9 @@ class Magnitude
     /**
      * Calculates the naked eye limiting magnitude if the bortle scale is given.
      *
-     * @param int   $bortle    The bortle scale
-     * @param float $fstOffset The offset between the real Nelm and the
-     *                         Nelm for the observer
-     *
+     * @param  int  $bortle  The bortle scale
+     * @param  float  $fstOffset  The offset between the real Nelm and the
+     *                            Nelm for the observer
      * @return float The naked eye limiting magnitude
      */
     public static function bortleToNelm(int $bortle, float $fstOffset = 0.0): float
@@ -218,8 +217,7 @@ class Magnitude
     /**
      * Calculates the SQM value if the bortle scale is given.
      *
-     * @param int $bortle The bortle scale
-     *
+     * @param  int  $bortle  The bortle scale
      * @return float The SQM value
      */
     public static function bortleToSqm(int $bortle): float

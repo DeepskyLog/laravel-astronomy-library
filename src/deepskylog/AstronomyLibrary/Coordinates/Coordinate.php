@@ -6,8 +6,10 @@
  * PHP Version 8
  *
  * @category Coordinates
+ *
  * @author   Deepsky Developers <developers@deepskylog.be>
  * @license  GPL3 <https://opensource.org/licenses/GPL-3.0>
+ *
  * @link     http://www.deepskylog.org
  */
 
@@ -19,8 +21,10 @@ namespace deepskylog\AstronomyLibrary\Coordinates;
  * PHP Version 8
  *
  * @category Coordinates
+ *
  * @author   Deepsky Developers <developers@deepskylog.be>
  * @license  GPL3 <https://opensource.org/licenses/GPL-3.0>
+ *
  * @link     http://www.deepskylog.org
  */
 class Coordinate
@@ -32,9 +36,9 @@ class Coordinate
     /**
      * The constructor.
      *
-     * @param float $coordinate The coordinate
-     * @param float $minValue   The minimum value for the coordinate
-     * @param float $maxValue   The maximum value for the coordinate
+     * @param  float  $coordinate  The coordinate
+     * @param  float  $minValue  The minimum value for the coordinate
+     * @param  float  $maxValue  The maximum value for the coordinate
      */
     public function __construct(
         float $coordinate,
@@ -50,8 +54,7 @@ class Coordinate
     /**
      * Set the coordinate.
      *
-     * @param float $coord the coordinate to set
-     *
+     * @param  float  $coord  the coordinate to set
      * @return None
      */
     public function setCoordinate(float $coord): void
@@ -185,8 +188,7 @@ class Coordinate
     /**
      * Sets the minimum valid value for the coordinate.
      *
-     * @param float $minValue The minimum valid value
-     *
+     * @param  float  $minValue  The minimum valid value
      * @return None
      */
     public function setMinValue(float $minValue): void
@@ -197,8 +199,7 @@ class Coordinate
     /**
      * Sets the maximum valid value for the first coordinate.
      *
-     * @param float $maxValue The maximum valid value
-     *
+     * @param  float  $maxValue  The maximum valid value
      * @return None
      */
     public function setMaxValue(float $maxValue): void

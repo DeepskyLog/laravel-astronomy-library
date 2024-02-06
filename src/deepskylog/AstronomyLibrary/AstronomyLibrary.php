@@ -5,8 +5,10 @@
  * PHP Version 8
  *
  * @category AstronomyLibrary
+ *
  * @author   Deepsky Developers <developers@deepskylog.be>
  * @license  GPL3 <https://opensource.org/licenses/GPL-3.0>
+ *
  * @link     http://www.deepskylog.org
  */
 
@@ -26,8 +28,10 @@ use deepskylog\AstronomyLibrary\Coordinates\HorizontalCoordinates;
  * PHP Version 8
  *
  * @category AstronomyLibrary
+ *
  * @author   Deepsky Developers <developers@deepskylog.be>
  * @license  GPL3 <https://opensource.org/licenses/GPL-3.0>
+ *
  * @link     http://www.deepskylog.org
  */
 class AstronomyLibrary
@@ -45,9 +49,9 @@ class AstronomyLibrary
     /**
      * The constructor.
      *
-     * @param Carbon                  $carbonDate  The date
-     * @param GeographicalCoordinates $coordinates The geographical coordinates
-     * @param float                   $height      The height of the location
+     * @param  Carbon  $carbonDate  The date
+     * @param  GeographicalCoordinates  $coordinates  The geographical coordinates
+     * @param  float  $height  The height of the location
      */
     public function __construct(
         Carbon $carbonDate,
@@ -79,8 +83,7 @@ class AstronomyLibrary
     /**
      * Sets the date and time.
      *
-     * @param Carbon $date The new Carbon date
-     *
+     * @param  Carbon  $date  The new Carbon date
      * @return None
      */
     public function setDate(Carbon $date): void
@@ -109,8 +112,7 @@ class AstronomyLibrary
     /**
      * Sets the date and time.
      *
-     * @param GeographicalCoordinates $coordinates The new geographical coordinates
-     *
+     * @param  GeographicalCoordinates  $coordinates  The new geographical coordinates
      * @return None
      */
     public function setGeographicalCoordinates(
@@ -138,8 +140,7 @@ class AstronomyLibrary
     /**
      * Sets the height of the location in meters.
      *
-     * @param float $height The height of the location in meters
-     *
+     * @param  float  $height  The height of the location in meters
      * @return None
      */
     public function setHeight(
@@ -162,8 +163,7 @@ class AstronomyLibrary
     /**
      * Sets the julian day and adapt the date.
      *
-     * @param float $jd The julian day
-     *
+     * @param  float  $jd  The julian day
      * @return None
      */
     public function setJd(float $jd): void
@@ -238,8 +238,7 @@ class AstronomyLibrary
     /**
      * Converts from Equatorial coordinates to ecliptical coordinates.
      *
-     * @param EquatorialCoordinates $coords the equatorial coordinates to convert
-     *
+     * @param  EquatorialCoordinates  $coords  the equatorial coordinates to convert
      * @return EclipticalCoordinates the ecliptical coordinates for J2000
      */
     public function equatorialToEcliptical(
@@ -251,8 +250,7 @@ class AstronomyLibrary
     /**
      * Converts from Ecliptical coordinates to Equatorial coordinates.
      *
-     * @param EclipticalCoordinates $coords the ecliptical coordinates to convert
-     *
+     * @param  EclipticalCoordinates  $coords  the ecliptical coordinates to convert
      * @return EquatorialCoordinates The equatorial coordinates in J2000
      */
     public function eclipticalToEquatorial(
@@ -264,8 +262,7 @@ class AstronomyLibrary
     /**
      * Converts from Equatorial coordinates to horizontal coordinates.
      *
-     * @param EquatorialCoordinates $coords the equatorial coordinates to convert
-     *
+     * @param  EquatorialCoordinates  $coords  the equatorial coordinates to convert
      * @return HorizontalCoordinates the horizontal coordinates for the date and
      *                               location
      */
@@ -283,8 +280,7 @@ class AstronomyLibrary
      * negative before and positive after the passage throught the southern
      * meridian. This is the effect of the moon that is lying down at moonrise.
      *
-     * @param EquatorialCoordinates $coords The coordinates of the object
-     *
+     * @param  EquatorialCoordinates  $coords  The coordinates of the object
      * @return float the parallactic angle in degrees
      */
     public function parallacticAngle(EquatorialCoordinates $coords): float
@@ -298,8 +294,7 @@ class AstronomyLibrary
     /**
      * Converts from Horizontal coordinates to Equatorial coordinates.
      *
-     * @param HorizontalCoordinates $coords the horizontal coordinates to convert
-     *
+     * @param  HorizontalCoordinates  $coords  the horizontal coordinates to convert
      * @return EquatorialCoordinates The equatorial coordinates
      */
     public function horizontalToEquatorial(
@@ -314,8 +309,7 @@ class AstronomyLibrary
     /**
      * Converts from Equatorial coordinates to Galactic coordinates.
      *
-     * @param EquatorialCoordinates $coords the equatorial coordinates to convert
-     *
+     * @param  EquatorialCoordinates  $coords  the equatorial coordinates to convert
      * @return GalacticCoordinates The galactic coordinates (J2000)
      */
     public function equatorialToGalactic(
@@ -327,8 +321,7 @@ class AstronomyLibrary
     /**
      * Converts from Galactic coordinates to Equatorial coordinates.
      *
-     * @param GalacticCoordinates $coords the galactic coordinates to convert
-     *
+     * @param  GalacticCoordinates  $coords  the galactic coordinates to convert
      * @return EquatorialCoordinates The equatorial coordinates
      */
     public function galacticToEquatorial(
@@ -340,8 +333,7 @@ class AstronomyLibrary
     /**
      * Creates a chart with the length of the year during the year.
      *
-     * @param string $timezone the timezone to create the graph for
-     *
+     * @param  string  $timezone  the timezone to create the graph for
      * @return string The chart with the length of the night
      */
     public function getLengthOfNightPlot($timezone): string
@@ -687,7 +679,7 @@ class AstronomyLibrary
             }
             // Date line
             $red = imagecolorallocate($image, 255, 0, 0);
-            $datelocation = 2 * ($this->getDate()->dayOfYear);
+            $datelocation = 2 * $this->getDate()->dayOfYear;
             imageline($image, $datelocation + 70, 5, $datelocation + 70, 365, $red);
 
             imageline($image, 802, 365, 802, 355, $axiscolor);
@@ -731,12 +723,11 @@ class AstronomyLibrary
      * Returns true if the three bodies are in a straight line.
      * Chapter 19 of Astronomical Algorithms.
      *
-     * @param EquatorialCoordinates $coords1   The coordinates of the first object
-     * @param EquatorialCoordinates $coords2   The coordinates of the second object
-     * @param EquatorialCoordinates $coords3   The coordinates of the thirds object
-     * @param float                 $threshold The threshold for the method
-     *                                         (default value is 10e-06)
-     *
+     * @param  EquatorialCoordinates  $coords1  The coordinates of the first object
+     * @param  EquatorialCoordinates  $coords2  The coordinates of the second object
+     * @param  EquatorialCoordinates  $coords3  The coordinates of the thirds object
+     * @param  float  $threshold  The threshold for the method
+     *                            (default value is 10e-06)
      * @return bool True if the three bodies are in a straight line
      */
     public function isInStraightLine(
@@ -752,10 +743,9 @@ class AstronomyLibrary
      * Returns the deviation from a straight line.
      * Chapter 19 of Astronomical Algorithms.
      *
-     * @param EquatorialCoordinates $coords1 The coordinates of the first object
-     * @param EquatorialCoordinates $coords2 The coordinates of the first object
-     * @param EquatorialCoordinates $coords3 The coordinates of the second object
-     *
+     * @param  EquatorialCoordinates  $coords1  The coordinates of the first object
+     * @param  EquatorialCoordinates  $coords2  The coordinates of the first object
+     * @param  EquatorialCoordinates  $coords3  The coordinates of the second object
      * @return Coordinate the deviation from the straight line
      */
     public function deviationFromStraightLine(
@@ -770,10 +760,9 @@ class AstronomyLibrary
      * Returns the smallest circle containing three celestial bodies.
      * Chapter 20 of Astronomical Algorithms.
      *
-     * @param EquatorialCoordinates $coords1 The coordinates of the first object
-     * @param EquatorialCoordinates $coords2 The coordinates of the second object
-     * @param EquatorialCoordinates $coords3 The coordinates of the third object
-     *
+     * @param  EquatorialCoordinates  $coords1  The coordinates of the first object
+     * @param  EquatorialCoordinates  $coords2  The coordinates of the second object
+     * @param  EquatorialCoordinates  $coords3  The coordinates of the third object
      * @return Coordinate the diameter of the smallest circle
      */
     public function smallestCircle(
@@ -787,8 +776,7 @@ class AstronomyLibrary
     /**
      * Returns the apparent place of a star.
      *
-     * @param EquatorialCoordinates $coords The coordinates to start with
-     *
+     * @param  EquatorialCoordinates  $coords  The coordinates to start with
      * @return EquatorialCoordinates The apparent place for the star
      */
     public function apparentPlace(
@@ -801,8 +789,7 @@ class AstronomyLibrary
      * Returns rhoSinPhi and rhoCosPhi.
      * Needed for the calculation of the parallax.
      *
-     * @param float $height The height of the location
-     *
+     * @param  float  $height  The height of the location
      * @return array with rhoSinPhi and rhoCosPhi
      *
      * See Chapter 11 of Astronomical Algorithms

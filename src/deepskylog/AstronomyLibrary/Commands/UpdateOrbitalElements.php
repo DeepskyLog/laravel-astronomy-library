@@ -71,15 +71,15 @@ class UpdateOrbitalElements extends Command
                 if ($name != '') {
                     CometsOrbitalElements::create(
                         [
-                            'name'                => $name,
-                            'epoch'               => $epoch,
-                            'q'                   => $q,
-                            'e'                   => $e,
-                            'i'                   => $i,
-                            'w'                   => $w,
-                            'node'                => $node,
-                            'Tp'                  => $Tp,
-                            'ref'                 => $ref,
+                            'name' => $name,
+                            'epoch' => $epoch,
+                            'q' => $q,
+                            'e' => $e,
+                            'i' => $i,
+                            'w' => $w,
+                            'node' => $node,
+                            'Tp' => $Tp,
+                            'ref' => $ref,
                         ]
                     );
                 }
@@ -127,19 +127,19 @@ class UpdateOrbitalElements extends Command
                 if ($name != '') {
                     AsteroidsOrbitalElements::create(
                         [
-                            'number'              => $number,
-                            'name'                => $name,
-                            'epoch'               => $epoch,
-                            'a'                   => $a,
-                            'e'                   => $e,
-                            'i'                   => $i,
-                            'w'                   => $w,
-                            'node'                => $node,
-                            'M'                   => $M,
-                            'H'                   => $H,
-                            'G'                   => $G,
-                            'Tp'                  => $Tp,
-                            'ref'                 => $ref,
+                            'number' => $number,
+                            'name' => $name,
+                            'epoch' => $epoch,
+                            'a' => $a,
+                            'e' => $e,
+                            'i' => $i,
+                            'w' => $w,
+                            'node' => $node,
+                            'M' => $M,
+                            'H' => $H,
+                            'G' => $G,
+                            'Tp' => $Tp,
+                            'ref' => $ref,
                         ]
                     );
                 }

@@ -6,8 +6,10 @@
  * PHP Version 8
  *
  * @category Target
+ *
  * @author   Deepsky Developers <developers@deepskylog.be>
  * @license  GPL3 <https://opensource.org/licenses/GPL-3.0>
+ *
  * @link     http://www.deepskylog.org
  */
 
@@ -25,8 +27,10 @@ use deepskylog\AstronomyLibrary\Time;
  * PHP Version 8
  *
  * @category Target
+ *
  * @author   Deepsky Developers <developers@deepskylog.be>
  * @license  GPL3 <https://opensource.org/licenses/GPL-3.0>
+ *
  * @link     http://www.deepskylog.org
  */
 abstract class Planet extends Target
@@ -42,7 +46,7 @@ abstract class Planet extends Target
     /**
      * Calculates the apparent equatorial coordinates of the planet.
      *
-     * @param Carbon $date      The date for which to calculate the coordinates
+     * @param  Carbon  $date  The date for which to calculate the coordinates
      *
      * See chapter 33 of Astronomical Algorithms
      */
@@ -59,16 +63,16 @@ abstract class Planet extends Target
                 $this->_calculateApparentEquatorialCoordinates($date->subDays(2))
             );
         } else {
-            print("START DE440");
+            echo 'START DE440';
         }
     }
 
     /**
      * Calculates the topocentric equatorial coordinates of the planet.
      *
-     * @param Carbon                  $date       The date for which to calculate the coordinates
-     * @param GeographicalCoordinates $geo_coords The geographical coordinates
-     * @param float                   $height     The height of the location
+     * @param  Carbon  $date  The date for which to calculate the coordinates
+     * @param  GeographicalCoordinates  $geo_coords  The geographical coordinates
+     * @param  float  $height  The height of the location
      *
      * See chapter 40 of Astronomical Algorithms
      */
@@ -85,7 +89,7 @@ abstract class Planet extends Target
                 $this->_calculateEquatorialCoordinates($date->subDays(2), $geo_coords, $height)
             );
         } else {
-            print("Downloading DE440");
+            echo 'Downloading DE440';
         }
     }
 
@@ -137,9 +141,9 @@ abstract class Planet extends Target
         $lambda += $deltaLambda;
         $beta += $deltaBeta;
 
-        $L_accent = $helio_coords[0] - 1.397 * ($T) - 0.00031 * ($T) ** 2;
+        $L_accent = $helio_coords[0] - 1.397 * $T - 0.00031 * $T ** 2;
 
-        $deltaLambda = -0.09033 + 0.03916 * (cos(deg2rad($L_accent) + sin(deg2rad($L_accent)))) * tan(deg2rad($helio_coords[1]));
+        $deltaLambda = -0.09033 + 0.03916 * cos(deg2rad($L_accent) + sin(deg2rad($L_accent))) * tan(deg2rad($helio_coords[1]));
         $deltaBeta = 0.03916 * (cos(deg2rad($L_accent)) - sin(deg2rad($L_accent)));
 
         $lambda += $deltaLambda / 3600.0;
@@ -199,9 +203,9 @@ abstract class Planet extends Target
         $lambda += $deltaLambda;
         $beta += $deltaBeta;
 
-        $L_accent = $helio_coords[0] - 1.397 * ($T) - 0.00031 * ($T) ** 2;
+        $L_accent = $helio_coords[0] - 1.397 * $T - 0.00031 * $T ** 2;
 
-        $deltaLambda = -0.09033 + 0.03916 * (cos(deg2rad($L_accent) + sin(deg2rad($L_accent)))) * tan(deg2rad($helio_coords[1]));
+        $deltaLambda = -0.09033 + 0.03916 * cos(deg2rad($L_accent) + sin(deg2rad($L_accent))) * tan(deg2rad($helio_coords[1]));
         $deltaBeta = 0.03916 * (cos(deg2rad($L_accent)) - sin(deg2rad($L_accent)));
 
         $lambda += $deltaLambda / 3600.0;
@@ -237,8 +241,7 @@ abstract class Planet extends Target
     /**
      * Calculates the illuminated fraction of the planet.
      *
-     * @param Carbon $date The date for which to calculate the fraction
-     *
+     * @param  Carbon  $date  The date for which to calculate the fraction
      * @return float The illuminated fraction
      *
      * See chapter 41 of Astronomical Algorithms

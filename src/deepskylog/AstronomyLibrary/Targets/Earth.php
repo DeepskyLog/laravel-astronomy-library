@@ -6,8 +6,10 @@
  * PHP Version 8
  *
  * @category Target
+ *
  * @author   Deepsky Developers <developers@deepskylog.be>
  * @license  GPL3 <https://opensource.org/licenses/GPL-3.0>
+ *
  * @link     http://www.deepskylog.org
  */
 
@@ -23,8 +25,10 @@ use deepskylog\AstronomyLibrary\Time;
  * PHP Version 8
  *
  * @category Target
+ *
  * @author   Deepsky Developers <developers@deepskylog.be>
  * @license  GPL3 <https://opensource.org/licenses/GPL-3.0>
+ *
  * @link     http://www.deepskylog.org
  */
 class Earth extends Planet
@@ -32,8 +36,7 @@ class Earth extends Planet
     /**
      * Calculates the mean orbital elements.
      *
-     * @param Carbon $date The needed date
-     *
+     * @param  Carbon  $date  The needed date
      * @return array L = mean longitude of the planet
      *               a = semimajor axis of the orbit
      *               e = eccentricity of the orbit
@@ -63,8 +66,7 @@ class Earth extends Planet
     /**
      * Calculates the mean orbital elements in J2000.0.
      *
-     * @param Carbon $date The needed date
-     *
+     * @param  Carbon  $date  The needed date
      * @return array L = mean longitude of the planet
      *               a = semimajor axis of the orbit
      *               e = eccentricity of the orbit
@@ -94,8 +96,7 @@ class Earth extends Planet
     /**
      * Calculates the heliocentric coordinates of Earth.
      *
-     * @param Carbon $date The date
-     *
+     * @param  Carbon  $date  The date
      * @return array L, B, R
      *
      * See chapter 32 of Astronomical Algorithms
@@ -2561,8 +2562,7 @@ class Earth extends Planet
     /**
      * Returns the date of perihelion closest to the given date.
      *
-     * @param Carbon $date The date for which we want to calculate the closest perihelion
-     *
+     * @param  Carbon  $date  The date for which we want to calculate the closest perihelion
      * @return Carbon The date of the perihelion
      *
      * Chapter 38 of Astronomical Algorithms
@@ -2582,8 +2582,7 @@ class Earth extends Planet
     /**
      * Returns the date of aphelion closest to the given date.
      *
-     * @param Carbon $date The date for which we want to calculate the closest aphelion
-     *
+     * @param  Carbon  $date  The date for which we want to calculate the closest aphelion
      * @return Carbon The date of the aphelion
      *
      * Chapter 38 of Astronomical Algorithms

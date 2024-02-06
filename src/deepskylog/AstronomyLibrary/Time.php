@@ -6,8 +6,10 @@
  * PHP Version 8
  *
  * @category Time
+ *
  * @author   Deepsky Developers <developers@deepskylog.be>
  * @license  GPL3 <https://opensource.org/licenses/GPL-3.0>
+ *
  * @link     http://www.deepskylog.org
  */
 
@@ -24,8 +26,10 @@ use Exception;
  * PHP Version 8
  *
  * @category Time
+ *
  * @author   Deepsky Developers <developers@deepskylog.be>
  * @license  GPL3 <https://opensource.org/licenses/GPL-3.0>
+ *
  * @link     http://www.deepskylog.org
  */
 class Time
@@ -34,8 +38,7 @@ class Time
      * Calculates the julian day if the time is given.
      * Chapter 7 in Astronomical Algorithms.
      *
-     * @param Carbon $date The date, in the correct timezone
-     *
+     * @param  Carbon  $date  The date, in the correct timezone
      * @return float the julian day
      */
     public static function getJd(Carbon $date): float
@@ -85,8 +88,7 @@ class Time
      * Calculates the carbon date is the julian day is given.
      * Chapter 7 in Astronomical Algorithms.
      *
-     * @param float $jd the julian day
-     *
+     * @param  float  $jd  the julian day
      * @return Carbon The date, in the UTC timezone
      */
     public static function fromJd(float $jd): Carbon
@@ -143,8 +145,7 @@ class Time
      * Returns the dynamical time as the time + delta t.
      * Chapter 10 in Astronomical Algorithms.
      *
-     * @param Carbon $date The date
-     *
+     * @param  Carbon  $date  The date
      * @return Carbon The dynamical time
      */
     public static function dynamicalTime(Carbon $date): Carbon
@@ -156,8 +157,7 @@ class Time
      * Calculates delta t for the given date.
      * Chapter 10 in Astronomical Algorithms.
      *
-     * @param Carbon $date The date
-     *
+     * @param  Carbon  $date  The date
      * @return float delta t in seconds
      */
     public static function deltaT(Carbon $date): float
@@ -231,9 +231,8 @@ class Time
      * Calculates the mean siderial time for the given date.
      * Chapter 12 in Astronomical Algorithms.
      *
-     * @param Carbon                  $date   The date
-     * @param GeographicalCoordinates $coords The geographical coordinates
-     *
+     * @param  Carbon  $date  The date
+     * @param  GeographicalCoordinates  $coords  The geographical coordinates
      * @return Carbon the siderial time
      */
     public static function meanSiderialTime(
@@ -255,7 +254,7 @@ class Time
         $theta0 -= floor($theta0 / 360.0) * 360;
 
         $decimalHours = $theta0 / 15.0;
-        $hour = (int) ($decimalHours);
+        $hour = (int) $decimalHours;
         $decimalMinutes = ($decimalHours - $hour) * 60.0;
         $minutes = (int) $decimalMinutes;
         $seconds = ($decimalMinutes - $minutes) * 60.0;
@@ -275,10 +274,9 @@ class Time
      * Calculates the apparent siderial time for the given date.
      * Chapter 12 in Astronomical Algorithms.
      *
-     * @param Carbon                  $date     The date
-     * @param GeographicalCoordinates $coords   The geographical coordinates
-     * @param array                   $nutation The nutation array
-     *
+     * @param  Carbon  $date  The date
+     * @param  GeographicalCoordinates  $coords  The geographical coordinates
+     * @param  array  $nutation  The nutation array
      * @return Carbon the siderial time
      */
     public static function apparentSiderialTime(
@@ -306,8 +304,7 @@ class Time
      * in Greenwich.
      * Chapter 12 in Astronomical Algorithms.
      *
-     * @param Carbon $date The date
-     *
+     * @param  Carbon  $date  The date
      * @return Carbon the siderial time
      */
     public static function apparentSiderialTimeGreenwich(
@@ -326,8 +323,7 @@ class Time
      * Calculates the nutation for the given julian day.
      * Chapter 22 of Astronomical Algorithms.
      *
-     * @param float $jd The Julian day
-     *
+     * @param  float  $jd  The Julian day
      * @return array The array with nutation in Longitude, nutation in Obliquity,
      *               mean Obliquity and true Obliquity
      */
@@ -375,50 +371,50 @@ class Time
             + (217 - 0.5 * $T) * sin(deg2rad(-2 * $D - $M + 2 * $F + 2 * $omega))
             + (-158) * sin(deg2rad(-2 * $D + $M_accent))
             + (129 + 0.1 * $T) * sin(deg2rad(-2 * $D + 2 * $F + $omega))
-            + (123) * sin(deg2rad(-$M_accent + 2 * $F + 2 * $omega))
-            + (63) * sin(deg2rad(2 * $D))
+            + 123 * sin(deg2rad(-$M_accent + 2 * $F + 2 * $omega))
+            + 63 * sin(deg2rad(2 * $D))
             + (63 + 0.1 * $T) * sin(deg2rad($M_accent + $omega))
             + (-59) * sin(deg2rad(2 * $D - $M_accent + 2 * $F + 2 * $omega))
             + (-58 - 0.1 * $T) * sin(deg2rad(-$M_accent + $omega))
             + (-51) * sin(deg2rad($M_accent + 2 * $F + $omega))
-            + (48) * sin(deg2rad(-2 * $D + 2 * $M_accent))
-            + (46) * sin(deg2rad(-2 * $M_accent + 2 * $F + $omega))
+            + 48 * sin(deg2rad(-2 * $D + 2 * $M_accent))
+            + 46 * sin(deg2rad(-2 * $M_accent + 2 * $F + $omega))
             + (-38) * sin(deg2rad(2 * $D + 2 * $F + 2 * $omega))
             + (-31) * sin(deg2rad(2 * $M_accent + 2 * $F + 2 * $omega))
-            + (29) * sin(deg2rad(2 * $M_accent))
-            + (29) * sin(deg2rad(-2 * $D + $M_accent + 2 * $F + 2 * $omega))
-            + (26) * sin(deg2rad(2 * $F))
+            + 29 * sin(deg2rad(2 * $M_accent))
+            + 29 * sin(deg2rad(-2 * $D + $M_accent + 2 * $F + 2 * $omega))
+            + 26 * sin(deg2rad(2 * $F))
             + (-22) * sin(deg2rad(-2 * $D + 2 * $F))
-            + (21) * sin(deg2rad(-$M_accent + 2 * $F + $omega))
+            + 21 * sin(deg2rad(-$M_accent + 2 * $F + $omega))
             + (17 - 0.1 * $T) * sin(deg2rad(2 * $M))
-            + (16) * sin(deg2rad(2 * $D - $M_accent + $omega))
+            + 16 * sin(deg2rad(2 * $D - $M_accent + $omega))
             + (-16 + 0.1 * $T) * sin(deg2rad(-2 * $D + 2 * $M + 2 * $F + 2 * $omega))
             + (-15) * sin(deg2rad($M + $omega))
             + (-13) * sin(deg2rad(-2 * $D + $M_accent + $omega))
             + (-12) * sin(deg2rad(-$M + $omega))
-            + (11) * sin(deg2rad(2 * $M_accent - 2 * $F))
+            + 11 * sin(deg2rad(2 * $M_accent - 2 * $F))
             + (-10) * sin(deg2rad(2 * $D - $M_accent + 2 * $F + $omega))
             + (-8) * sin(deg2rad(2 * $D + $M_accent + 2 * $F + 2 * $omega))
-            + (7) * sin(deg2rad($M + 2 * $F + 2 * $omega))
+            + 7 * sin(deg2rad($M + 2 * $F + 2 * $omega))
             + (-7) * sin(deg2rad(-2 * $D + $M + $M_accent))
             + (-7) * sin(deg2rad(-$M + 2 * $F + 2 * $omega))
             + (-7) * sin(deg2rad(2 * $D + 2 * $F + $omega))
-            + (6) * sin(deg2rad(2 * $D + $M_accent))
-            + (6) * sin(deg2rad(-2 * $D + 2 * $M_accent + 2 * $F + 2 * $omega))
-            + (6) * sin(deg2rad(-2 * $D + $M_accent + 2 * $F + $omega))
+            + 6 * sin(deg2rad(2 * $D + $M_accent))
+            + 6 * sin(deg2rad(-2 * $D + 2 * $M_accent + 2 * $F + 2 * $omega))
+            + 6 * sin(deg2rad(-2 * $D + $M_accent + 2 * $F + $omega))
             + (-6) * sin(deg2rad(2 * $D - 2 * $M_accent + $omega))
             + (-6) * sin(deg2rad(2 * $D + $omega))
-            + (5) * sin(deg2rad(-$M + $M_accent))
+            + 5 * sin(deg2rad(-$M + $M_accent))
             + (-5) * sin(deg2rad(-2 * $D - $M + 2 * $F + $omega))
             + (-5) * sin(deg2rad(-2 * $D + $omega))
             + (-5) * sin(deg2rad(2 * $M_accent + 2 * $F + $omega))
-            + (4) * sin(deg2rad(-2 * $D + 2 * $M_accent + $omega))
-            + (4) * sin(deg2rad(-2 * $D + $M + 2 * $F + $omega))
-            + (4) * sin(deg2rad($M_accent - 2 * $F))
+            + 4 * sin(deg2rad(-2 * $D + 2 * $M_accent + $omega))
+            + 4 * sin(deg2rad(-2 * $D + $M + 2 * $F + $omega))
+            + 4 * sin(deg2rad($M_accent - 2 * $F))
             + (-4) * sin(deg2rad(-$D + $M_accent))
             + (-4) * sin(deg2rad(-2 * $D + $M))
             + (-4) * sin(deg2rad($D))
-            + (3) * sin(deg2rad($M_accent + 2 * $F))
+            + 3 * sin(deg2rad($M_accent + 2 * $F))
             + (-3) * sin(deg2rad(-2 * $M_accent + 2 * $F + 2 * $omega))
             + (-3) * sin(deg2rad(-$D - $M + $M_accent))
             + (-3) * sin(deg2rad($M + $M_accent))
@@ -437,37 +433,37 @@ class Time
                 + (54 - 0.1 * $T) * cos(deg2rad($M))
                 + (-7) * cos(deg2rad($M_accent))
                 + (224 - 0.6 * $T) * cos(deg2rad(-2 * $D + $M + 2 * $F + 2 * $omega))
-                + (200) * cos(deg2rad(2 * $F + $omega))
+                + 200 * cos(deg2rad(2 * $F + $omega))
                 + (129 - 0.1 * $T) * cos(deg2rad($M_accent + 2 * $F + 2 * $omega))
                 + (-95 + 0.3 * $T) * cos(deg2rad(-2 * $D - $M + 2 * $F + 2 * $omega))
                 + (-70) * cos(deg2rad(-2 * $D + 2 * $F + $omega))
                 + (-53) * cos(deg2rad(-$M_accent + 2 * $F + 2 * $omega))
                 + (-33) * cos(deg2rad($M_accent + $omega))
-                + (26) * cos(deg2rad(2 * $D - $M_accent + 2 * $F + 2 * $omega))
-                + (32) * cos(deg2rad(-$M_accent + $omega))
-                + (27) * cos(deg2rad($M_accent + 2 * $F + $omega))
+                + 26 * cos(deg2rad(2 * $D - $M_accent + 2 * $F + 2 * $omega))
+                + 32 * cos(deg2rad(-$M_accent + $omega))
+                + 27 * cos(deg2rad($M_accent + 2 * $F + $omega))
                 + (-24) * cos(deg2rad(-2 * $M_accent + 2 * $F + $omega))
-                + (16) * cos(deg2rad(2 * $D + 2 * $F + 2 * $omega))
-                + (13) * cos(deg2rad(2 * $M_accent + 2 * $F + 2 * $omega))
+                + 16 * cos(deg2rad(2 * $D + 2 * $F + 2 * $omega))
+                + 13 * cos(deg2rad(2 * $M_accent + 2 * $F + 2 * $omega))
                 + (-12) * cos(deg2rad(-2 * $D + $M_accent + 2 * $F + 2 * $omega))
                 + (-10) * cos(deg2rad(-$M_accent + 2 * $F + $omega))
                 + (-8) * cos(deg2rad(2 * $D - $M_accent + $omega))
-                + (7) * cos(deg2rad(-2 * $D + 2 * $M + 2 * $F + 2 * $omega))
-                + (9) * cos(deg2rad($M + $omega))
-                + (7) * cos(deg2rad(-2 * $D + $M_accent + $omega))
-                + (6) * cos(deg2rad(-$M + $omega))
-                + (5) * cos(deg2rad(2 * $D - $M_accent + 2 * $F + $omega))
-                + (3) * cos(deg2rad(2 * $D + $M_accent + 2 * $F + 2 * $omega))
+                + 7 * cos(deg2rad(-2 * $D + 2 * $M + 2 * $F + 2 * $omega))
+                + 9 * cos(deg2rad($M + $omega))
+                + 7 * cos(deg2rad(-2 * $D + $M_accent + $omega))
+                + 6 * cos(deg2rad(-$M + $omega))
+                + 5 * cos(deg2rad(2 * $D - $M_accent + 2 * $F + $omega))
+                + 3 * cos(deg2rad(2 * $D + $M_accent + 2 * $F + 2 * $omega))
                 + (-3) * cos(deg2rad($M + 2 * $F + 2 * $omega))
-                + (3) * cos(deg2rad(-$M + 2 * $F + 2 * $omega))
-                + (3) * cos(deg2rad(2 * $D + 2 * $F + $omega))
+                + 3 * cos(deg2rad(-$M + 2 * $F + 2 * $omega))
+                + 3 * cos(deg2rad(2 * $D + 2 * $F + $omega))
                 + (-3) * cos(deg2rad(-2 * $D + 2 * $M_accent + 2 * $F + 2 * $omega))
                 + (-3) * cos(deg2rad(-2 * $D + $M_accent + 2 * $F + $omega))
-                + (3) * cos(deg2rad(2 * $D - 2 * $M_accent + $omega))
-                + (3) * cos(deg2rad(2 * $D + $omega))
-                + (3) * cos(deg2rad(-2 * $D - $M + 2 * $F + $omega))
-                + (3) * cos(deg2rad(-2 * $D + $omega))
-                + (3) * cos(deg2rad(2 * $M_accent + 2 * $F + $omega));
+                + 3 * cos(deg2rad(2 * $D - 2 * $M_accent + $omega))
+                + 3 * cos(deg2rad(2 * $D + $omega))
+                + 3 * cos(deg2rad(-2 * $D - $M + 2 * $F + $omega))
+                + 3 * cos(deg2rad(-2 * $D + $omega))
+                + 3 * cos(deg2rad(2 * $M_accent + 2 * $F + $omega));
 
         $nutObliquity /= 10000.0;
 
@@ -497,8 +493,7 @@ class Time
      * Returns the date of spring for the given year
      * Chapter 27 of Astronomical Algorithms.
      *
-     * @param Carbon $date The date, with the year for which to calculate spring.
-     *
+     * @param  Carbon  $date  The date, with the year for which to calculate spring.
      * @return Carbon The correct time and date for spring
      */
     public static function getSpring(Carbon $date): Carbon
@@ -520,8 +515,7 @@ class Time
      * Returns the date of summer for the given year
      * Chapter 27 of Astronomical Algorithms.
      *
-     * @param Carbon $date The date, with the year for which to calculate summer.
-     *
+     * @param  Carbon  $date  The date, with the year for which to calculate summer.
      * @return Carbon The correct time and date for summer
      */
     public static function getSummer(Carbon $date): Carbon
@@ -543,8 +537,7 @@ class Time
      * Returns the date of autumn for the given year
      * Chapter 27 of Astronomical Algorithms.
      *
-     * @param Carbon $date The date, with the year for which to calculate autumn.
-     *
+     * @param  Carbon  $date  The date, with the year for which to calculate autumn.
      * @return Carbon The correct time and date for autumn
      */
     public static function getAutumn(Carbon $date): Carbon
@@ -566,8 +559,7 @@ class Time
      * Returns the date of winter for the given year
      * Chapter 27 of Astronomical Algorithms.
      *
-     * @param Carbon $date The date, with the year for which to calculate winter.
-     *
+     * @param  Carbon  $date  The date, with the year for which to calculate winter.
      * @return Carbon The correct time and date for winter
      */
     public static function getWinter(Carbon $date): Carbon
