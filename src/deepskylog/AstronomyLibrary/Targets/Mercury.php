@@ -6,8 +6,10 @@
  * PHP Version 8
  *
  * @category Target
+ *
  * @author   Deepsky Developers <developers@deepskylog.be>
  * @license  GPL3 <https://opensource.org/licenses/GPL-3.0>
+ *
  * @link     http://www.deepskylog.org
  */
 
@@ -23,8 +25,10 @@ use deepskylog\AstronomyLibrary\Time;
  * PHP Version 8
  *
  * @category Target
+ *
  * @author   Deepsky Developers <developers@deepskylog.be>
  * @license  GPL3 <https://opensource.org/licenses/GPL-3.0>
+ *
  * @link     http://www.deepskylog.org
  */
 class Mercury extends Planet
@@ -32,8 +36,7 @@ class Mercury extends Planet
     /**
      * Calculates the mean orbital elements.
      *
-     * @param Carbon $date The needed date
-     *
+     * @param  Carbon  $date  The needed date
      * @return array L = mean longitude of the planet
      *               a = semimajor axis of the orbit
      *               e = eccentricity of the orbit
@@ -63,8 +66,7 @@ class Mercury extends Planet
     /**
      * Calculates the mean orbital elements in J2000.0.
      *
-     * @param Carbon $date The needed date
-     *
+     * @param  Carbon  $date  The needed date
      * @return array L = mean longitude of the planet
      *               a = semimajor axis of the orbit
      *               e = eccentricity of the orbit
@@ -94,8 +96,7 @@ class Mercury extends Planet
     /**
      * Calculates the heliocentric coordinates of Mercury.
      *
-     * @param Carbon $date The date
-     *
+     * @param  Carbon  $date  The date
      * @return array L, B, R
      *
      * See chapter 32 of Astronomical Algorithms
@@ -288,8 +289,7 @@ class Mercury extends Planet
     /**
      * Calculates the inferior conjunction closest to the given date.
      *
-     * @param Carbon $date The date for which we want to calculate the closest inferior conjunction
-     *
+     * @param  Carbon  $date  The date for which we want to calculate the closest inferior conjunction
      * @return Carbon The date of the inferior conjunction
      *
      * Chapter 36 of Astronomical Algorithms
@@ -303,7 +303,7 @@ class Mercury extends Planet
 
         $Y = $date->year + $date->dayOfYear / (365 + $date->format('L'));
 
-        $k = ceil((365.2425 * $Y + 1721060 - $A) / ($B));
+        $k = ceil((365.2425 * $Y + 1721060 - $A) / $B);
         $JDE0 = $A + $k * $B;
         $M = deg2rad($M0 + $k * $M1);
         $T = ($JDE0 - 2451545) / 36525;
@@ -328,8 +328,7 @@ class Mercury extends Planet
     /**
      * Calculates the superior conjunction closest to the given date.
      *
-     * @param Carbon $date The date for which we want to calculate the closest inferior conjunction
-     *
+     * @param  Carbon  $date  The date for which we want to calculate the closest inferior conjunction
      * @return Carbon The date of the inferior conjunction
      *
      * Chapter 36 of Astronomical Algorithms
@@ -343,7 +342,7 @@ class Mercury extends Planet
 
         $Y = $date->year + $date->dayOfYear / (365 + $date->format('L'));
 
-        $k = ceil((365.2425 * $Y + 1721060 - $A) / ($B));
+        $k = ceil((365.2425 * $Y + 1721060 - $A) / $B);
         $JDE0 = $A + $k * $B;
         $M = deg2rad($M0 + $k * $M1);
         $T = ($JDE0 - 2451545) / 36525;
@@ -369,8 +368,7 @@ class Mercury extends Planet
      * Calculates the greatest eastern elongation closest to the given date. This is the best
      * evening visibility.
      *
-     * @param Carbon $date The date for which we want to calculate the greatest eastern elongation
-     *
+     * @param  Carbon  $date  The date for which we want to calculate the greatest eastern elongation
      * @return Carbon The date of the greatest eastern elongation
      *
      * Chapter 36 of Astronomical Algorithms
@@ -384,7 +382,7 @@ class Mercury extends Planet
 
         $Y = $date->year + $date->dayOfYear / (365 + $date->format('L'));
 
-        $k = ceil((365.2425 * $Y + 1721060 - $A) / ($B));
+        $k = ceil((365.2425 * $Y + 1721060 - $A) / $B);
         $JDE0 = $A + $k * $B;
         $M = deg2rad($M0 + $k * $M1);
         $T = ($JDE0 - 2451545) / 36525;
@@ -396,7 +394,7 @@ class Mercury extends Planet
             + cos(2 * $M) * (0.2905 + 0.0034 * $T + 0.00001 * $T * $T)
             + sin(3 * $M) * (-0.1121 - 0.0001 * $T + 0.00001 * $T * $T)
             + cos(3 * $M) * (-0.0098 - 0.0015 * $T)
-            + sin(4 * $M) * (0.0192)
+            + sin(4 * $M) * 0.0192
             + cos(4 * $M) * (0.0111 + 0.0004 * $T)
             + sin(5 * $M) * (-0.0061)
             + cos(5 * $M) * (-0.0032 - 0.0001 * $T);
@@ -410,8 +408,7 @@ class Mercury extends Planet
      * Calculates the greatest western elongation closest to the given date. This is the best
      * morning visibility.
      *
-     * @param Carbon $date The date for which we want to calculate the greatest western elongation
-     *
+     * @param  Carbon  $date  The date for which we want to calculate the greatest western elongation
      * @return Carbon The date of the greatest western elongation
      *
      * Chapter 36 of Astronomical Algorithms
@@ -425,7 +422,7 @@ class Mercury extends Planet
 
         $Y = $date->year + $date->dayOfYear / (365 + $date->format('L'));
 
-        $k = ceil((365.2425 * $Y + 1721060 - $A) / ($B));
+        $k = ceil((365.2425 * $Y + 1721060 - $A) / $B);
         $JDE0 = $A + $k * $B;
         $M = deg2rad($M0 + $k * $M1);
         $T = ($JDE0 - 2451545) / 36525;
@@ -435,12 +432,12 @@ class Mercury extends Planet
             + cos($M) * (-2.7661 - 0.0011 * $T + 0.00001 * $T * $T)
             + sin(2 * $M) * (0.2438 - 0.0024 * $T - 0.00001 * $T * $T)
             + cos(2 * $M) * (0.5767 + 0.0023 * $T)
-            + sin(3 * $M) * (0.1041)
+            + sin(3 * $M) * 0.1041
             + cos(3 * $M) * (-0.0184 + 0.0007 * $T)
             + sin(4 * $M) * (-0.0051 - 0.0001 * $T)
             + cos(4 * $M) * (0.0048 + 0.0001 * $T)
-            + sin(5 * $M) * (0.0026)
-            + cos(5 * $M) * (0.0037);
+            + sin(5 * $M) * 0.0026
+            + cos(5 * $M) * 0.0037;
 
         $JDE = $JDE0 + $diff;
 
@@ -450,8 +447,7 @@ class Mercury extends Planet
     /**
      * Returns the date of perihelion closest to the given date.
      *
-     * @param Carbon $date The date for which we want to calculate the closest perihelion
-     *
+     * @param  Carbon  $date  The date for which we want to calculate the closest perihelion
      * @return Carbon The date of the perihelion
      *
      * Chapter 38 of Astronomical Algorithms
@@ -471,8 +467,7 @@ class Mercury extends Planet
     /**
      * Returns the date of aphelion closest to the given date.
      *
-     * @param Carbon $date The date for which we want to calculate the closest aphelion
-     *
+     * @param  Carbon  $date  The date for which we want to calculate the closest aphelion
      * @return Carbon The date of the aphelion
      *
      * Chapter 38 of Astronomical Algorithms
@@ -491,8 +486,7 @@ class Mercury extends Planet
     /**
      * Calculates the magnitude at the given date.
      *
-     * @param Carbon $date The date for which we want to calculate the magnitude
-     *
+     * @param  Carbon  $date  The date for which we want to calculate the magnitude
      * @return float The magnitude
      *
      * Chapter 41 of Astronomical Algorithms
@@ -523,8 +517,7 @@ class Mercury extends Planet
      * Calculate the diameter of Mercury.  You can get the diamter
      * by using the getDiameter method.
      *
-     * @param Carbon $date The date
-     *
+     * @param  Carbon  $date  The date
      * @return None
      *
      * Chapter 55 of Astronomical Algorithms

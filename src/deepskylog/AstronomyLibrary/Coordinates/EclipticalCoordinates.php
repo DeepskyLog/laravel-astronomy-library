@@ -6,8 +6,10 @@
  * PHP Version 8
  *
  * @category Coordinates
+ *
  * @author   Deepsky Developers <developers@deepskylog.be>
  * @license  GPL3 <https://opensource.org/licenses/GPL-3.0>
+ *
  * @link     http://www.deepskylog.org
  */
 
@@ -22,8 +24,10 @@ use deepskylog\AstronomyLibrary\Time;
  * PHP Version 8
  *
  * @category Coordinates
+ *
  * @author   Deepsky Developers <developers@deepskylog.be>
  * @license  GPL3 <https://opensource.org/licenses/GPL-3.0>
+ *
  * @link     http://www.deepskylog.org
  */
 class EclipticalCoordinates
@@ -35,9 +39,9 @@ class EclipticalCoordinates
     /**
      * The constructor.
      *
-     * @param float $longitude The ecliptical longitude (0, 360)
-     * @param float $latitude  The ecliptical latitude (-90, 90)
-     * @param float $epoch     The epoch of the target (2000.0 is standard)
+     * @param  float  $longitude  The ecliptical longitude (0, 360)
+     * @param  float  $latitude  The ecliptical latitude (-90, 90)
+     * @param  float  $epoch  The epoch of the target (2000.0 is standard)
      */
     public function __construct(
         float $longitude,
@@ -52,8 +56,7 @@ class EclipticalCoordinates
     /**
      * Sets the ecliptical longitude.
      *
-     * @param float $longitude The ecliptical longitude
-     *
+     * @param  float  $longitude  The ecliptical longitude
      * @return None
      */
     public function setLongitude(float $longitude): void
@@ -64,8 +67,7 @@ class EclipticalCoordinates
     /**
      * Sets the ecliptical latitude.
      *
-     * @param float $latitude The ecliptical latitude
-     *
+     * @param  float  $latitude  The ecliptical latitude
      * @return None
      */
     public function setLatitude(float $latitude): void
@@ -76,8 +78,7 @@ class EclipticalCoordinates
     /**
      * Sets the epoch.
      *
-     * @param float $epoch The epoch
-     *
+     * @param  float  $epoch  The epoch
      * @return None
      */
     public function setEpoch(float $epoch): void
@@ -141,8 +142,7 @@ class EclipticalCoordinates
      * Converts the ecliptical coordinates to equatorial coordinates.
      * Chapter 13 of Astronomical Algorithms.
      *
-     * @param float $nutObliquity The nutation in obliquity
-     *
+     * @param  float  $nutObliquity  The nutation in obliquity
      * @return EquatorialCoordinates The equatorial coordinates
      */
     public function convertToEquatorial(float $nutObliquity): EquatorialCoordinates
@@ -198,8 +198,7 @@ class EclipticalCoordinates
      * Returns the precession: the coordinates for another epoch and equinox.
      * Chapter 21 of Astronomical Algorithms.
      *
-     * @param Carbon $date The date for the new equinox
-     *
+     * @param  Carbon  $date  The date for the new equinox
      * @return EclipticalCoordinates the precessed coordinates
      */
     public function precessionHighAccuracy(Carbon $date): EclipticalCoordinates

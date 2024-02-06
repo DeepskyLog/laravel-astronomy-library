@@ -48,8 +48,8 @@ class Sun extends Target
     /**
      * Calculates the equatorial coordinates of the sun with a low accuracy (0.01 degree).
      *
-     * @param Carbon $date      The date for which to calculate the coordinates
-     * @param float  $obliquity The obliquity of the ecliptic for the given date
+     * @param  Carbon  $date  The date for which to calculate the coordinates
+     * @param  float  $obliquity  The obliquity of the ecliptic for the given date
      *
      * See chapter 25 of Astronomical Algorithms
      */
@@ -69,9 +69,8 @@ class Sun extends Target
     /**
      * Calculates the equatorial coordinates of the sun with a low accuracy (0.01 degree).
      *
-     * @param Carbon $date      The date for which to calculate the coordinates
-     * @param float  $obliquity The obliquity of the ecliptic for the given date
-     *
+     * @param  Carbon  $date  The date for which to calculate the coordinates
+     * @param  float  $obliquity  The obliquity of the ecliptic for the given date
      * @return EquatorialCoordinates The equatorial coordinates for the given date.
      *
      * See chapter 25 of Astronomical Algorithms
@@ -126,8 +125,8 @@ class Sun extends Target
     /**
      * Calculates the equatorial coordinates of the sun with a high accuracy.
      *
-     * @param Carbon $date     The date for which to calculate the coordinates
-     * @param array  $nutation The nutation
+     * @param  Carbon  $date  The date for which to calculate the coordinates
+     * @param  array  $nutation  The nutation
      *
      * See chapter 25 of Astronomical Algorithms
      */
@@ -147,9 +146,8 @@ class Sun extends Target
     /**
      * Calculates the equatorial coordinates of the sun with a high accuracy.
      *
-     * @param Carbon $date     The date for which to calculate the coordinates
-     * @param array  $nutation The nutation
-     *
+     * @param  Carbon  $date  The date for which to calculate the coordinates
+     * @param  array  $nutation  The nutation
      * @return EquatorialCoordinates The coordinates for the given date
      *
      * See chapter 25 of Astronomical Algorithms
@@ -167,9 +165,8 @@ class Sun extends Target
     /**
      * Calculates the equatorial coordinates of the sun with a high accuracy.
      *
-     * @param Carbon $date     The date for which to calculate the coordinates
-     * @param array  $nutation The nutation
-     *
+     * @param  Carbon  $date  The date for which to calculate the coordinates
+     * @param  array  $nutation  The nutation
      * @return EquatorialCoordinates The coordinates for the given date
      *
      * See chapter 25 of Astronomical Algorithms
@@ -210,9 +207,8 @@ class Sun extends Target
     /**
      * Calculates L for the calculation of the coordinates of the sun.
      *
-     * @param    type  $tau julian millenia since epoch J2000.0
-     *
-     * @return   float L
+     * @param  type  $tau  julian millenia since epoch J2000.0
+     * @return float L
      *
      * See chapter 25 of Astronomical Algorithms
      */
@@ -361,9 +357,8 @@ class Sun extends Target
     /**
      * Calculates R for the calculation of the coordinates of the sun.
      *
-     * @param    type  $tau julian millenia since epoch J2000.0
-     *
-     * @return   float R
+     * @param  type  $tau  julian millenia since epoch J2000.0
+     * @return float R
      *
      * See chapter 25 of Astronomical Algorithms
      */
@@ -441,8 +436,7 @@ class Sun extends Target
     /**
      * Calculates the geometric coordinates of the sun for the equinox of the date.
      *
-     * @param Carbon $date The date
-     *
+     * @param  Carbon  $date  The date
      * @return RectangularCoordinates The rectangular Coordinates
      *
      * See chapter 26 of Astronomical Algorithms
@@ -465,8 +459,7 @@ class Sun extends Target
     /**
      * Calculates the geometric coordinates of the sun for the J2000 equinox.
      *
-     * @param Carbon $date The date
-     *
+     * @param  Carbon  $date  The date
      * @return RectangularCoordinates The rectangular Coordinates
      *
      * See chapter 26 of Astronomical Algorithms
@@ -721,8 +714,7 @@ class Sun extends Target
     /**
      * Calculates the equation of time of the sun for a given date.
      *
-     * @param Carbon $date The date
-     *
+     * @param  Carbon  $date  The date
      * @return CarbonInterval The equation of time
      *
      * See chapter 28 of Astronomical Algorithms
@@ -748,13 +740,12 @@ class Sun extends Target
     /**
      * Calculates the ephemeris for physical observations of the sun.
      *
-     * @param Carbon $date   The date
-     * @param float  $deltaT Delta T for the given date
-     *
+     * @param  Carbon  $date  The date
+     * @param  float  $deltaT  Delta T for the given date
      * @return array The ephemeris for physical observations of the sun.
      *               First element: P: The position angle of the northern
-     *                                 extremity of the axis of rotation, measured
-     *                                 eastwards from the North Point of the solar disk.
+     *               extremity of the axis of rotation, measured
+     *               eastwards from the North Point of the solar disk.
      *               Second element: B0: The heliographic latitude of the center of the solar disk
      *               Third element:  L0: The heliographic ongitude of the same point
      *
@@ -810,8 +801,7 @@ class Sun extends Target
      * Calculate the diameter of the Sun.  You can get the diamter
      * by using the getDiameter method.
      *
-     * @param Carbon $date The date
-     *
+     * @param  Carbon  $date  The date
      * @return None
      *
      * Chapter 55 of Astronomical Algorithms

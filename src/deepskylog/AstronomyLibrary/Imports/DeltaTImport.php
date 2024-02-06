@@ -8,8 +8,7 @@ use Maatwebsite\Excel\Concerns\ToModel;
 class DeltaTImport implements ToModel
 {
     /**
-     * @param array $row The row of the csv file
-     *
+     * @param  array  $row  The row of the csv file
      * @return \Illuminate\Database\Eloquent\Model|null
      */
     public function model(array $row)

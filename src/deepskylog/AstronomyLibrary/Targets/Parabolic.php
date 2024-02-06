@@ -6,8 +6,10 @@
  * PHP Version 8
  *
  * @category Target
+ *
  * @author   Deepsky Developers <developers@deepskylog.be>
  * @license  GPL3 <https://opensource.org/licenses/GPL-3.0>
+ *
  * @link     http://www.deepskylog.org
  */
 
@@ -24,8 +26,10 @@ use deepskylog\AstronomyLibrary\Time;
  * PHP Version 8
  *
  * @category Target
+ *
  * @author   Deepsky Developers <developers@deepskylog.be>
  * @license  GPL3 <https://opensource.org/licenses/GPL-3.0>
+ *
  * @link     http://www.deepskylog.org
  */
 class Parabolic extends Target
@@ -47,11 +51,11 @@ class Parabolic extends Target
     /**
      * Set Orbital Elements.
      *
-     * @param float  $q                        perihelion distance, in AU
-     * @param float  $i                        Inclination
-     * @param float  $omega                    Argument of perihelion
-     * @param float  $longitude_ascending_node The Longitude of the Ascending Node
-     * @param Carbon $perihelion_date          The date of the perihelion
+     * @param  float  $q  perihelion distance, in AU
+     * @param  float  $i  Inclination
+     * @param  float  $omega  Argument of perihelion
+     * @param  float  $longitude_ascending_node  The Longitude of the Ascending Node
+     * @param  Carbon  $perihelion_date  The date of the perihelion
      */
     public function setOrbitalElements(float $q, float $i, float $omega, float $longitude_ascending_node, Carbon $perihelion_date): void
     {
@@ -65,7 +69,7 @@ class Parabolic extends Target
     /**
      * Calculates the equatorial coordinates of the planet.
      *
-     * @param Carbon $date      The date for which to calculate the coordinates
+     * @param  Carbon  $date  The date for which to calculate the coordinates
      *
      * See chapter 33 of Astronomical Algorithms
      */
@@ -124,7 +128,7 @@ class Parabolic extends Target
         $delta = sqrt($ksi ** 2 + $eta ** 2 + $zeta ** 2);
         $tau = 0.0057755183 * $delta;
 
-        $ra  = rad2deg(atan2($eta, $ksi)) / 15.0;
+        $ra = rad2deg(atan2($eta, $ksi)) / 15.0;
         $dec = rad2deg(asin($zeta / $delta));
 
         $equa_coords = new EquatorialCoordinates($ra, $dec);
@@ -139,7 +143,7 @@ class Parabolic extends Target
         $earthsGlobe = $geo_coords->earthsGlobe($height);
 
         $deltara = rad2deg(atan(-$earthsGlobe[1] * sin(deg2rad($pi / 3600.0)) * sin(deg2rad($hour_angle)) / (cos(deg2rad($equa_coords->getDeclination()->getCoordinate())) - $earthsGlobe[1] * sin(deg2rad($pi / 3600.0)) * sin(deg2rad($hour_angle)))));
-        $dec     = rad2deg(atan((sin(deg2rad($equa_coords->getDeclination()->getCoordinate())) - $earthsGlobe[0] * sin(deg2rad($pi / 3600.0))) * cos(deg2rad($deltara / 3600.0))
+        $dec = rad2deg(atan((sin(deg2rad($equa_coords->getDeclination()->getCoordinate())) - $earthsGlobe[0] * sin(deg2rad($pi / 3600.0))) * cos(deg2rad($deltara / 3600.0))
                                 / (cos(deg2rad($equa_coords->getDeclination()->getCoordinate())) - $earthsGlobe[1] * sin(deg2rad($pi / 3600.0)) * cos(deg2rad($height)))));
 
         $equa_coords->setRA($ra + $deltara);
