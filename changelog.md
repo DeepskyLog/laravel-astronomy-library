@@ -2,6 +2,13 @@
 
 All notable changes to `laravel-astronomy-library` will be documented in this file.
 
+## Version 6.2
+
+Changed:
+
+- Fix equation of time for March 21 and 22. 
+- Return equation of time as float and not as CarbonInterval (which fails for negative values).
+
 ## Version 6.1.2
 
 Changed:
