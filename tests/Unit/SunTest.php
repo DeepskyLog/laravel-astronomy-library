@@ -16,7 +16,6 @@
 namespace Tests\Unit;
 
 use Carbon\Carbon;
-use Carbon\CarbonInterval;
 use deepskylog\AstronomyLibrary\Targets\Sun;
 use deepskylog\AstronomyLibrary\Testing\BaseTestCase;
 use deepskylog\AstronomyLibrary\Time;
@@ -120,7 +119,7 @@ class SunTest extends BaseTestCase
 
         $equationOfTime = $sun->calculateEquationOfTime($date);
 
-        $this->assertEquals(CarbonInterval::create(0, 0, 0, 0, 0, 13, 42, 564279), $equationOfTime);
+        $this->assertEquals(13.7090, $equationOfTime);
     }
 
     public function testPhysicalEphemeris()

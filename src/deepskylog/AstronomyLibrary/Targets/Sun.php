@@ -16,7 +16,6 @@
 namespace deepskylog\AstronomyLibrary\Targets;
 
 use Carbon\Carbon;
-use Carbon\CarbonInterval;
 use deepskylog\AstronomyLibrary\Coordinates\Coordinate;
 use deepskylog\AstronomyLibrary\Coordinates\EclipticalCoordinates;
 use deepskylog\AstronomyLibrary\Coordinates\EquatorialCoordinates;
@@ -715,11 +714,11 @@ class Sun extends Target
      * Calculates the equation of time of the sun for a given date.
      *
      * @param  Carbon  $date  The date
-     * @return CarbonInterval The equation of time
+     * @return float The equation of time in minutes
      *
      * See chapter 28 of Astronomical Algorithms
      */
-    public function calculateEquationOfTime(Carbon $date): CarbonInterval
+    public function calculateEquationOfTime(Carbon $date): float
     {
         $tau = (Time::getJd($date) - 2451545.0) / 365250.0;
 
@@ -734,7 +733,11 @@ class Sun extends Target
 
         $E = $L0->getCoordinate() - 0.0057183 - $ra + $nutation[0] / 3600.0 * cos(deg2rad($nutation[3]));
 
-        return CarbonInterval::make($E * 4 .'m');
+        if ($E > 180) {
+            $E = $E - 360;
+        }
+
+        return $E * 4;
     }
 
     /**
