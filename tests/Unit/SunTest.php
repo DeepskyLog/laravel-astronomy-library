@@ -16,7 +16,6 @@
 namespace Tests\Unit;
 
 use Carbon\Carbon;
-use Carbon\CarbonInterval;
 use deepskylog\AstronomyLibrary\Targets\Sun;
 use deepskylog\AstronomyLibrary\Testing\BaseTestCase;
 use deepskylog\AstronomyLibrary\Time;
