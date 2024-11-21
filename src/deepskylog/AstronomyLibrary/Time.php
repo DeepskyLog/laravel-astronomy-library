@@ -16,6 +16,7 @@
 namespace deepskylog\AstronomyLibrary;
 
 use Carbon\Carbon;
+use Carbon\Exceptions\InvalidDateException;
 use deepskylog\AstronomyLibrary\Coordinates\GeographicalCoordinates;
 use deepskylog\AstronomyLibrary\Models\DeltaT;
 use Exception;
@@ -67,13 +68,13 @@ class Time
         if ($date > Carbon::create(1582, 10, 4, 0, 0, 0, 'UTC')
             && $date < Carbon::create(1582, 10, 15, 0, 0, 0, 'UTC')
         ) {
-            throw new \Carbon\Exceptions\InvalidDateException(
+            throw new InvalidDateException(
                 'Date does not exist',
                 $date
             );
         }
         if ($date < Carbon::create(-4712, 1, 1, 12, 0, 0, 'UTC')) {
-            throw new \Carbon\Exceptions\InvalidDateException(
+            throw new InvalidDateException(
                 'Date does not exist',
                 $date
             );
@@ -94,7 +95,7 @@ class Time
     public static function fromJd(float $jd): Carbon
     {
         if ($jd < 0.0) {
-            throw new \Carbon\Exceptions\InvalidDateException(
+            throw new InvalidDateException(
                 'Julian Day does not exist',
                 $jd
             );
@@ -164,7 +165,6 @@ class Time
     {
         $y = $date->year + ($date->month - 0.5) / 12;
 
-        $databaseAvailable = false;
         try {
             $databaseDate = Carbon::create(
                 DeltaT::first()['year'] + 1,
@@ -176,7 +176,7 @@ class Time
                 'UTC'
             );
             $databaseAvailable = true;
-        } catch (Exception $e) {
+        } catch (Exception) {
             $databaseAvailable = false;
         }
 
@@ -274,9 +274,9 @@ class Time
      * Calculates the apparent siderial time for the given date.
      * Chapter 12 in Astronomical Algorithms.
      *
-     * @param  Carbon  $date  The date
-     * @param  GeographicalCoordinates  $coords  The geographical coordinates
-     * @param  array  $nutation  The nutation array
+     * @param Carbon $date The date
+     * @param GeographicalCoordinates $coords The geographical coordinates
+     * @param array|null $nutation The nutation array
      * @return Carbon the siderial time
      */
     public static function apparentSiderialTime(
@@ -294,7 +294,7 @@ class Time
         $correction = cos(deg2rad($nutation[3])) * $nutation[0] / 15.0;
         $correction *= 1000000.0;
 
-        $siderialTime->microsecond($siderialTime->microsecond + $correction);
+        $siderialTime->microsecond((int)($siderialTime->microsecond + $correction));
 
         return $siderialTime;
     }
@@ -468,7 +468,7 @@ class Time
         $nutObliquity /= 10000.0;
 
         $U = $T / 100.0;
-        /* For the obliquity, we have an accuracy of 0.01 arcseconds after
+        /* For the obliquity, we have an accuracy of 0.01 arc seconds after
            1000 years. (A.D. 1000 - 3000). The accuracy is still a few seconds of
            arc 10000 years after or before 2000 A.D. */
         $meanObliquity = (84381.448 - 4680.93 * $U

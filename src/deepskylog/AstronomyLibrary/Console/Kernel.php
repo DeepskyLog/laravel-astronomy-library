@@ -10,9 +10,9 @@ class Kernel extends ConsoleKernel
     /**
      * Define laravel-astronomy-library's command schedule.
      *
-     * @param  \Illuminate\Console\Scheduling\Schedule  $schedule  The schedule
+     * @param Schedule $schedule  The schedule
      */
-    protected function schedule(Schedule $schedule)
+    protected function schedule(Schedule $schedule): void
     {
         parent::schedule($schedule);
 
