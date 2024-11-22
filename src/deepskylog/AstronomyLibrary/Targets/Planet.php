@@ -50,9 +50,9 @@ abstract class Planet extends Target
      *
      * See chapter 33 of Astronomical Algorithms
      */
-    public function calculateApparentEquatorialCoordinates(Carbon $date, bool $VSOP87 = false): void
+    public function calculateApparentEquatorialCoordinates(Carbon $date, bool $VSOP87 = true): void
     {
-        if ($VSOP87) {
+//        if ($VSOP87) {
             $this->setEquatorialCoordinatesToday(
                 $this->_calculateApparentEquatorialCoordinates($date)
             );
@@ -62,9 +62,9 @@ abstract class Planet extends Target
             $this->setEquatorialCoordinatesYesterday(
                 $this->_calculateApparentEquatorialCoordinates($date->subDays(2))
             );
-        } else {
-            echo 'START DE440';
-        }
+//        } else {
+//            // TODO: Implement DE440
+//        }
     }
 
     /**
@@ -78,7 +78,7 @@ abstract class Planet extends Target
      */
     public function calculateEquatorialCoordinates(Carbon $date, GeographicalCoordinates $geo_coords, float $height, bool $VSOP87 = false): void
     {
-        if ($VSOP87) {
+//        if ($VSOP87) {
             $this->setEquatorialCoordinatesToday(
                 $this->_calculateEquatorialCoordinates($date, $geo_coords, $height)
             );
@@ -88,9 +88,9 @@ abstract class Planet extends Target
             $this->setEquatorialCoordinatesYesterday(
                 $this->_calculateEquatorialCoordinates($date->subDays(2), $geo_coords, $height)
             );
-        } else {
-            echo 'Downloading DE440';
-        }
+//        } else {
+//            echo 'Downloading DE440';
+//        }
     }
 
     abstract public function calculateHeliocentricCoordinates(Carbon $date);

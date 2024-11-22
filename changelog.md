@@ -2,12 +2,19 @@
 
 All notable changes to `laravel-astronomy-library` will be documented in this file.
 
+## Version 6.2.2
+
+Fixed:
+
+- Fixed problem calculating planet coordinates
+- Added example to calculate the coordinates of Venus
+
 ## Version 6.2.1
 
 Fixed:
 
 - AstronomyLibrary crashed when using decimal seconds (for example when running Carbon::now())
-- Updated to newest version of the needed libraries
+- Updated to the newest version of the needed libraries
 
 ## Version 6.2
 

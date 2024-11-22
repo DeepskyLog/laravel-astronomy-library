@@ -588,6 +588,36 @@ The orbital elements for the asteroids can be accessed from laravel using the **
 + G: Magnitude slope parameter
 + Ref: The orbital solution reference
 
+## Example
+
+This example describes how to calculate the coordinates of Venus at a given date
+
+```php
+use deepskylog\AstronomyLibrary\Coordinates\GeographicalCoordinates;
+use deepskylog\AstronomyLibrary\Targets\Venus;
+use Carbon\Carbon;
+
+$coords_Utrecht = ['latitude' => 52.0919255, 'longitude' => 5.1229572];
+$carbonDate = Carbon::now();
+
+$coords = new GeographicalCoordinates($coords_Utrecht ['latitude'], $coords_Utrecht ['longitude']);
+
+$venus = new Venus()
+$venus->calculateApparentEquatorialCoordinates($carbonDate);
+
+// Print the coordinates (as strings)
+print ($venus->getEquatorialCoordinates()->getRA()->convertToHours());
+print ($venus->getEquatorialCoordinates()->getDeclination()->convertToDegrees());
+
+// If the correction for the location on earth should be done, use the following method
+$heightOfLocation = 5;   // In meters
+$venus->calculateEquatorialCoordinates($carbonDate, $coords, $heightOfLocation);
+
+// Print the coordinates
+print ($venus->getEquatorialCoordinates()->getRA()->getCoordinate());
+print ($venus->getEquatorialCoordinates()->getDeclination()->getCoordinate());
+```
+
 ## Change log
 
 Please see the [changelog](changelog.md) for more information on what has changed recently.
