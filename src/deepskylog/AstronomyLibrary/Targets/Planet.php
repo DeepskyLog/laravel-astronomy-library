@@ -53,15 +53,15 @@ abstract class Planet extends Target
     public function calculateApparentEquatorialCoordinates(Carbon $date, bool $VSOP87 = true): void
     {
 //        if ($VSOP87) {
-            $this->setEquatorialCoordinatesToday(
-                $this->_calculateApparentEquatorialCoordinates($date)
-            );
-            $this->setEquatorialCoordinatesTomorrow(
-                $this->_calculateApparentEquatorialCoordinates($date->addDay())
-            );
-            $this->setEquatorialCoordinatesYesterday(
-                $this->_calculateApparentEquatorialCoordinates($date->subDays(2))
-            );
+        $this->setEquatorialCoordinatesToday(
+            $this->_calculateApparentEquatorialCoordinates($date)
+        );
+        $this->setEquatorialCoordinatesTomorrow(
+            $this->_calculateApparentEquatorialCoordinates($date->addDay())
+        );
+        $this->setEquatorialCoordinatesYesterday(
+            $this->_calculateApparentEquatorialCoordinates($date->subDays(2))
+        );
 //        } else {
 //            // TODO: Implement DE440
 //        }
@@ -79,15 +79,15 @@ abstract class Planet extends Target
     public function calculateEquatorialCoordinates(Carbon $date, GeographicalCoordinates $geo_coords, float $height, bool $VSOP87 = false): void
     {
 //        if ($VSOP87) {
-            $this->setEquatorialCoordinatesToday(
-                $this->_calculateEquatorialCoordinates($date, $geo_coords, $height)
-            );
-            $this->setEquatorialCoordinatesTomorrow(
-                $this->_calculateEquatorialCoordinates($date->addDay(), $geo_coords, $height)
-            );
-            $this->setEquatorialCoordinatesYesterday(
-                $this->_calculateEquatorialCoordinates($date->subDays(2), $geo_coords, $height)
-            );
+        $this->setEquatorialCoordinatesToday(
+            $this->_calculateEquatorialCoordinates($date, $geo_coords, $height)
+        );
+        $this->setEquatorialCoordinatesTomorrow(
+            $this->_calculateEquatorialCoordinates($date->addDay(), $geo_coords, $height)
+        );
+        $this->setEquatorialCoordinatesYesterday(
+            $this->_calculateEquatorialCoordinates($date->subDays(2), $geo_coords, $height)
+        );
 //        } else {
 //            echo 'Downloading DE440';
 //        }
