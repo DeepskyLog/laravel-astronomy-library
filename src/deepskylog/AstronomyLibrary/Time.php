@@ -274,9 +274,9 @@ class Time
      * Calculates the apparent siderial time for the given date.
      * Chapter 12 in Astronomical Algorithms.
      *
-     * @param Carbon $date The date
-     * @param GeographicalCoordinates $coords The geographical coordinates
-     * @param array|null $nutation The nutation array
+     * @param  Carbon  $date  The date
+     * @param  GeographicalCoordinates  $coords  The geographical coordinates
+     * @param  array|null  $nutation  The nutation array
      * @return Carbon the siderial time
      */
     public static function apparentSiderialTime(
@@ -294,7 +294,7 @@ class Time
         $correction = cos(deg2rad($nutation[3])) * $nutation[0] / 15.0;
         $correction *= 1000000.0;
 
-        $siderialTime->microsecond((int)($siderialTime->microsecond + $correction));
+        $siderialTime->microsecond((int) ($siderialTime->microsecond + $correction));
 
         return $siderialTime;
     }
