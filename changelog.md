@@ -2,6 +2,11 @@
 
 All notable changes to `laravel-astronomy-library` will be documented in this file.
 
+## Version 6.2.4
+
+Changed:
+- Allow laravel 12.
+
 ## Version 6.2.3
 
 Changed:
