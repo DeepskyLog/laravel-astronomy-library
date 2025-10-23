@@ -2,6 +2,16 @@
 
 All notable changes to `laravel-astronomy-library` will be documented in this file.
 
+## Version 6.3
+
+Added:
+- Added moon elevation to the altitude graph.
+- Only show the elevation graph when the target is above the horizon.
+
+Changed:
+- Improved scheduling of package commands.
+
+
 ## Version 6.2.4
 
 Changed:
