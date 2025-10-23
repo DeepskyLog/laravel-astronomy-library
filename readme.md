@@ -151,10 +151,10 @@ $nutation = Time::nutation($jd);
 
 ```php
 // Convert from Naked Eye Limiting Magnitude to SQM value
-$sqm = Magnitude::nelmToSqm($sqm, $fstOffset);
+$sqm = Magnitude::nelmToSqm($nelm, $fstOffset);
 
 // Convert from Naked Eye Limiting Magnitude to bortle scale
-$bortle = Magnitude::nelmToBortle($sqm);
+$bortle = Magnitude::nelmToBortle($nelm);
 
 // Convert from SQM value to Naked Eye Limiting Magnitude
 $nelm = Magnitude::sqmToNelm($sqm, $fstOffset);
@@ -397,7 +397,7 @@ echo $target->getBestTimeToObserve();
 
 // Return the altitude graph for the target for the given date
 // In blade:
-{!! $target->getAltitudeGraph() !!}
+{!! $target->altitudeGraph() !!}
 
 // Calculate the equatorial coordinates of the sun in low accuracy
 $sun = new Sun();

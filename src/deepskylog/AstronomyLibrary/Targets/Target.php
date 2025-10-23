@@ -1070,15 +1070,29 @@ class Target
 
             // Start at noon
             $date->hour = 12;
+            $date->minute = 0;
 
             $textcolor = imagecolorallocate($image, 255, 255, 255);
             $axiscolor = imagecolorallocate($image, 150, 150, 150);
 
-            for ($i = 0; $i <= 24; $i++) {
+            // We'll keep track of the previous plotted positive point
+            $prevX = null;
+            $prevY = null;
+
+            // Increase sampling: steps per hour (4 -> 15min sampling).
+            $stepsPerHour = 4;
+            $stepMinutes = 60 / $stepsPerHour; // 15
+            $totalSteps = 24 * $stepsPerHour; // 96
+
+            for ($i = 0; $i <= $totalSteps; $i++) {
                 // Calculate the apparent siderial time
                 $siderial_time = Time::apparentSiderialTime($date, $geo_coords);
 
-                imagestring($image, 2, 55 + $i * 37, 370, $date->isoFormat('HH:mm'), $textcolor);
+                // Draw time labels only at whole hours (every $stepsPerHour step)
+                if ($i % $stepsPerHour == 0) {
+                    $labelX = 55 + ($i / $stepsPerHour) * 37;
+                    imagestring($image, 2, (int) $labelX, 370, $date->isoFormat('HH:mm'), $textcolor);
+                }
 
                 // Use the correct coordinates for moving targets
                 if ($this->getEquatorialCoordinatesToday()->getRA() == $this->getEquatorialCoordinatesYesterday()->getRA()
@@ -1115,25 +1129,54 @@ class Target
                     $siderial_time
                 );
 
-                // Add an hour
-                $date->addHour();
+                // Add the step (30 minutes when stepsPerHour==2)
+                $date->addMinutes($stepMinutes);
 
-                imagefilledellipse($image, 70 + $i * 37, 185 - $horizontal->getAltitude()->getCoordinate() * 2, 5, 5, $textcolor);
-                imageline($image, 70 + $i * 37, 365, 70 + $i * 37, 355, $axiscolor);
+                // Only plot non-negative altitudes (0..90 deg)
+                $alt = $horizontal->getAltitude()->getCoordinate();
+                if ($alt >= 0.0) {
+                    // Map 0..90 deg to pixel range 365..5 (365 at 0deg, 5 at 90deg)
+                    $y = 365 - $alt * 4;
+                    if ($y < 5) {
+                        $y = 5;
+                    }
+                    if ($y > 365) {
+                        $y = 365;
+                    }
+                    $x = 70 + ($i / $stepsPerHour) * 37;
+
+                    // If there's a previous positive point, draw a line to it
+                    if ($prevX !== null && $prevY !== null) {
+                        imageline($image, $prevX, (int) $prevY, $x, (int) $y, $textcolor);
+                    }
+
+                    // Draw the marker for this point
+                    // Draw a small marker only at whole hours to reduce clutter
+                    // if ($i % $stepsPerHour == 0) {
+                    //     imagefilledellipse($image, (int) $x, (int) $y, 5, 5, $textcolor);
+                    // }
+
+                    // Save as previous
+                    $prevX = $x;
+                    $prevY = $y;
+                } else {
+                    // Reset previous when there's a gap (negative altitude)
+                    $prevX = null;
+                    $prevY = null;
+                }
+                // Draw minor tick only at whole hours
+                if ($i % $stepsPerHour == 0) {
+                    $tickX = 70 + ($i / $stepsPerHour) * 37;
+                    imageline($image, (int) $tickX, 365, (int) $tickX, 355, $axiscolor);
+                }
             }
-
-            imagestring($image, 2, 35, 360, '-90', $textcolor);
+            // Show only positive elevation axis (0..90)
+            imagestring($image, 2, 35, 360, '0', $textcolor);
             imageline($image, 70, 365, 958, 365, $axiscolor);
-            imagestring($image, 2, 35, 300, '-60', $textcolor);
-            imageline($image, 70, 305, 958, 305, $axiscolor);
-            imagestring($image, 2, 35, 240, '-30', $textcolor);
+            imagestring($image, 2, 35, 240, '30', $textcolor);
             imageline($image, 70, 245, 958, 245, $axiscolor);
-            imagestring($image, 2, 35, 180, '0', $textcolor);
-            imageline($image, 70, 185, 958, 185, $axiscolor);
-            imagestring($image, 2, 35, 120, '30', $textcolor);
+            imagestring($image, 2, 35, 120, '60', $textcolor);
             imageline($image, 70, 125, 958, 125, $axiscolor);
-            imagestring($image, 2, 35, 60, '60', $textcolor);
-            imageline($image, 70, 65, 958, 65, $axiscolor);
             imagestring($image, 2, 35, 0, '90', $textcolor);
             imageline($image, 70, 5, 958, 5, $axiscolor);
 
