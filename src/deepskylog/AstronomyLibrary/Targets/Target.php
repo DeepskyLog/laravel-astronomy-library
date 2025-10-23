@@ -1088,7 +1088,7 @@ class Target
             $moonDashStyle = [
                 $textcolor, $textcolor, $textcolor, $textcolor, $textcolor, $textcolor,
                 $axiscolor, $axiscolor, $axiscolor, $axiscolor, $axiscolor,
-                $axiscolor, $axiscolor, $axiscolor, $axiscolor, $axiscolor
+                $axiscolor, $axiscolor, $axiscolor, $axiscolor, $axiscolor,
             ];
             imagesetstyle($image, $moonDashStyle);
             $moonStyle = IMG_COLOR_STYLED;
@@ -1512,7 +1512,7 @@ class Target
      * Subclasses may override to calculate apparent equatorial coordinates for a given date.
      * Default implementation is a no-op to allow calling code to remain generic.
      *
-     * @param Carbon $date
+     * @param  Carbon  $date
      */
     protected function calculateApparentEquatorialCoordinates(Carbon $date, ...$args): void
     {
@@ -1523,9 +1523,9 @@ class Target
      * Subclasses may override to calculate topocentric equatorial coordinates for a given date.
      * Default implementation is a no-op to allow calling code to remain generic.
      *
-     * @param Carbon $date
-     * @param GeographicalCoordinates $geo_coords
-     * @param float $height
+     * @param  Carbon  $date
+     * @param  GeographicalCoordinates  $geo_coords
+     * @param  float  $height
      */
     protected function calculateEquatorialCoordinates(Carbon $date, ...$args): void
     {

@@ -218,7 +218,7 @@ class Sun extends Target
     /**
      * Calculates L for the calculation of the coordinates of the sun.
      *
-    * @param  float  $tau  julian millenia since epoch J2000.0
+     * @param  float  $tau  julian millenia since epoch J2000.0
      * @return float L
      *
      * See chapter 25 of Astronomical Algorithms
@@ -368,7 +368,7 @@ class Sun extends Target
     /**
      * Calculates R for the calculation of the coordinates of the sun.
      *
-    * @param  float  $tau  julian millenia since epoch J2000.0
+     * @param  float  $tau  julian millenia since epoch J2000.0
      * @return float R
      *
      * See chapter 25 of Astronomical Algorithms
