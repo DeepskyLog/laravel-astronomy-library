@@ -5,6 +5,7 @@ namespace deepskylog\AstronomyLibrary;
 use deepskylog\AstronomyLibrary\Commands\UpdateDeltaTTable;
 use deepskylog\AstronomyLibrary\Commands\UpdateOrbitalElements;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Console\Scheduling\Schedule;
 
 class AstronomyLibraryServiceProvider extends ServiceProvider
 {
@@ -75,6 +76,27 @@ class AstronomyLibraryServiceProvider extends ServiceProvider
         if ($this->app->runningInConsole()) {
             $this->bootForConsole();
         }
+
+        // Register package schedule when the application has booted.
+        // This ensures the application's scheduler is available and
+        // the package's scheduled tasks are added automatically.
+        $this->app->booted(function () {
+            // If the host app provides the Schedule binding, resolve it
+            // and add package scheduled commands. If not, skip silently.
+            if ($this->app->bound(Schedule::class)) {
+                $schedule = $this->app->make(Schedule::class);
+
+                // Use the package's console kernel to define its own schedule
+                // (keeps schedule definitions in one place).
+                $kernel = $this->app->make(\deepskylog\AstronomyLibrary\Console\Kernel::class);
+
+                // Call the kernel's schedule method so the package schedule is merged
+                // into the application's schedule.
+                if (method_exists($kernel, 'schedule')) {
+                    $kernel->callSchedule($schedule);
+                }
+            }
+        });
     }
 
     /**
