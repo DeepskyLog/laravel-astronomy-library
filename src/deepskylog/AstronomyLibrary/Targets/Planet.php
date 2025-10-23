@@ -50,9 +50,12 @@ abstract class Planet extends Target
      *
      * See chapter 33 of Astronomical Algorithms
      */
-    public function calculateApparentEquatorialCoordinates(Carbon $date, bool $VSOP87 = true): void
+    public function calculateApparentEquatorialCoordinates(Carbon $date, ...$args): void
     {
-//        if ($VSOP87) {
+        // Accept variadic args for compatibility. Optional first arg: $VSOP87 (bool)
+        $VSOP87 = $args[0] ?? true;
+
+        // Default behavior: use VSOP87 apparent coords
         $this->setEquatorialCoordinatesToday(
             $this->_calculateApparentEquatorialCoordinates($date)
         );
@@ -62,9 +65,6 @@ abstract class Planet extends Target
         $this->setEquatorialCoordinatesYesterday(
             $this->_calculateApparentEquatorialCoordinates($date->subDays(2))
         );
-//        } else {
-//            // TODO: Implement DE440
-//        }
     }
 
     /**
@@ -76,9 +76,19 @@ abstract class Planet extends Target
      *
      * See chapter 40 of Astronomical Algorithms
      */
-    public function calculateEquatorialCoordinates(Carbon $date, GeographicalCoordinates $geo_coords, float $height, bool $VSOP87 = false): void
+    public function calculateEquatorialCoordinates(Carbon $date, ...$args): void
     {
-//        if ($VSOP87) {
+        // Expected args: [GeographicalCoordinates $geo_coords, float $height = 0.0, bool $VSOP87 = false]
+        $geo_coords = $args[0] ?? null;
+        $height = $args[1] ?? 0.0;
+        $VSOP87 = $args[2] ?? false;
+
+        if (! $geo_coords instanceof GeographicalCoordinates) {
+            $geo_coords = new GeographicalCoordinates(0.0, 0.0);
+        }
+
+        $height = floatval($height);
+
         $this->setEquatorialCoordinatesToday(
             $this->_calculateEquatorialCoordinates($date, $geo_coords, $height)
         );
@@ -88,9 +98,6 @@ abstract class Planet extends Target
         $this->setEquatorialCoordinatesYesterday(
             $this->_calculateEquatorialCoordinates($date->subDays(2), $geo_coords, $height)
         );
-//        } else {
-//            echo 'Downloading DE440';
-//        }
     }
 
     abstract public function calculateHeliocentricCoordinates(Carbon $date);

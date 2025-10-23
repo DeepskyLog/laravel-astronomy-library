@@ -74,8 +74,9 @@ class NearParabolic extends Target
      *
      * See chapter 33 of Astronomical Algorithms
      */
-    public function calculateEquatorialCoordinates(Carbon $date): void
+    public function calculateEquatorialCoordinates(Carbon $date, ...$args): void
     {
+        // No extra args expected; keep behavior but accept variadic for signature compatibility
         $this->setEquatorialCoordinatesToday(
             $this->_calculateEquatorialCoordinates($date)
         );

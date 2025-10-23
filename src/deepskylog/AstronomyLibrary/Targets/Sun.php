@@ -52,8 +52,20 @@ class Sun extends Target
      *
      * See chapter 25 of Astronomical Algorithms
      */
-    public function calculateEquatorialCoordinates(Carbon $date, float $obliquity): void
+    public function calculateEquatorialCoordinates(Carbon $date, ...$args): void
     {
+        // Accept variadic args for compatibility with Target::calculateEquatorialCoordinates
+        // Expected: [$obliquity]
+        $obliquity = $args[0] ?? null;
+
+        if ($obliquity === null) {
+            // If obliquity not provided, try to derive a reasonable default using nutation
+            $nutation = Time::nutation(Time::getJd($date));
+            $obliquity = $nutation[3];
+        }
+
+        $obliquity = floatval($obliquity);
+
         $this->setEquatorialCoordinatesToday(
             $this->_calculateEquatorialCoordinates($date, $obliquity)
         );
@@ -206,7 +218,7 @@ class Sun extends Target
     /**
      * Calculates L for the calculation of the coordinates of the sun.
      *
-     * @param  type  $tau  julian millenia since epoch J2000.0
+    * @param  float  $tau  julian millenia since epoch J2000.0
      * @return float L
      *
      * See chapter 25 of Astronomical Algorithms
@@ -356,7 +368,7 @@ class Sun extends Target
     /**
      * Calculates R for the calculation of the coordinates of the sun.
      *
-     * @param  type  $tau  julian millenia since epoch J2000.0
+    * @param  float  $tau  julian millenia since epoch J2000.0
      * @return float R
      *
      * See chapter 25 of Astronomical Algorithms

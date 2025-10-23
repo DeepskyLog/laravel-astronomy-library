@@ -79,8 +79,20 @@ class Elliptic extends Target
      *
      * See chapter 33 of Astronomical Algorithms
      */
-    public function calculateEquatorialCoordinates(Carbon $date, GeographicalCoordinates $geo_coords, $epoch = 2451545.0, float $height = 0.0): void
+    public function calculateEquatorialCoordinates(Carbon $date, ...$args): void
     {
+        // Expected args: [GeographicalCoordinates $geo_coords, $epoch = 2451545.0, float $height = 0.0]
+        $geo_coords = $args[0] ?? null;
+        $epoch = $args[1] ?? 2451545.0;
+        $height = $args[2] ?? 0.0;
+
+        if (! $geo_coords instanceof GeographicalCoordinates) {
+            $geo_coords = new GeographicalCoordinates(0.0, 0.0);
+        }
+
+        $epoch = $epoch;
+        $height = floatval($height);
+
         $this->setEquatorialCoordinatesToday(
             $this->_calculateEquatorialCoordinates($date, $geo_coords, $epoch, $height)
         );

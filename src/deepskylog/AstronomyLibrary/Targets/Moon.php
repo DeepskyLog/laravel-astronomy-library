@@ -289,7 +289,7 @@ class Moon extends Target
      *
      * See chapter 33 of Astronomical Algorithms
      */
-    public function calculateApparentEquatorialCoordinates(Carbon $date): void
+    public function calculateApparentEquatorialCoordinates(Carbon $date, ...$args): void
     {
         $this->setEquatorialCoordinatesToday(
             $this->_calculateApparentEquatorialCoordinates($date)
@@ -311,8 +311,20 @@ class Moon extends Target
      *
      * See chapter 40 of Astronomical Algorithms
      */
-    public function calculateEquatorialCoordinates(Carbon $date, GeographicalCoordinates $geo_coords, float $height): void
+    public function calculateEquatorialCoordinates(Carbon $date, ...$args): void
     {
+        // Accept variadic args for compatibility with the base Target signature.
+        // Expected: [$geo_coords, $height]
+        $geo_coords = $args[0] ?? null;
+        $height = $args[1] ?? 0.0;
+
+        if (! $geo_coords instanceof GeographicalCoordinates) {
+            // Fallback: use a neutral geographical coordinate if none provided
+            $geo_coords = new GeographicalCoordinates(0.0, 0.0);
+        }
+
+        $height = floatval($height);
+
         $this->setEquatorialCoordinatesToday(
             $this->_calculateEquatorialCoordinates($date, $geo_coords, $height)
         );

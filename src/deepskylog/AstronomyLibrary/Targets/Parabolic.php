@@ -73,8 +73,18 @@ class Parabolic extends Target
      *
      * See chapter 33 of Astronomical Algorithms
      */
-    public function calculateEquatorialCoordinates(Carbon $date, GeographicalCoordinates $geo_coords, float $height = 0.0): void
+    public function calculateEquatorialCoordinates(Carbon $date, ...$args): void
     {
+        // Expected args: [GeographicalCoordinates $geo_coords, float $height = 0.0]
+        $geo_coords = $args[0] ?? null;
+        $height = $args[1] ?? 0.0;
+
+        if (! $geo_coords instanceof GeographicalCoordinates) {
+            $geo_coords = new GeographicalCoordinates(0.0, 0.0);
+        }
+
+        $height = floatval($height);
+
         $this->setEquatorialCoordinatesToday(
             $this->_calculateEquatorialCoordinates($date, $geo_coords, $height)
         );
