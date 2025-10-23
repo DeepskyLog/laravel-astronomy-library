@@ -1079,57 +1079,88 @@ class Target
             $prevX = null;
             $prevY = null;
 
+            // Prepare moon plotting: dashed white line
+            $moon = new Moon();
+            $prevMoonX = null;
+            $prevMoonY = null;
+            // Define a longer dash style: more white pixels then a larger gap
+            // (repeat white pixels 6 times, gap as axiscolor 10 times for more space)
+            $moonDashStyle = [
+                $textcolor, $textcolor, $textcolor, $textcolor, $textcolor, $textcolor,
+                $axiscolor, $axiscolor, $axiscolor, $axiscolor, $axiscolor,
+                $axiscolor, $axiscolor, $axiscolor, $axiscolor, $axiscolor
+            ];
+            imagesetstyle($image, $moonDashStyle);
+            $moonStyle = IMG_COLOR_STYLED;
+
             // Increase sampling: steps per hour (4 -> 15min sampling).
             $stepsPerHour = 4;
             $stepMinutes = 60 / $stepsPerHour; // 15
             $totalSteps = 24 * $stepsPerHour; // 96
 
             for ($i = 0; $i <= $totalSteps; $i++) {
-                // Calculate the apparent siderial time
-                $siderial_time = Time::apparentSiderialTime($date, $geo_coords);
+                // Use a copy of the loop date as the absolute time of this sample
+                $stepDate = $date->copy();
+
+                // Calculate the apparent siderial time for this sample
+                $siderial_time = Time::apparentSiderialTime($stepDate, $geo_coords);
 
                 // Draw time labels only at whole hours (every $stepsPerHour step)
                 if ($i % $stepsPerHour == 0) {
                     $labelX = 55 + ($i / $stepsPerHour) * 37;
-                    imagestring($image, 2, (int) $labelX, 370, $date->isoFormat('HH:mm'), $textcolor);
+                    imagestring($image, 2, (int) $labelX, 370, $stepDate->isoFormat('HH:mm'), $textcolor);
                 }
 
-                // Use the correct coordinates for moving targets
-                if ($this->getEquatorialCoordinatesToday()->getRA() == $this->getEquatorialCoordinatesYesterday()->getRA()
-                    && $this->getEquatorialCoordinatesToday()->getDeclination() == $this->getEquatorialCoordinatesYesterday()->getDeclination()
-                ) {
-                    $coords = $this->getEquatorialCoordinates();
+                // Recalculate equatorial coordinates for this exact sample time when possible.
+                // Prefer subclass implementations if available.
+                if (method_exists($this, 'calculateApparentEquatorialCoordinates')) {
+                    // This method sets equatorial coordinates for today/tomorrow/yesterday
+                    $this->calculateApparentEquatorialCoordinates($stepDate->copy());
+                    $coords = $this->getEquatorialCoordinatesToday();
+                } elseif (method_exists($this, 'calculateEquatorialCoordinates')) {
+                    // Topocentric equatorial coordinates (needs geo coords and height)
+                    // Use height 0.0 by default
+                    $this->calculateEquatorialCoordinates($stepDate->copy(), $geo_coords, 0.0);
+                    $coords = $this->getEquatorialCoordinatesToday();
                 } else {
-                    // Coordinates are for 0:00 TD
-                    $raToday = $this->getEquatorialCoordinatesToday()->getRA()->getCoordinate();
-                    $declToday = $this->getEquatorialCoordinatesToday()
-                        ->getDeclination()->getCoordinate();
-                    $raTomorrow = $this->getEquatorialCoordinatesTomorrow()->getRA()->getCoordinate();
-                    $declTomorrow = $this->getEquatorialCoordinatesTomorrow()
-                        ->getDeclination()->getCoordinate();
+                    // Fallback: interpolate between stored today/tomorrow values (original behavior)
+                    if ($this->getEquatorialCoordinatesToday()->getRA() == $this->getEquatorialCoordinatesYesterday()->getRA()
+                        && $this->getEquatorialCoordinatesToday()->getDeclination() == $this->getEquatorialCoordinatesYesterday()->getDeclination()
+                    ) {
+                        $coords = $this->getEquatorialCoordinates();
+                    } else {
+                        // Coordinates are for 0:00 TD
+                        $raToday = $this->getEquatorialCoordinatesToday()->getRA()->getCoordinate();
+                        $declToday = $this->getEquatorialCoordinatesToday()
+                            ->getDeclination()->getCoordinate();
+                        $raTomorrow = $this->getEquatorialCoordinatesTomorrow()->getRA()->getCoordinate();
+                        $declTomorrow = $this->getEquatorialCoordinatesTomorrow()
+                            ->getDeclination()->getCoordinate();
 
-                    $raDiff = $raTomorrow - $raToday;
-                    if (abs($raDiff) > 12) {
-                        if ($raToday > $raTomorrow) {
-                            $raDiff = 24 + $raDiff;
-                        } else {
-                            $raDiff = $raDiff - 24;
+                        $raDiff = $raTomorrow - $raToday;
+                        if (abs($raDiff) > 12) {
+                            if ($raToday > $raTomorrow) {
+                                $raDiff = 24 + $raDiff;
+                            } else {
+                                $raDiff = $raDiff - 24;
+                            }
                         }
-                    }
-                    $raInterval = $raDiff / 24;
-                    $ra = $raToday + $raInterval * (12 + $i);
-                    $decl = $declToday
-                        + ($declTomorrow - $declToday) / 24 * (12 + $i);
+                        $raInterval = $raDiff / 24;
+                        $ra = $raToday + $raInterval * (12 + $i);
+                        $decl = $declToday
+                            + ($declTomorrow - $declToday) / 24 * (12 + $i);
 
-                    $coords = new EquatorialCoordinates($ra, $decl);
+                        $coords = new EquatorialCoordinates($ra, $decl);
+                    }
                 }
-                // Calculate the horizontal coordinates
+
+                // Calculate the horizontal coordinates for this sample
                 $horizontal = $coords->convertToHorizontal(
                     $geo_coords,
                     $siderial_time
                 );
 
-                // Add the step (30 minutes when stepsPerHour==2)
+                // Advance the loop date by one step for the next iteration
                 $date->addMinutes($stepMinutes);
 
                 // Only plot non-negative altitudes (0..90 deg)
@@ -1164,12 +1195,55 @@ class Target
                     $prevX = null;
                     $prevY = null;
                 }
+                // ----- Moon plotting: compute moon altitude at this same time -----
+                // Use a copy of the date so Moon methods that mutate the passed Carbon
+                // don't affect the plotting loop's $date.
+                $moonDate = $date->copy();
+                // Calculate moon apparent equatorial coords for this moment
+                $moon->calculateApparentEquatorialCoordinates($moonDate);
+                $moonCoords = $moon->getEquatorialCoordinatesToday();
+                $moonHorizontal = $moonCoords->convertToHorizontal($geo_coords, $siderial_time);
+
+                $moonAlt = $moonHorizontal->getAltitude()->getCoordinate();
+                if ($moonAlt >= 0.0) {
+                    $moonY = 365 - $moonAlt * 4;
+                    if ($moonY < 5) {
+                        $moonY = 5;
+                    }
+                    if ($moonY > 365) {
+                        $moonY = 365;
+                    }
+                    $moonX = 70 + ($i / $stepsPerHour) * 37;
+
+                    if ($prevMoonX !== null && $prevMoonY !== null) {
+                        // Draw dashed moon line
+                        imageline($image, (int) $prevMoonX, (int) $prevMoonY, (int) $moonX, (int) $moonY, $moonStyle);
+                    }
+
+                    $prevMoonX = $moonX;
+                    $prevMoonY = $moonY;
+                } else {
+                    $prevMoonX = null;
+                    $prevMoonY = null;
+                }
                 // Draw minor tick only at whole hours
                 if ($i % $stepsPerHour == 0) {
                     $tickX = 70 + ($i / $stepsPerHour) * 37;
                     imageline($image, (int) $tickX, 365, (int) $tickX, 355, $axiscolor);
                 }
             }
+            // Draw a small legend for the moon (top-right)
+            // Move slightly left so it doesn't touch the image border
+            $legendX = 830;
+            $legendY = 15;
+            // Draw a short dashed sample line using the same style
+            $sampleLen = 60;
+            // We draw the sample in the legend area: from legendX to legendX+sampleLen
+            // Use the styled color index
+            imagesetstyle($image, $moonDashStyle);
+            imageline($image, $legendX, $legendY + 6, $legendX + $sampleLen, $legendY + 6, IMG_COLOR_STYLED);
+            // Label it 'Moon'
+            imagestring($image, 2, $legendX + $sampleLen + 8, $legendY - 2, 'Moon', $textcolor);
             // Show only positive elevation axis (0..90)
             imagestring($image, 2, 35, 360, '0', $textcolor);
             imageline($image, 70, 365, 958, 365, $axiscolor);
@@ -1432,5 +1506,29 @@ class Target
         }
 
         return $bestMagnification;
+    }
+
+    /**
+     * Subclasses may override to calculate apparent equatorial coordinates for a given date.
+     * Default implementation is a no-op to allow calling code to remain generic.
+     *
+     * @param Carbon $date
+     */
+    protected function calculateApparentEquatorialCoordinates(Carbon $date, ...$args): void
+    {
+        // no-op; subclasses (e.g. Moon, Planet) provide a real implementation
+    }
+
+    /**
+     * Subclasses may override to calculate topocentric equatorial coordinates for a given date.
+     * Default implementation is a no-op to allow calling code to remain generic.
+     *
+     * @param Carbon $date
+     * @param GeographicalCoordinates $geo_coords
+     * @param float $height
+     */
+    protected function calculateEquatorialCoordinates(Carbon $date, ...$args): void
+    {
+        // no-op; subclasses (e.g. Sun, Moon, Planet) provide a real implementation
     }
 }
