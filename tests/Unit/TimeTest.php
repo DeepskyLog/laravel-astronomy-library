@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Tests for the time methods.
  *

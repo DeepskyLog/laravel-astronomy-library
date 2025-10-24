@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Tests calculating the contrast.
  *

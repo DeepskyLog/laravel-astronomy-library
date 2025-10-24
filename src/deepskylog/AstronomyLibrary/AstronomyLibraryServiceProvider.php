@@ -4,8 +4,8 @@ namespace deepskylog\AstronomyLibrary;
 
 use deepskylog\AstronomyLibrary\Commands\UpdateDeltaTTable;
 use deepskylog\AstronomyLibrary\Commands\UpdateOrbitalElements;
-use Illuminate\Support\ServiceProvider;
 use Illuminate\Console\Scheduling\Schedule;
+use Illuminate\Support\ServiceProvider;
 
 class AstronomyLibraryServiceProvider extends ServiceProvider
 {

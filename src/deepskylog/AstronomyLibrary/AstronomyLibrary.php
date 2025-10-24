@@ -1,4 +1,5 @@
 <?php
+
 /**
  * The main AstronomyLibrary class.
  *

@@ -282,7 +282,7 @@ class Time
     public static function apparentSiderialTime(
         Carbon $date,
         GeographicalCoordinates $coords,
-        array $nutation = null
+        ?array $nutation = null
     ): Carbon {
         $date = $date->copy()->timezone('UTC');
         $siderialTime = self::meanSiderialTime($date, $coords);
