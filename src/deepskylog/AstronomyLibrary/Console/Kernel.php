@@ -24,4 +24,17 @@ class Kernel extends ConsoleKernel
             'astronomy:updateOrbitalElements'
         )->weeklyOn(1, '4:30');
     }
+
+    /**
+     * Public wrapper to allow external callers (like the package service provider)
+     * to invoke the schedule method. The actual schedule method is protected
+     * (as defined by Laravel), so expose a thin public shim that forwards to it.
+     *
+     * @param Schedule $schedule
+     * @return void
+     */
+    public function callSchedule(Schedule $schedule): void
+    {
+        $this->schedule($schedule);
+    }
 }
