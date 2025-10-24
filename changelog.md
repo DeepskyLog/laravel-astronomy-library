@@ -2,6 +2,11 @@
 
 All notable changes to `laravel-astronomy-library` will be documented in this file.
 
+## Version 6.3.1
+
+Fixed:
+- Fixed syntax error
+
 ## Version 6.3
 
 Added:
