@@ -839,7 +839,7 @@ class Target
             $th = new Coordinate($transitHeight, -90.0, 90.0);
         }
         $this->_maxHeight = new Coordinate($transitHeight, -90.0, 90.0);
-        if (!isset($hasAstronomical) && !isset($hasNautical)) {
+        if (! isset($hasAstronomical) && ! isset($hasNautical)) {
             // safety: if bounds weren't computed, set to null
             $this->_maxHeightAtNight = null;
         } elseif (! $hasAstronomical && ! $hasNautical) {
@@ -1407,12 +1407,12 @@ class Target
         $black = imagecolorallocate($image, 0, 0, 0);
         imagefilledrectangle($image, 0, 0, 1000, 400, $black);
 
-    $textcolor = imagecolorallocate($image, 255, 255, 255);
-    $axiscolor = imagecolorallocate($image, 150, 150, 150);
+        $textcolor = imagecolorallocate($image, 255, 255, 255);
+        $axiscolor = imagecolorallocate($image, 150, 150, 150);
     // More saturated / darker blue fill and a brighter cyan border to make
     // blue month regions stand out clearly.
-    $blue = imagecolorallocate($image, 0, 38, 153); // darker saturated blue
-    $blueBorder = imagecolorallocate($image, 0, 160, 255); // thin border color
+        $blue = imagecolorallocate($image, 0, 38, 153); // darker saturated blue
+        $blueBorder = imagecolorallocate($image, 0, 160, 255); // thin border color
 
         // plotting area left..right
         $left = 70;
@@ -1441,15 +1441,15 @@ class Target
         // edge so the line visibly continues through to the year's end.
         $plotXs = $xs;
 
-    $monthMaxes = [];
-    $monthAllNoAstronomical = [];
-    $monthNoNautCounts = [];
-    // Collect per-sample datapoints for plotting (ensure at least 5 per month)
-    $monthSamples = [];
+        $monthMaxes = [];
+        $monthAllNoAstronomical = [];
+        $monthNoNautCounts = [];
+        // Collect per-sample datapoints for plotting (ensure at least 5 per month)
+        $monthSamples = [];
 
-    // Steps for sampling the night: every 10 minutes (6 steps/hour)
-    $stepsPerHour = 6;
-    $stepMinutes = 60 / $stepsPerHour; // 10
+        // Steps for sampling the night: every 10 minutes (6 steps/hour)
+        $stepsPerHour = 6;
+        $stepMinutes = 60 / $stepsPerHour; // 10
 
         // How many samples per month to take (increase for higher resolution).
         // Higher values increase accuracy but also CPU cost. Ten samples is a
@@ -1631,7 +1631,7 @@ class Target
                 }
             }
 
-            $noAstrByDay[$day] = !$hasAstronomical;
+            $noAstrByDay[$day] = ! $hasAstronomical;
         }
 
         // Find contiguous runs of no-astronomical days and draw them. We map
@@ -1650,8 +1650,12 @@ class Target
                 $endFrac = $runEnd / $daysInYear;
                 $x1 = (int) floor($left + $startFrac * $width) - 1;
                 $x2 = (int) ceil($left + $endFrac * $width) + 1;
-                if ($x1 < $left) $x1 = $left;
-                if ($x2 > $right) $x2 = $right;
+                if ($x1 < $left) {
+                    $x1 = $left;
+                }
+                if ($x2 > $right) {
+                    $x2 = $right;
+                }
                 imagefilledrectangle($image, $x1, 5, $x2, 365, $blue);
                 imagerectangle($image, $x1, 5, $x2, 365, $blueBorder);
                 $inRun = false;
@@ -1664,14 +1668,18 @@ class Target
             $endFrac = $runEnd / $daysInYear;
             $x1 = (int) floor($left + $startFrac * $width) - 1;
             $x2 = (int) ceil($left + $endFrac * $width) + 1;
-            if ($x1 < $left) $x1 = $left;
-            if ($x2 > $right) $x2 = $right;
+            if ($x1 < $left) {
+                $x1 = $left;
+            }
+            if ($x2 > $right) {
+                $x2 = $right;
+            }
             imagefilledrectangle($image, $x1, 5, $x2, 365, $blue);
             imagerectangle($image, $x1, 5, $x2, 365, $blueBorder);
         }
 
         // Draw month labels and horizontal axis
-        $monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+        $monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
         for ($m = 0; $m < 12; $m++) {
             $labelX = (int) $xs[$m] - 10;
             imagestring($image, 2, $labelX, 370, $monthNames[$m], $textcolor);
@@ -1688,15 +1696,15 @@ class Target
         imagestring($image, 2, $labelXNextJan, 370, 'Jan', $textcolor);
         imageline($image, (int) $right, 365, (int) $right, 355, $axiscolor);
 
-    // Draw Y axis markers (0,30,60,90)
-    imagestring($image, 2, 35, 360, '0'.chr(176), $textcolor);
-    imageline($image, $left, 365, $right, 365, $axiscolor);
-    imagestring($image, 2, 35, 240, '30'.chr(176), $textcolor);
-    imageline($image, $left, 245, $right, 245, $axiscolor);
-    imagestring($image, 2, 35, 120, '60'.chr(176), $textcolor);
-    imageline($image, $left, 125, $right, 125, $axiscolor);
-    imagestring($image, 2, 35, 0, '90'.chr(176), $textcolor);
-    imageline($image, $left, 5, $right, 5, $axiscolor);
+        // Draw Y axis markers (0,30,60,90)
+        imagestring($image, 2, 35, 360, '0'.chr(176), $textcolor);
+        imageline($image, $left, 365, $right, 365, $axiscolor);
+        imagestring($image, 2, 35, 240, '30'.chr(176), $textcolor);
+        imageline($image, $left, 245, $right, 245, $axiscolor);
+        imagestring($image, 2, 35, 120, '60'.chr(176), $textcolor);
+        imageline($image, $left, 125, $right, 125, $axiscolor);
+        imagestring($image, 2, 35, 0, '90'.chr(176), $textcolor);
+        imageline($image, $left, 5, $right, 5, $axiscolor);
 
         // Draw a connected white line through all chronological samples
         // collected across the year. This produces multiple datapoints per
@@ -1705,7 +1713,9 @@ class Target
         // maximum.
         $allSamples = [];
         for ($m = 1; $m <= 12; $m++) {
-            if (! isset($monthSamples[$m - 1])) continue;
+            if (! isset($monthSamples[$m - 1])) {
+                continue;
+            }
             foreach ($monthSamples[$m - 1] as $s) {
                 $sampleDate = Carbon::create($year, $m, $s['day'], 12, 0, 0, $date->timezone);
                 $doy = $sampleDate->dayOfYear;
@@ -1713,14 +1723,20 @@ class Target
                 $x = $left + $frac * $width;
                 $alt = $s['val'];
                 $y = 365 - $alt * 4;
-                if ($y < 5) $y = 5;
-                if ($y > 365) $y = 365;
+                if ($y < 5) {
+                    $y = 5;
+                }
+                if ($y > 365) {
+                    $y = 365;
+                }
                 $allSamples[] = ['doy' => $doy, 'x' => (int) $x, 'y' => (int) $y, 'val' => $alt];
             }
         }
 
         // They are already chronological by month/sample order, but sort to be safe
-        usort($allSamples, function ($a, $b) { return $a['doy'] <=> $b['doy']; });
+        usort($allSamples, function ($a, $b) {
+            return $a['doy'] <=> $b['doy'];
+        });
 
         $prevX = null;
         $prevY = null;
@@ -1754,8 +1770,8 @@ class Target
         imagepng($image);
         $rawImageBytes = ob_get_clean();
 
-    // rawImageBytes is PNG data
-    return "<img src='data:image/png;base64,".base64_encode($rawImageBytes)."' />";
+        // rawImageBytes is PNG data
+        return "<img src='data:image/png;base64,".base64_encode($rawImageBytes)."' />";
     }
 
     /**

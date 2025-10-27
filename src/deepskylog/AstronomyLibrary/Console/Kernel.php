@@ -30,7 +30,7 @@ class Kernel extends ConsoleKernel
      * to invoke the schedule method. The actual schedule method is protected
      * (as defined by Laravel), so expose a thin public shim that forwards to it.
      *
-     * @param Schedule $schedule
+     * @param  Schedule  $schedule
      * @return void
      */
     public function callSchedule(Schedule $schedule): void
