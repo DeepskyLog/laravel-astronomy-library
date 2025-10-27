@@ -622,98 +622,182 @@ class Target
             $geo_coords->getLatitude()->getCoordinate(),
             $geo_coords->getLongitude()->getCoordinate()
         );
+        // Also need sun info for the following day to get the full night bounds
+        $sun_info2 = date_sun_info(
+            $siderial_time->copy()->addDay()->timestamp,
+            $geo_coords->getLatitude()->getCoordinate(),
+            $geo_coords->getLongitude()->getCoordinate()
+        );
 
         $during_night = true;
 
-        if ($sun_info['astronomical_twilight_begin'] === true) {
-            $endOfNight = Carbon::createFromTimestamp(
-                $sun_info['nautical_twilight_begin']
-            );
+        // Prefer astronomical twilight bounds when present, otherwise fall back
+        // to nautical twilight if available. If neither exists, treat as no
+        // usable night for nightly max calculations.
+        $hasAstronomical = (bool) ($sun_info['astronomical_twilight_end'] && $sun_info2['astronomical_twilight_begin']);
+        $hasNautical = (bool) ($sun_info['nautical_twilight_end'] && $sun_info2['nautical_twilight_begin']);
 
-            $startOfNight = Carbon::createFromTimestamp(
-                $sun_info['nautical_twilight_end']
-            );
-            if ($sun_info['nautical_twilight_begin'] === true) {
-                $this->_maxHeight = new Coordinate($transitHeight, -90.0, 90.0);
-                $this->_maxHeightAtNight = null;
-                $this->_bestTime = null;
+        // Defensive check: some PHP builds or locales may return epoch-ish
+        // timestamps (year 1970) or other sentinel values for missing
+        // twilight entries. If the constructed Carbon falls in year 1970,
+        // treat that twilight as missing so we don't use bogus bounds.
+        if ($hasAstronomical) {
+            $tmpStart = Carbon::createFromTimestamp($sun_info['astronomical_twilight_end'])->timezone($siderial_time->timezone);
+            $tmpEnd = Carbon::createFromTimestamp($sun_info2['astronomical_twilight_begin'])->timezone($siderial_time->timezone);
+            if ($tmpStart->year === 1970 || $tmpEnd->year === 1970) {
+                $hasAstronomical = false;
             }
-        } else {
-            $endOfNight = Carbon::createFromTimestamp(
-                $sun_info['astronomical_twilight_begin']
-            );
-
-            $startOfNight = Carbon::createFromTimestamp(
-                $sun_info['astronomical_twilight_end']
-            );
+        }
+        if ($hasNautical) {
+            $tmpStartN = Carbon::createFromTimestamp($sun_info['nautical_twilight_end'])->timezone($siderial_time->timezone);
+            $tmpEndN = Carbon::createFromTimestamp($sun_info2['nautical_twilight_begin'])->timezone($siderial_time->timezone);
+            if ($tmpStartN->year === 1970 || $tmpEndN->year === 1970) {
+                $hasNautical = false;
+            }
         }
 
-        // Check if the transit is before the beginning of the night
-        if ($this->_transit->isBefore(
-            Carbon::createFromTimestamp(
-                $sun_info['astronomical_twilight_end']
-            )->toDate()
-        )
-        ) {
-            // Check if the transit is after the end of the night
-            if ($this->_transit->isAfter($endOfNight->toDate())) {
-                $during_night = false;
+        if ($hasAstronomical) {
+            $startOfNight = Carbon::createFromTimestamp($sun_info['astronomical_twilight_end'])->timezone($siderial_time->timezone);
+            $endOfNight = Carbon::createFromTimestamp($sun_info2['astronomical_twilight_begin'])->timezone($siderial_time->timezone);
+        } elseif ($hasNautical) {
+            // No astronomical darkness -> use nautical twilight bounds as requested
+            $startOfNight = Carbon::createFromTimestamp($sun_info['nautical_twilight_end'])->timezone($siderial_time->timezone);
+            $endOfNight = Carbon::createFromTimestamp($sun_info2['nautical_twilight_begin'])->timezone($siderial_time->timezone);
+        } else {
+            // No useful twilight bounds; mark that there is no night
+            $startOfNight = Carbon::createFromTimestamp(0)->timezone($siderial_time->timezone);
+            $endOfNight = Carbon::createFromTimestamp(0)->timezone($siderial_time->timezone);
+        }
+
+        // Determine whether the transit occurs during the night interval.
+        // Night interval may wrap past midnight, so handle both cases.
+        // The computed $this->_transit is anchored to the date used as the
+        // siderial-time base; that may put the transit on the previous or
+        // next calendar day relative to the night bounds. Try the transit
+        // on the day before, the day of, and the day after and pick the
+        // candidate that falls inside the night interval.
+        $during_night = false;
+        $transitInNight = null;
+        $candidates = [
+            $this->_transit->copy(),
+            $this->_transit->copy()->subDay(),
+            $this->_transit->copy()->addDay(),
+        ];
+        foreach ($candidates as $cand) {
+            if ($startOfNight->lte($endOfNight)) {
+                if ($cand->betweenIncluded($startOfNight, $endOfNight)) {
+                    $during_night = true;
+                    $transitInNight = $cand;
+                    break;
+                }
+            } else {
+                if ($cand->gte($startOfNight) || $cand->lte($endOfNight)) {
+                    $during_night = true;
+                    $transitInNight = $cand;
+                    break;
+                }
             }
+        }
+        // If we found a transit candidate that occurs during the night,
+        // prefer that as the best time to observe.
+        if ($transitInNight !== null) {
+            $this->_bestTime = $transitInNight;
         }
 
         if (! $during_night) {
-            $th = new Coordinate($transitHeight, -90.0, 90.0);
+            // When the transit does not occur during the chosen night
+            // interval, prefer the true maximum DURING the night when an
+            // astronomical night exists. Only when no astronomical night
+            // is present (but a nautical one may exist) do we fall back to
+            // comparing twilight endpoint altitudes.
+            if ($hasAstronomical) {
+                // Sample the night at 15 minute intervals to find the true
+                // maximum altitude during the night interval. This ensures
+                // we pick the nightly maximum even when the transit lies
+                // outside the night bounds.
+                $bestNightAlt = -INF;
+                $bestNightTime = null;
+                $sampleTime = $startOfNight->copy();
+                while ($sampleTime->lte($endOfNight)) {
+                    $timeHours = $sampleTime->hour + $sampleTime->minute / 60.0 + $sampleTime->second / 3600.0;
+                    $mForCalc = $timeHours / 24.0;
+                    [$hval] = $this->_calculateHeight(
+                        $theta0,
+                        $mForCalc,
+                        $deltaT,
+                        $targetDoesNotMove,
+                        $a,
+                        $b,
+                        $adec,
+                        $bdec,
+                        $geo_coords
+                    );
+                    if (is_finite($hval) && $hval > $bestNightAlt) {
+                        $bestNightAlt = $hval;
+                        $bestNightTime = $sampleTime->copy();
+                    }
+                    $sampleTime->addMinutes(15);
+                }
 
-            // Calculate the height at the end of the night
-            $astroend = $endOfNight->hour + $endOfNight->minute / 60.0;
-
-            $height = $this->_calculateHeight(
-                $theta0,
-                $astroend / 24.0,
-                $deltaT,
-                $targetDoesNotMove,
-                $a,
-                $b,
-                $adec,
-                $bdec,
-                $geo_coords
-            )[0];
-
-            // Calculate the height at the beginning of the night
-            $astrobegin = $startOfNight->hour + $startOfNight->minute / 60.0;
-
-            $height2 = $this->_calculateHeight(
-                $theta0,
-                $astrobegin / 24.0,
-                $deltaT,
-                $targetDoesNotMove,
-                $a,
-                $b,
-                $adec,
-                $bdec,
-                $geo_coords
-            )[0];
-
-            // Compare and use the hightest height as the best height for the target
-            if ($height2 > $height) {
-                $th = new Coordinate($height2, -90.0, 90.0);
-                $this->_bestTime = $startOfNight;
+                // Use the nightly maximum (even if below horizon). This
+                // obeys the rule to choose the maximum during the real
+                // night rather than a twilight endpoint.
+                if ($bestNightTime !== null) {
+                    $th = new Coordinate($bestNightAlt, -90.0, 90.0);
+                    $this->_bestTime = $bestNightTime;
+                } else {
+                    // Fallback: no samples? fall back to transitHeight
+                    $th = new Coordinate($transitHeight, -90.0, 90.0);
+                }
             } else {
-                $th = new Coordinate($height, -90.0, 90.0);
-                $this->_bestTime = $endOfNight;
-            }
-            // If max height < 0.0 at astronomical darkness, try nautical darkness.
-            if ($th->getCoordinate() < 0.0) {
-                if ($endOfNight != Carbon::createFromTimestamp(
-                    $sun_info['nautical_twilight_begin']
-                )
-                ) {
-                    $endOfNight = Carbon::createFromTimestamp(
-                        $sun_info['nautical_twilight_begin']
-                    );
-                    $startOfNight = Carbon::createFromTimestamp(
-                        $sun_info['nautical_twilight_end']
-                    );
+                // No astronomical night: fall back to the previous behavior
+                // of comparing twilight endpoint altitudes (nautical case).
+                $astroend = $endOfNight->hour + $endOfNight->minute / 60.0;
+
+                $height = $this->_calculateHeight(
+                    $theta0,
+                    $astroend / 24.0,
+                    $deltaT,
+                    $targetDoesNotMove,
+                    $a,
+                    $b,
+                    $adec,
+                    $bdec,
+                    $geo_coords
+                )[0];
+
+                // Calculate the height at the beginning of the night
+                $astrobegin = $startOfNight->hour + $startOfNight->minute / 60.0;
+
+                $height2 = $this->_calculateHeight(
+                    $theta0,
+                    $astrobegin / 24.0,
+                    $deltaT,
+                    $targetDoesNotMove,
+                    $a,
+                    $b,
+                    $adec,
+                    $bdec,
+                    $geo_coords
+                )[0];
+
+                // Compare and use the highest height as the best height for the target
+                if ($height2 > $height) {
+                    $th = new Coordinate($height2, -90.0, 90.0);
+                    $this->_bestTime = $startOfNight;
+                } else {
+                    $th = new Coordinate($height, -90.0, 90.0);
+                    $this->_bestTime = $endOfNight;
+                }
+
+                // If selected twilight-based maximum is negative and nautical
+                // twilight exists we may try nautical bounds (preserve old
+                // behavior). This block mirrors the previous fallback.
+                if ($th->getCoordinate() < 0.0 && $hasNautical) {
+                    $endOfNight = Carbon::createFromTimestamp($sun_info2['nautical_twilight_begin'])
+                        ->timezone($siderial_time->timezone);
+                    $startOfNight = Carbon::createFromTimestamp($sun_info['nautical_twilight_end'])
+                        ->timezone($siderial_time->timezone);
                     $astroend = $endOfNight->hour + $endOfNight->minute / 60.0;
 
                     $height = $this->_calculateHeight(
@@ -728,7 +812,6 @@ class Target
                         $geo_coords
                     )[0];
 
-                    // Calculate the height at the beginning of the night
                     $astrobegin = $startOfNight->hour + $startOfNight->minute / 60.0;
 
                     $height2 = $this->_calculateHeight(
@@ -743,8 +826,6 @@ class Target
                         $geo_coords
                     )[0];
 
-                    // Compare and use the hightest height as the best height
-                    // for the target
                     if ($height2 > $height) {
                         $th = new Coordinate($height2, -90.0, 90.0);
                         $this->_bestTime = $startOfNight;
@@ -758,7 +839,15 @@ class Target
             $th = new Coordinate($transitHeight, -90.0, 90.0);
         }
         $this->_maxHeight = new Coordinate($transitHeight, -90.0, 90.0);
-        $this->_maxHeightAtNight = $th;
+        if (!isset($hasAstronomical) && !isset($hasNautical)) {
+            // safety: if bounds weren't computed, set to null
+            $this->_maxHeightAtNight = null;
+        } elseif (! $hasAstronomical && ! $hasNautical) {
+            // no astronomical nor nautical darkness -> no nightly max
+            $this->_maxHeightAtNight = null;
+        } else {
+            $this->_maxHeightAtNight = $th;
+        }
     }
 
     /**
@@ -1062,11 +1151,38 @@ class Target
             $daycolor = imagecolorallocate($image, 0, 0, 200);
             $twilightcolor = imagecolorallocate($image, 100, 100, 200);
 
+            // Always draw the 'day' regions (left of nautical start and right of nautical end)
             imagefilledrectangle($image, 70, 5, 70 + $startNautical * 37, 365, $daycolor);
             imagefilledrectangle($image, 70 + $endNautical * 37, 5, 958, 365, $daycolor);
 
-            imagefilledrectangle($image, 70 + $startNautical * 37, 5, 70 + $startAstronomical * 37, 365, $twilightcolor);
-            imagefilledrectangle($image, 70 + $endAstronomical * 37, 5, 70 + $endNautical * 37, 365, $twilightcolor);
+            // Only draw the astronomical-twilight shaded regions when we really
+            // have valid astronomical twilight bounds. Some PHP builds/locales
+            // return sentinel/epoch timestamps (year 1970) or nulls; guard against
+            // that so we don't draw a small twilight band when astronomical
+            // twilight is absent for the date (e.g. high-latitude summer).
+            $hasAstronomical = (bool) ($sun_info['astronomical_twilight_end'] && $sun_info2['astronomical_twilight_begin']);
+            if ($hasAstronomical) {
+                $tmpStart = Carbon::createFromTimestamp($sun_info['astronomical_twilight_end'])->timezone($date->timezone);
+                $tmpEnd = Carbon::createFromTimestamp($sun_info2['astronomical_twilight_begin'])->timezone($date->timezone);
+                if ($tmpStart->year === 1970 || $tmpEnd->year === 1970) {
+                    $hasAstronomical = false;
+                }
+            }
+
+            if ($hasAstronomical) {
+                imagefilledrectangle($image, 70 + $startNautical * 37, 5, 70 + $startAstronomical * 37, 365, $twilightcolor);
+                imagefilledrectangle($image, 70 + $endAstronomical * 37, 5, 70 + $endNautical * 37, 365, $twilightcolor);
+            } else {
+                // No astronomical twilight for this date: fill the entire night
+                // area (between nautical start and nautical end) with light blue so
+                // the background isn't black. Guard against invalid numeric
+                // defaults (e.g. both equal 12) which would produce an empty area.
+                $xStart = 70 + $startNautical * 37;
+                $xEnd = 70 + $endNautical * 37;
+                if ($xEnd > $xStart) {
+                    imagefilledrectangle($image, (int) $xStart, 5, (int) $xEnd, 365, $twilightcolor);
+                }
+            }
 
             // Start at noon
             $date->hour = 12;
@@ -1245,13 +1361,13 @@ class Target
             // Label it 'Moon'
             imagestring($image, 2, $legendX + $sampleLen + 8, $legendY - 2, 'Moon', $textcolor);
             // Show only positive elevation axis (0..90)
-            imagestring($image, 2, 35, 360, '0', $textcolor);
+            imagestring($image, 2, 35, 360, '0'.chr(176), $textcolor);
             imageline($image, 70, 365, 958, 365, $axiscolor);
-            imagestring($image, 2, 35, 240, '30', $textcolor);
+            imagestring($image, 2, 35, 240, '30'.chr(176), $textcolor);
             imageline($image, 70, 245, 958, 245, $axiscolor);
-            imagestring($image, 2, 35, 120, '60', $textcolor);
+            imagestring($image, 2, 35, 120, '60'.chr(176), $textcolor);
             imageline($image, 70, 125, 958, 125, $axiscolor);
-            imagestring($image, 2, 35, 0, '90', $textcolor);
+            imagestring($image, 2, 35, 0, '90'.chr(176), $textcolor);
             imageline($image, 70, 5, 958, 5, $axiscolor);
 
             // Begin capturing the byte stream
@@ -1268,6 +1384,378 @@ class Target
         }
 
         return $this->_altitudeChart;
+    }
+
+    /**
+     * Creates a yearly chart with the maximum altitude per month.
+     * For each month we sample every 10 days (day 1, 11 and 21) and
+     * compute the maximum altitude during the night. The X axis shows
+     * months, the Y axis the maximum altitude during the night (0..90).
+     * If a month's sampled nights all have no astronomical twilight,
+     * that month's background is filled blue; otherwise kept black.
+     * The graph uses a single connected line and no separate point markers.
+     *
+     * @param  GeographicalCoordinates  $geo_coords  The geographical coordinates
+     * @param  Carbon  $date  A representative date (year used)
+     * @return string The generated chart as an embedded image
+     */
+    public function yearGraph(GeographicalCoordinates $geo_coords, Carbon $date, bool $debug = false): string
+    {
+        $image = imagecreatetruecolor(1000, 400);
+
+        // Background black
+        $black = imagecolorallocate($image, 0, 0, 0);
+        imagefilledrectangle($image, 0, 0, 1000, 400, $black);
+
+    $textcolor = imagecolorallocate($image, 255, 255, 255);
+    $axiscolor = imagecolorallocate($image, 150, 150, 150);
+    // More saturated / darker blue fill and a brighter cyan border to make
+    // blue month regions stand out clearly.
+    $blue = imagecolorallocate($image, 0, 38, 153); // darker saturated blue
+    $blueBorder = imagecolorallocate($image, 0, 160, 255); // thin border color
+
+        // plotting area left..right
+        $left = 70;
+        $right = 958;
+        $width = $right - $left;
+
+        // Compute X positions for month STARTS (first of each month).
+        // We map the day-of-year of the first day of each month to the
+        // plotting width. This places month labels and ticks at the
+        // first-of-month instead of the middle of the month.
+        $year = $date->year;
+        $yearStart = Carbon::create($year, 1, 1, 12, 0, 0, $date->timezone);
+        $daysInYear = $yearStart->isLeapYear() ? 366 : 365;
+
+        $xs = [];
+        for ($m = 0; $m < 12; $m++) {
+            $firstOfMonth = Carbon::create($year, $m + 1, 1, 12, 0, 0, $date->timezone);
+            $doy = $firstOfMonth->dayOfYear; // 1..daysInYear
+            $frac = ($doy - 1) / $daysInYear; // 0-based fraction across year
+            $xs[$m] = $left + $frac * $width;
+        }
+
+        // For plotting, put the monthly maxima exactly at the first-of-month
+        // X positions so the line starts at Jan 1 and the December point is
+        // at Dec 1; we'll draw an extra segment from Dec 1 to the right
+        // edge so the line visibly continues through to the year's end.
+        $plotXs = $xs;
+
+    $monthMaxes = [];
+    $monthAllNoAstronomical = [];
+    $monthNoNautCounts = [];
+    // Collect per-sample datapoints for plotting (ensure at least 5 per month)
+    $monthSamples = [];
+
+    // Steps for sampling the night: every 10 minutes (6 steps/hour)
+    $stepsPerHour = 6;
+    $stepMinutes = 60 / $stepsPerHour; // 10
+
+        // How many samples per month to take (increase for higher resolution).
+        // Higher values increase accuracy but also CPU cost. Ten samples is a
+        // reasonable default (roughly every 2-3 days).
+        $samplesPerMonth = 10;
+
+        for ($m = 1; $m <= 12; $m++) {
+            // Generate evenly spaced sample days across the month up to the
+            // 28th day to avoid month-length variability and keep sampling
+            // uniform across months. This produces approx $samplesPerMonth
+            // samples per month.
+            $daysInSpan = 28; // sample within days 1..28
+            $step = max(1, floor($daysInSpan / $samplesPerMonth));
+            $sampleDays = [];
+            for ($d = 1; $d <= $daysInSpan; $d += $step) {
+                $sampleDays[] = $d;
+            }
+            $values = [];
+            $monthSamples[$m - 1] = [];
+            $noAstrCount = 0;
+            foreach ($sampleDays as $d) {
+                // create a Carbon for the sample date at noon so date_sun_info covers the following night
+                $sample = Carbon::create($year, $m, $d, 12, 0, 0, $date->timezone);
+
+                // get sun info for sample day and next day
+                $sun_info = date_sun_info(
+                    $sample->timestamp,
+                    $geo_coords->getLatitude()->getCoordinate(),
+                    $geo_coords->getLongitude()->getCoordinate()
+                );
+                $sun_info2 = date_sun_info(
+                    $sample->copy()->addDay()->timestamp,
+                    $geo_coords->getLatitude()->getCoordinate(),
+                    $geo_coords->getLongitude()->getCoordinate()
+                );
+
+                // Determine astronomical night bounds (primary) and fall back to
+                // nautical if astronomical is not present. The blue-month marker
+                // should reflect absence of astronomical darkness per user request.
+                $hasAstronomical = (bool) ($sun_info['astronomical_twilight_end'] && $sun_info2['astronomical_twilight_begin']);
+
+                // Track whether we've already counted this sample as 'no astronomical'
+                $countedNoAstr = false;
+                if (! $hasAstronomical) {
+                    $noAstrCount++;
+                    $countedNoAstr = true;
+                }
+
+                // Choose which twilight bounds we will use for sampling: prefer
+                // astronomical, otherwise use nautical when available.
+                if ($sun_info['astronomical_twilight_end'] && $sun_info2['astronomical_twilight_begin']) {
+                    $startOfNight = Carbon::createFromTimestamp($sun_info['astronomical_twilight_end'])->timezone($sample->timezone);
+                    $endOfNight = Carbon::createFromTimestamp($sun_info2['astronomical_twilight_begin'])->timezone($sample->timezone);
+                } elseif ($sun_info['nautical_twilight_end'] && $sun_info2['nautical_twilight_begin']) {
+                    $startOfNight = Carbon::createFromTimestamp($sun_info['nautical_twilight_end'])->timezone($sample->timezone);
+                    $endOfNight = Carbon::createFromTimestamp($sun_info2['nautical_twilight_begin'])->timezone($sample->timezone);
+                } else {
+                    // no valid twilight bounds; record a 0.0 sample for this day
+                    // so that we still have datapoints to plot and don't
+                    // short-circuit the month's sampling.
+                    $val = 0.0;
+                    $values[] = $val;
+                    $monthSamples[$m - 1][] = ['day' => $d, 'val' => $val];
+                    // Proceed to next sample day
+                    continue;
+                }
+
+                // (debug log removed)
+
+                // If the returned start is the Unix epoch (1970) or start equals end,
+                // treat this as a missing astronomical twilight and count it towards
+                // making the month blue (per user request). Also skip sampling for
+                // this night since the bounds are not usable.
+                if (! $countedNoAstr && ($startOfNight->year === 1970 || $startOfNight->eq($endOfNight))) {
+                    // We saw an epoch/sentinel or degenerate twilight interval.
+                    // Count this as a 'no astronomical' sample but DO NOT skip
+                    // the ephemeris calculation — the internal
+                    // calculateEphemerides() method is more robust and may
+                    // still produce a usable nightly maximum (see user's note
+                    // about June). Previously we short-circuited and pushed a
+                    // 0.0 which caused months like June to be zeroed even when
+                    // a valid max exists.
+                    $noAstrCount++;
+                    // (debug log removed)
+                    // don't continue; fall through to ephemeris calculation
+                }
+
+                // Normalize times to an interval starting at local noon - 12h mapping like altitudeGraph
+                $start = ($startOfNight->hour + $startOfNight->minute / 60.0 + $startOfNight->second / 3600.0) - 12.0;
+                if ($start < 0) {
+                    $start += 24.0;
+                }
+                $end = ($endOfNight->hour + $endOfNight->minute / 60.0 + $endOfNight->second / 3600.0) - 12.0;
+                if ($end < 0) {
+                    $end += 24.0;
+                }
+
+                // If end < start it means the night wraps past midnight in the mapped 0..24 space
+                if ($end <= $start) {
+                    $end += 24.0;
+                }
+
+                // Instead of sampling every few minutes, use the established
+                // ephemeris calculation which determines the maximum height
+                // during the night and stores it in getMaxHeightAtNight().
+                // This centralizes the logic and avoids duplicating horizon/
+                // twilight handling here.
+                $greenwichSiderialTime = Time::apparentSiderialTimeGreenwich($sample);
+                $deltaTVal = Time::deltaT($sample);
+
+                try {
+                    // calculateEphemerides will populate _maxHeightAtNight
+                    $this->calculateEphemerides($geo_coords, $greenwichSiderialTime, $deltaTVal);
+                    $coord = $this->getMaxHeightAtNight();
+                } catch (\Exception $e) {
+                    // In case of unexpected failure, treat as no visible height
+                    $coord = null;
+                }
+
+                if ($coord !== null && is_finite($coord->getCoordinate())) {
+                    $val = $coord->getCoordinate();
+                    if ($val >= 0.0) {
+                        $values[] = min(90.0, $val);
+                        $monthSamples[$m - 1][] = ['day' => $d, 'val' => min(90.0, $val)];
+                    } else {
+                        $values[] = 0.0;
+                        $monthSamples[$m - 1][] = ['day' => $d, 'val' => 0.0];
+                    }
+                } else {
+                    $values[] = 0.0;
+                    $monthSamples[$m - 1][] = ['day' => $d, 'val' => 0.0];
+                }
+            }
+
+            // decide month's maximum: the maximum of sampled values (if any)
+            if (! empty($values)) {
+                $monthMaxes[$m - 1] = max($values);
+            } else {
+                $monthMaxes[$m - 1] = 0.0;
+            }
+            // Record count and decide month-blue flag (astronomical-based).
+            $monthNoAstrCounts[$m - 1] = $noAstrCount;
+            // Mark month as having 'no astronomical night' only if ALL sampled
+            // nights lack astronomical twilight (matching the header description
+            // "If a month's sampled nights all have no astronomical twilight,
+            // that month's background is filled blue").
+            $monthAllNoAstronomical[$m - 1] = ($noAstrCount === count($sampleDays));
+
+            // (debug log removed)
+        }
+
+        // Fill background blue where there is no astronomical darkness.
+        // Instead of coarse month-wide flags we compute a day-resolution
+        // mask across the year so partial-month spans (e.g. ending
+        // July 17) are represented accurately.
+
+        $noAstrByDay = array_fill(1, $daysInYear, false);
+        for ($day = 1; $day <= $daysInYear; $day++) {
+            $sample = $yearStart->copy()->addDays($day - 1);
+
+            $sun_info = date_sun_info(
+                $sample->timestamp,
+                $geo_coords->getLatitude()->getCoordinate(),
+                $geo_coords->getLongitude()->getCoordinate()
+            );
+            $sun_info2 = date_sun_info(
+                $sample->copy()->addDay()->timestamp,
+                $geo_coords->getLatitude()->getCoordinate(),
+                $geo_coords->getLongitude()->getCoordinate()
+            );
+
+            $hasAstronomical = (bool) ($sun_info['astronomical_twilight_end'] && $sun_info2['astronomical_twilight_begin']);
+            if ($hasAstronomical) {
+                // guard against sentinel/epoch timestamps
+                $tmpStart = Carbon::createFromTimestamp($sun_info['astronomical_twilight_end'])->timezone($sample->timezone);
+                $tmpEnd = Carbon::createFromTimestamp($sun_info2['astronomical_twilight_begin'])->timezone($sample->timezone);
+                if ($tmpStart->year === 1970 || $tmpEnd->year === 1970) {
+                    $hasAstronomical = false;
+                }
+            }
+
+            $noAstrByDay[$day] = !$hasAstronomical;
+        }
+
+        // Find contiguous runs of no-astronomical days and draw them. We map
+        // day-of-year to an X coordinate across the plotting width to allow
+        // sub-month precision.
+        $inRun = false;
+        $runStart = 0;
+        for ($d = 1; $d <= $daysInYear; $d++) {
+            $isNoAstr = $noAstrByDay[$d];
+            if ($isNoAstr && ! $inRun) {
+                $inRun = true;
+                $runStart = $d;
+            } elseif (! $isNoAstr && $inRun) {
+                $runEnd = $d - 1;
+                $startFrac = ($runStart - 1) / $daysInYear;
+                $endFrac = $runEnd / $daysInYear;
+                $x1 = (int) floor($left + $startFrac * $width) - 1;
+                $x2 = (int) ceil($left + $endFrac * $width) + 1;
+                if ($x1 < $left) $x1 = $left;
+                if ($x2 > $right) $x2 = $right;
+                imagefilledrectangle($image, $x1, 5, $x2, 365, $blue);
+                imagerectangle($image, $x1, 5, $x2, 365, $blueBorder);
+                $inRun = false;
+            }
+        }
+        // If we ended while still in a run, close it now
+        if ($inRun) {
+            $runEnd = $daysInYear;
+            $startFrac = ($runStart - 1) / $daysInYear;
+            $endFrac = $runEnd / $daysInYear;
+            $x1 = (int) floor($left + $startFrac * $width) - 1;
+            $x2 = (int) ceil($left + $endFrac * $width) + 1;
+            if ($x1 < $left) $x1 = $left;
+            if ($x2 > $right) $x2 = $right;
+            imagefilledrectangle($image, $x1, 5, $x2, 365, $blue);
+            imagerectangle($image, $x1, 5, $x2, 365, $blueBorder);
+        }
+
+        // Draw month labels and horizontal axis
+        $monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+        for ($m = 0; $m < 12; $m++) {
+            $labelX = (int) $xs[$m] - 10;
+            imagestring($image, 2, $labelX, 370, $monthNames[$m], $textcolor);
+            imageline($image, (int) $xs[$m], 365, (int) $xs[$m], 355, $axiscolor);
+            // We keep textual debug in the error log, but do not draw any
+            // debug overlay on the generated image so the output is clean.
+        }
+
+        // Add a tick and label for January of the next year at the right edge.
+        // We intentionally do NOT compute or plot a projected Jan value; the
+        // graph should show the December sample as the last data point but
+        // include a visual tick for Jan 1 of the following year.
+        $labelXNextJan = (int) $right - 10;
+        imagestring($image, 2, $labelXNextJan, 370, 'Jan', $textcolor);
+        imageline($image, (int) $right, 365, (int) $right, 355, $axiscolor);
+
+    // Draw Y axis markers (0,30,60,90)
+    imagestring($image, 2, 35, 360, '0'.chr(176), $textcolor);
+    imageline($image, $left, 365, $right, 365, $axiscolor);
+    imagestring($image, 2, 35, 240, '30'.chr(176), $textcolor);
+    imageline($image, $left, 245, $right, 245, $axiscolor);
+    imagestring($image, 2, 35, 120, '60'.chr(176), $textcolor);
+    imageline($image, $left, 125, $right, 125, $axiscolor);
+    imagestring($image, 2, 35, 0, '90'.chr(176), $textcolor);
+    imageline($image, $left, 5, $right, 5, $axiscolor);
+
+        // Draw a connected white line through all chronological samples
+        // collected across the year. This produces multiple datapoints per
+        // month (at least the configured sample count, and at least 5 when
+        // requested) and gives a more detailed curve than a single monthly
+        // maximum.
+        $allSamples = [];
+        for ($m = 1; $m <= 12; $m++) {
+            if (! isset($monthSamples[$m - 1])) continue;
+            foreach ($monthSamples[$m - 1] as $s) {
+                $sampleDate = Carbon::create($year, $m, $s['day'], 12, 0, 0, $date->timezone);
+                $doy = $sampleDate->dayOfYear;
+                $frac = ($doy - 1) / $daysInYear;
+                $x = $left + $frac * $width;
+                $alt = $s['val'];
+                $y = 365 - $alt * 4;
+                if ($y < 5) $y = 5;
+                if ($y > 365) $y = 365;
+                $allSamples[] = ['doy' => $doy, 'x' => (int) $x, 'y' => (int) $y, 'val' => $alt];
+            }
+        }
+
+        // They are already chronological by month/sample order, but sort to be safe
+        usort($allSamples, function ($a, $b) { return $a['doy'] <=> $b['doy']; });
+
+        $prevX = null;
+        $prevY = null;
+        foreach ($allSamples as $pt) {
+            // treat non-positive values as gaps
+            if ($pt['val'] <= 0.0) {
+                $prevX = null;
+                $prevY = null;
+                continue;
+            }
+            $x = $pt['x'];
+            $y = $pt['y'];
+            if ($prevX !== null && $prevY !== null) {
+                imageline($image, (int) $prevX, (int) $prevY, (int) $x, (int) $y, $textcolor);
+            }
+            $prevX = $x;
+            $prevY = $y;
+        }
+
+        // Extend the final segment past the Dec 1 tick to the right edge
+        // so the plotted line visually reaches the Jan tick. Use the last
+        // plotted y-value for a horizontal continuation.
+        if ($prevX !== null && $prevY !== null) {
+            $xEdge = $right;
+            if ($xEdge > $prevX) {
+                imageline($image, (int) $prevX, (int) $prevY, (int) $xEdge, (int) $prevY, $textcolor);
+            }
+        }
+
+        ob_start();
+        imagepng($image);
+        $rawImageBytes = ob_get_clean();
+
+    // rawImageBytes is PNG data
+    return "<img src='data:image/png;base64,".base64_encode($rawImageBytes)."' />";
     }
 
     /**

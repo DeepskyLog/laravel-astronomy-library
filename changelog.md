@@ -2,6 +2,15 @@
 
 All notable changes to `laravel-astronomy-library` will be documented in this file.
 
+## Version 6.4
+
+Added:
+- Targets can now generate a graph of the maximum altitude during a whole year
+
+Fixed:
+- A lot of fixes in the calculation of the maximum altitude during the night and best time to observe a target.
+- the altitude graph now shows the correct colors for nautical twilight.
+
 ## Version 6.3.1
 
 Fixed:

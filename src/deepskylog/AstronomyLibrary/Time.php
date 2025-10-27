@@ -176,7 +176,9 @@ class Time
                 'UTC'
             );
             $databaseAvailable = true;
-        } catch (Exception) {
+        } catch (\Throwable $e) {
+            // Eloquent/DB may not be available in CLI contexts; fall back
+            // to polynomial approximations below.
             $databaseAvailable = false;
         }
 
