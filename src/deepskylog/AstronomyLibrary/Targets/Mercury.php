@@ -146,21 +146,21 @@ class Mercury extends Planet
             + 106.0 * cos(4.206 + 19804.827 * $tau);
 
         $L1 = (2608814706223.0 * cos(0.0)
-                + 1126008.0 * cos(6.2170397 + 26087.9031416 * $tau)
-                + 303471.0 * cos(3.055655 + 52175.806283 * $tau)
-                + 80538.0 * cos(6.10455 + 78263.70942 * $tau)
-                + 21245.0 * cos(2.83532 + 104351.61257 * $tau)
-                + 5592.0 * cos(5.8268 + 130439.5157 * $tau)
-                + 1472.0 * cos(2.5185 + 156527.4188 * $tau)
-                + 388.0 * cos(5.480 + 182615.322 * $tau)
-                + 352.0 * cos(3.052 + 1109.379 * $tau)
-                + 103.0 * cos(2.149 + 208703.225 * $tau)
-                + 94.0 * cos(6.12 + 27197.28 * $tau)
-                + 91.0 * cos(24978.52 * $tau)
-                + 52.0 * cos(5.62 + 5661.33 * $tau)
-                + 44.0 * cos(4.57 + 25028.52 * $tau)
-                + 28.0 * cos(3.04 + 51066.43 * $tau)
-                + 27.0 * cos(5.09 + 234791.13 * $tau));
+            + 1126008.0 * cos(6.2170397 + 26087.9031416 * $tau)
+            + 303471.0 * cos(3.055655 + 52175.806283 * $tau)
+            + 80538.0 * cos(6.10455 + 78263.70942 * $tau)
+            + 21245.0 * cos(2.83532 + 104351.61257 * $tau)
+            + 5592.0 * cos(5.8268 + 130439.5157 * $tau)
+            + 1472.0 * cos(2.5185 + 156527.4188 * $tau)
+            + 388.0 * cos(5.480 + 182615.322 * $tau)
+            + 352.0 * cos(3.052 + 1109.379 * $tau)
+            + 103.0 * cos(2.149 + 208703.225 * $tau)
+            + 94.0 * cos(6.12 + 27197.28 * $tau)
+            + 91.0 * cos(24978.52 * $tau)
+            + 52.0 * cos(5.62 + 5661.33 * $tau)
+            + 44.0 * cos(4.57 + 25028.52 * $tau)
+            + 28.0 * cos(3.04 + 51066.43 * $tau)
+            + 27.0 * cos(5.09 + 234791.13 * $tau));
 
         $L2 = (53050.0 * cos(0.0)
             + 16904.0 * cos(4.69072 + 26087.90314 * $tau)
@@ -182,11 +182,11 @@ class Mercury extends Planet
             + 7.0 * cos(5.82 + 156527.42 * $tau)
             + 3.0 * cos(2.57 + 182615.32 * $tau));
         $L4 = (114.0 * cos(3.1416)
-              + 3.0 * cos(2.03 + 26087.90 * $tau)
-              + 2.0 * cos(1.42 + 78263.71 * $tau)
-              + 2.0 * cos(4.50 + 52175.81 * $tau)
-              + 1.0 * cos(4.50 + 104351.61 * $tau)
-              + 1.0 * cos(1.27 + 130439.52 * $tau));
+            + 3.0 * cos(2.03 + 26087.90 * $tau)
+            + 2.0 * cos(1.42 + 78263.71 * $tau)
+            + 2.0 * cos(4.50 + 52175.81 * $tau)
+            + 1.0 * cos(4.50 + 104351.61 * $tau)
+            + 1.0 * cos(1.27 + 130439.52 * $tau));
 
         $L5 = (1 * cos(3.14));
 
@@ -245,27 +245,27 @@ class Mercury extends Planet
 
         // R
         $R0 = 39528272.0 * cos(0.0)
-             + 7834132.0 * cos(6.1923372 + 26087.9031416 * $tau)
-             + 795526.0 * cos(2.959897 + 52175.806283 * $tau)
-             + 121282.0 * cos(6.010642 + 78263.709425 * $tau)
-             + 21922.0 * cos(2.77820 + 104351.61257 * $tau)
-             + 4354.0 * cos(5.8289 + 130439.5157 * $tau)
-             + 918.0 * cos(2.597 + 156527.419 * $tau)
-             + 290.0 * cos(1.424 + 25028.521 * $tau)
-             + 260.0 * cos(3.028 + 27197.282 * $tau)
-             + 202.0 * cos(5.647 + 182615.322 * $tau)
-             + 201.0 * cos(5.592 + 31749.235 * $tau)
-             + 142.0 * cos(6.253 + 24978.525 * $tau)
-             + 100.0 * cos(3.734 + 21535.950 * $tau);
+            + 7834132.0 * cos(6.1923372 + 26087.9031416 * $tau)
+            + 795526.0 * cos(2.959897 + 52175.806283 * $tau)
+            + 121282.0 * cos(6.010642 + 78263.709425 * $tau)
+            + 21922.0 * cos(2.77820 + 104351.61257 * $tau)
+            + 4354.0 * cos(5.8289 + 130439.5157 * $tau)
+            + 918.0 * cos(2.597 + 156527.419 * $tau)
+            + 290.0 * cos(1.424 + 25028.521 * $tau)
+            + 260.0 * cos(3.028 + 27197.282 * $tau)
+            + 202.0 * cos(5.647 + 182615.322 * $tau)
+            + 201.0 * cos(5.592 + 31749.235 * $tau)
+            + 142.0 * cos(6.253 + 24978.525 * $tau)
+            + 100.0 * cos(3.734 + 21535.950 * $tau);
 
         $R1 = (217348.0 * cos(4.656172 + 26087.903142 * $tau)
-              + 44142.0 * cos(1.42386 + 52175.80628 * $tau)
-              + 10094.0 * cos(4.47466 + 78263.70942 * $tau)
-              + 2433.0 * cos(1.2423 + 104351.6126 * $tau)
-              + 1624.0 * cos(0.0)
-              + 604.0 * cos(4.293 + 130439.516 * $tau)
-              + 153.0 * cos(1.061 + 156527.419 * $tau)
-              + 39.0 * cos(4.11 + 182615.32 * $tau));
+            + 44142.0 * cos(1.42386 + 52175.80628 * $tau)
+            + 10094.0 * cos(4.47466 + 78263.70942 * $tau)
+            + 2433.0 * cos(1.2423 + 104351.6126 * $tau)
+            + 1624.0 * cos(0.0)
+            + 604.0 * cos(4.293 + 130439.516 * $tau)
+            + 153.0 * cos(1.061 + 156527.419 * $tau)
+            + 39.0 * cos(4.11 + 182615.32 * $tau));
 
         $R2 = (3118 * cos(3.0823 + 26087.9031 * $tau)
             + 1245 * cos(6.1518 + 52175.8063 * $tau)
@@ -510,7 +510,8 @@ class Mercury extends Planet
 
         $i = rad2deg(acos(($R - $R0 * cos(deg2rad($helio_coords[1])) * cos(deg2rad($helio_coords[0] - $helio_coords_earth[0]))) / $delta));
 
-        return round(1.16 + 5 * log10($R * $delta) + 0.02838 * ($i - 50) + 0.0001023 * ($i - 50) ** 2, 1);
+        // Return full-precision magnitude (avoid quantization to 0.1 mag)
+        return 1.16 + 5 * log10($R * $delta) + 0.02838 * ($i - 50) + 0.0001023 * ($i - 50) ** 2;
     }
 
     /**
@@ -529,11 +530,11 @@ class Mercury extends Planet
         $earth = new Earth();
         $helio_coords_earth = $earth->calculateHeliocentricCoordinates($date);
         $x = $helio_coords[2] * cos(deg2rad($helio_coords[1])) * cos(deg2rad($helio_coords[0])) -
-                    $helio_coords_earth[2] * cos(deg2rad($helio_coords_earth[1])) * cos(deg2rad($helio_coords_earth[0]));
+            $helio_coords_earth[2] * cos(deg2rad($helio_coords_earth[1])) * cos(deg2rad($helio_coords_earth[0]));
         $y = $helio_coords[2] * cos(deg2rad($helio_coords[1])) * sin(deg2rad($helio_coords[0])) -
-                    $helio_coords_earth[2] * cos(deg2rad($helio_coords_earth[1])) * sin(deg2rad($helio_coords_earth[0]));
+            $helio_coords_earth[2] * cos(deg2rad($helio_coords_earth[1])) * sin(deg2rad($helio_coords_earth[0]));
         $z = $helio_coords[2] * sin(deg2rad($helio_coords[1])) -
-                    $helio_coords_earth[2] * sin(deg2rad($helio_coords_earth[1]));
+            $helio_coords_earth[2] * sin(deg2rad($helio_coords_earth[1]));
         $delta = sqrt($x ** 2 + $y ** 2 + $z ** 2);
 
         $this->setDiameter(round(2 * 3.36 / $delta, 1));

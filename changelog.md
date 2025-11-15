@@ -2,6 +2,15 @@
 
 All notable changes to `laravel-astronomy-library` will be documented in this file.
 
+## Version 6.5
+
+Added:
+- `Target::yearDiameterGraph(GeographicalCoordinates $geo_coords, Carbon $date, bool $debug = false)` — generate a year-long plot of the planet's apparent angular diameter (arcseconds).
+
+Changed:
+- `Target::yearMagnitudeGraph(..., $debug = true)` now emits debug logging for skipped samples and exceptions (rendered into the placeholder/debug image when `debug` is true).
+- Increased magnitude precision for several planet magnitude implementations by removing final rounding in `magnitude()` (reduces 0.1-mag quantization in graphs). Affected: Jupiter, Mercury, Venus, Mars, Neptune, Uranus, Saturn.
+
 ## Version 6.4
 
 Added:

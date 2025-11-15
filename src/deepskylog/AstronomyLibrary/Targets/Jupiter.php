@@ -3763,7 +3763,8 @@ class Jupiter extends Planet
 
         $i = rad2deg(acos(($R - $R0 * cos(deg2rad($helio_coords[1])) * cos(deg2rad($helio_coords[0] - $helio_coords_earth[0]))) / $delta));
 
-        return round(-8.93 + 5 * log10($R * $delta), 1);
+        // Return full-precision magnitude (do not quantize to 0.1 mag here)
+        return -8.93 + 5 * log10($R * $delta);
     }
 
     /**
@@ -3782,11 +3783,11 @@ class Jupiter extends Planet
         $earth = new Earth();
         $helio_coords_earth = $earth->calculateHeliocentricCoordinates($date);
         $x = $helio_coords[2] * cos(deg2rad($helio_coords[1])) * cos(deg2rad($helio_coords[0])) -
-                    $helio_coords_earth[2] * cos(deg2rad($helio_coords_earth[1])) * cos(deg2rad($helio_coords_earth[0]));
+            $helio_coords_earth[2] * cos(deg2rad($helio_coords_earth[1])) * cos(deg2rad($helio_coords_earth[0]));
         $y = $helio_coords[2] * cos(deg2rad($helio_coords[1])) * sin(deg2rad($helio_coords[0])) -
-                    $helio_coords_earth[2] * cos(deg2rad($helio_coords_earth[1])) * sin(deg2rad($helio_coords_earth[0]));
+            $helio_coords_earth[2] * cos(deg2rad($helio_coords_earth[1])) * sin(deg2rad($helio_coords_earth[0]));
         $z = $helio_coords[2] * sin(deg2rad($helio_coords[1])) -
-                    $helio_coords_earth[2] * sin(deg2rad($helio_coords_earth[1]));
+            $helio_coords_earth[2] * sin(deg2rad($helio_coords_earth[1]));
         $delta = sqrt($x ** 2 + $y ** 2 + $z ** 2);
 
         $this->setDiameter(round(2 * 98.44 / $delta, 1));

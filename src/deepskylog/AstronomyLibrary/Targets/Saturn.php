@@ -6093,7 +6093,8 @@ class Saturn extends Planet
         );
         $deltaU = abs($U1 - $U2);
 
-        return round(-8.68 + 5 * log10($R * $delta) + 0.044 * abs($deltaU) - 2.60 * sin(abs($B)) + 1.25 * sin($B) ** 2, 2);
+        // Return full-precision magnitude (avoid quantization here)
+        return -8.68 + 5 * log10($R * $delta) + 0.044 * abs($deltaU) - 2.60 * sin(abs($B)) + 1.25 * sin($B) ** 2;
     }
 
     /**
@@ -6112,11 +6113,11 @@ class Saturn extends Planet
         $earth = new Earth();
         $helio_coords_earth = $earth->calculateHeliocentricCoordinates($date);
         $x = $helio_coords[2] * cos(deg2rad($helio_coords[1])) * cos(deg2rad($helio_coords[0])) -
-                    $helio_coords_earth[2] * cos(deg2rad($helio_coords_earth[1])) * cos(deg2rad($helio_coords_earth[0]));
+            $helio_coords_earth[2] * cos(deg2rad($helio_coords_earth[1])) * cos(deg2rad($helio_coords_earth[0]));
         $y = $helio_coords[2] * cos(deg2rad($helio_coords[1])) * sin(deg2rad($helio_coords[0])) -
-                    $helio_coords_earth[2] * cos(deg2rad($helio_coords_earth[1])) * sin(deg2rad($helio_coords_earth[0]));
+            $helio_coords_earth[2] * cos(deg2rad($helio_coords_earth[1])) * sin(deg2rad($helio_coords_earth[0]));
         $z = $helio_coords[2] * sin(deg2rad($helio_coords[1])) -
-                    $helio_coords_earth[2] * sin(deg2rad($helio_coords_earth[1]));
+            $helio_coords_earth[2] * sin(deg2rad($helio_coords_earth[1]));
         $delta = sqrt($x ** 2 + $y ** 2 + $z ** 2);
 
         $this->setDiameter(round(2 * 82.73 / $delta, 1));

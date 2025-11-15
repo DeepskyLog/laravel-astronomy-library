@@ -72,105 +72,254 @@ class Target
     private $_LTCSize = 24;
     private $_angleSize = 7;
     private $_angle = [
-        -0.2255, 0.5563, 0.9859, 1.260,
-        1.742, 2.083, 2.556,
+        -0.2255,
+        0.5563,
+        0.9859,
+        1.260,
+        1.742,
+        2.083,
+        2.556,
     ];
     private $_LTC = [
         [
-            4, -0.3769, -1.8064, -2.3368, -2.4601,
-            -2.5469, -2.5610, -2.5660,
+            4,
+            -0.3769,
+            -1.8064,
+            -2.3368,
+            -2.4601,
+            -2.5469,
+            -2.5610,
+            -2.5660,
         ],
         [
-            5, -0.3315, -1.7747, -2.3337, -2.4608,
-            -2.5465, -2.5607, -2.5658,
+            5,
+            -0.3315,
+            -1.7747,
+            -2.3337,
+            -2.4608,
+            -2.5465,
+            -2.5607,
+            -2.5658,
         ],
         [
-            6, -0.2682, -1.7345, -2.3310, -2.4605,
-            -2.5467, -2.5608, -2.5658,
+            6,
+            -0.2682,
+            -1.7345,
+            -2.3310,
+            -2.4605,
+            -2.5467,
+            -2.5608,
+            -2.5658,
         ],
         [
-            7, -0.1982, -1.6851, -2.3140, -2.4572,
-            -2.5481, -2.5615, -2.5665,
+            7,
+            -0.1982,
+            -1.6851,
+            -2.3140,
+            -2.4572,
+            -2.5481,
+            -2.5615,
+            -2.5665,
         ],
         [
-            8, -0.1238, -1.6252, -2.2791, -2.4462,
-            -2.5463, -2.5597, -2.5646,
+            8,
+            -0.1238,
+            -1.6252,
+            -2.2791,
+            -2.4462,
+            -2.5463,
+            -2.5597,
+            -2.5646,
         ],
         [
-            9, -0.0424, -1.5529, -2.2297, -2.4214,
-            -2.5343, -2.5501, -2.5552,
+            9,
+            -0.0424,
+            -1.5529,
+            -2.2297,
+            -2.4214,
+            -2.5343,
+            -2.5501,
+            -2.5552,
         ],
         [
-            10, 0.0498, -1.4655, -2.1659, -2.3763,
-            -2.5047, -2.5269, -2.5333,
+            10,
+            0.0498,
+            -1.4655,
+            -2.1659,
+            -2.3763,
+            -2.5047,
+            -2.5269,
+            -2.5333,
         ],
         [
-            11, 0.1596, -1.3581, -2.0810, -2.3036,
-            -2.4499, -2.4823, -2.4937,
+            11,
+            0.1596,
+            -1.3581,
+            -2.0810,
+            -2.3036,
+            -2.4499,
+            -2.4823,
+            -2.4937,
         ],
         [
-            12, 0.2934, -1.2256, -1.9674, -2.1965,
-            -2.3631, -2.4092, -2.4318,
+            12,
+            0.2934,
+            -1.2256,
+            -1.9674,
+            -2.1965,
+            -2.3631,
+            -2.4092,
+            -2.4318,
         ],
         [
-            13, 0.4557, -1.0673, -1.8186, -2.0531,
-            -2.2445, -2.3083, -2.3491,
+            13,
+            0.4557,
+            -1.0673,
+            -1.8186,
+            -2.0531,
+            -2.2445,
+            -2.3083,
+            -2.3491,
         ],
         [
-            14, 0.6500, -0.8841, -1.6292, -1.8741,
-            -2.0989, -2.1848, -2.2505,
+            14,
+            0.6500,
+            -0.8841,
+            -1.6292,
+            -1.8741,
+            -2.0989,
+            -2.1848,
+            -2.2505,
         ],
         [
-            15, 0.8808, -0.6687, -1.3967, -1.6611,
-            -1.9284, -2.0411, -2.1375,
+            15,
+            0.8808,
+            -0.6687,
+            -1.3967,
+            -1.6611,
+            -1.9284,
+            -2.0411,
+            -2.1375,
         ],
         [
-            16, 1.1558, -0.3952, -1.1264, -1.4176,
-            -1.7300, -1.8727, -2.0034,
+            16,
+            1.1558,
+            -0.3952,
+            -1.1264,
+            -1.4176,
+            -1.7300,
+            -1.8727,
+            -2.0034,
         ],
         [
-            17, 1.4822, -0.0419, -0.8243, -1.1475,
-            -1.5021, -1.6768, -1.8420,
+            17,
+            1.4822,
+            -0.0419,
+            -0.8243,
+            -1.1475,
+            -1.5021,
+            -1.6768,
+            -1.8420,
         ],
         [
-            18, 1.8559, 0.3458, -0.4924, -0.8561,
-            -1.2661, -1.4721, -1.6624,
+            18,
+            1.8559,
+            0.3458,
+            -0.4924,
+            -0.8561,
+            -1.2661,
+            -1.4721,
+            -1.6624,
         ],
         [
-            19, 2.2669, 0.6960, -0.1315, -0.5510,
-            -1.0562, -1.2892, -1.4827,
+            19,
+            2.2669,
+            0.6960,
+            -0.1315,
+            -0.5510,
+            -1.0562,
+            -1.2892,
+            -1.4827,
         ],
         [
-            20, 2.6760, 1.0880, 0.2060, -0.3210,
-            -0.8800, -1.1370, -1.3620,
+            20,
+            2.6760,
+            1.0880,
+            0.2060,
+            -0.3210,
+            -0.8800,
+            -1.1370,
+            -1.3620,
         ],
         [
-            21, 2.7766, 1.2065, 0.3467, -0.1377,
-            -0.7361, -0.9964, -1.2439,
+            21,
+            2.7766,
+            1.2065,
+            0.3467,
+            -0.1377,
+            -0.7361,
+            -0.9964,
+            -1.2439,
         ],
         [
-            22, 2.9304, 1.3821, 0.5353, 0.0328,
-            -0.5605, -0.8606, -1.1187,
+            22,
+            2.9304,
+            1.3821,
+            0.5353,
+            0.0328,
+            -0.5605,
+            -0.8606,
+            -1.1187,
         ],
         [
-            23, 3.1634, 1.6107, 0.7708, 0.2531,
-            -0.3895, -0.7030, -0.9681,
+            23,
+            3.1634,
+            1.6107,
+            0.7708,
+            0.2531,
+            -0.3895,
+            -0.7030,
+            -0.9681,
         ],
         [
-            24, 3.4643, 1.9034, 1.0338, 0.4943,
-            -0.2033, -0.5259, -0.8288,
+            24,
+            3.4643,
+            1.9034,
+            1.0338,
+            0.4943,
+            -0.2033,
+            -0.5259,
+            -0.8288,
         ],
         [
-            25, 3.8211, 2.2564, 1.3265, 0.7605,
-            0.0172, -0.2992, -0.6394,
+            25,
+            3.8211,
+            2.2564,
+            1.3265,
+            0.7605,
+            0.0172,
+            -0.2992,
+            -0.6394,
         ],
         [
-            26, 4.2210, 2.6320, 1.6990, 1.1320,
-            0.2860, -0.0510, -0.4080,
+            26,
+            4.2210,
+            2.6320,
+            1.6990,
+            1.1320,
+            0.2860,
+            -0.0510,
+            -0.4080,
         ],
         [
-            27, 4.6100, 3.0660, 2.1320, 1.5850,
-            0.6520, 0.2410, -0.1210,
+            27,
+            4.6100,
+            3.0660,
+            2.1320,
+            1.5850,
+            0.6520,
+            0.2410,
+            -0.1210,
         ],
     ];
 
@@ -461,13 +610,13 @@ class Target
                         )
                     )
                 )
-                / (cos(deg2rad($geo_coords->getLatitude()->getCoordinate()))
-                * cos(
-                    deg2rad(
-                        $this->getEquatorialCoordinatesToday()
-                            ->getDeclination()->getCoordinate()
-                    )
-                ))
+                    / (cos(deg2rad($geo_coords->getLatitude()->getCoordinate()))
+                        * cos(
+                            deg2rad(
+                                $this->getEquatorialCoordinatesToday()
+                                    ->getDeclination()->getCoordinate()
+                            )
+                        ))
             )
         );
 
@@ -503,7 +652,8 @@ class Target
             $m2 -= floor($m2);
         }
 
-        if ($this->getEquatorialCoordinatesYesterday()->getRA()->getCoordinate() == $this->getEquatorialCoordinatesTomorrow()->getRA()->getCoordinate()
+        if (
+            $this->getEquatorialCoordinatesYesterday()->getRA()->getCoordinate() == $this->getEquatorialCoordinatesTomorrow()->getRA()->getCoordinate()
             && $this->getEquatorialCoordinatesYesterday()->getDeclination()->getCoordinate() == $this->getEquatorialCoordinatesTomorrow()->getDeclination()->getCoordinate()
         ) {
             $a = 0.0;
@@ -1005,10 +1155,10 @@ class Target
         return rad2deg(
             asin(
                 sin(deg2rad($latitude))
-                * sin(deg2rad($deltaInterpol))
-                + cos(deg2rad($latitude))
-                * cos(deg2rad($deltaInterpol))
-                * cos(deg2rad($H))
+                    * sin(deg2rad($deltaInterpol))
+                    + cos(deg2rad($latitude))
+                    * cos(deg2rad($deltaInterpol))
+                    * cos(deg2rad($H))
             )
         );
     }
@@ -1032,8 +1182,8 @@ class Target
     ): float {
         return ($height - $h0)
             / (360.0 * cos(deg2rad($deltaInterpol))
-            * cos(deg2rad($latitude))
-            * sin(deg2rad($H)));
+                * cos(deg2rad($latitude))
+                * sin(deg2rad($H)));
     }
 
     /**
@@ -1202,9 +1352,22 @@ class Target
             // Define a longer dash style: more white pixels then a larger gap
             // (repeat white pixels 6 times, gap as axiscolor 10 times for more space)
             $moonDashStyle = [
-                $textcolor, $textcolor, $textcolor, $textcolor, $textcolor, $textcolor,
-                $axiscolor, $axiscolor, $axiscolor, $axiscolor, $axiscolor,
-                $axiscolor, $axiscolor, $axiscolor, $axiscolor, $axiscolor,
+                $textcolor,
+                $textcolor,
+                $textcolor,
+                $textcolor,
+                $textcolor,
+                $textcolor,
+                $axiscolor,
+                $axiscolor,
+                $axiscolor,
+                $axiscolor,
+                $axiscolor,
+                $axiscolor,
+                $axiscolor,
+                $axiscolor,
+                $axiscolor,
+                $axiscolor,
             ];
             imagesetstyle($image, $moonDashStyle);
             $moonStyle = IMG_COLOR_STYLED;
@@ -1240,7 +1403,8 @@ class Target
                     $coords = $this->getEquatorialCoordinatesToday();
                 } else {
                     // Fallback: interpolate between stored today/tomorrow values (original behavior)
-                    if ($this->getEquatorialCoordinatesToday()->getRA() == $this->getEquatorialCoordinatesYesterday()->getRA()
+                    if (
+                        $this->getEquatorialCoordinatesToday()->getRA() == $this->getEquatorialCoordinatesYesterday()->getRA()
                         && $this->getEquatorialCoordinatesToday()->getDeclination() == $this->getEquatorialCoordinatesYesterday()->getDeclination()
                     ) {
                         $coords = $this->getEquatorialCoordinates();
@@ -1361,13 +1525,13 @@ class Target
             // Label it 'Moon'
             imagestring($image, 2, $legendX + $sampleLen + 8, $legendY - 2, 'Moon', $textcolor);
             // Show only positive elevation axis (0..90)
-            imagestring($image, 2, 35, 360, '0'.chr(176), $textcolor);
+            imagestring($image, 2, 35, 360, '0' . chr(176), $textcolor);
             imageline($image, 70, 365, 958, 365, $axiscolor);
-            imagestring($image, 2, 35, 240, '30'.chr(176), $textcolor);
+            imagestring($image, 2, 35, 240, '30' . chr(176), $textcolor);
             imageline($image, 70, 245, 958, 245, $axiscolor);
-            imagestring($image, 2, 35, 120, '60'.chr(176), $textcolor);
+            imagestring($image, 2, 35, 120, '60' . chr(176), $textcolor);
             imageline($image, 70, 125, 958, 125, $axiscolor);
-            imagestring($image, 2, 35, 0, '90'.chr(176), $textcolor);
+            imagestring($image, 2, 35, 0, '90' . chr(176), $textcolor);
             imageline($image, 70, 5, 958, 5, $axiscolor);
 
             // Begin capturing the byte stream
@@ -1380,7 +1544,7 @@ class Target
             $rawImageBytes = ob_get_clean();
 
             $this->_altitudeChart = "<img src='data:image/jpeg;base64,"
-                .base64_encode($rawImageBytes)."' />";
+                . base64_encode($rawImageBytes) . "' />";
         }
 
         return $this->_altitudeChart;
@@ -1407,12 +1571,12 @@ class Target
         $black = imagecolorallocate($image, 0, 0, 0);
         imagefilledrectangle($image, 0, 0, 1000, 400, $black);
 
-    $textcolor = imagecolorallocate($image, 255, 255, 255);
-    $axiscolor = imagecolorallocate($image, 150, 150, 150);
-    // More saturated / darker blue fill and a brighter cyan border to make
-    // blue month regions stand out clearly.
-    $blue = imagecolorallocate($image, 0, 38, 153); // darker saturated blue
-    $blueBorder = imagecolorallocate($image, 0, 160, 255); // thin border color
+        $textcolor = imagecolorallocate($image, 255, 255, 255);
+        $axiscolor = imagecolorallocate($image, 150, 150, 150);
+        // More saturated / darker blue fill and a brighter cyan border to make
+        // blue month regions stand out clearly.
+        $blue = imagecolorallocate($image, 0, 38, 153); // darker saturated blue
+        $blueBorder = imagecolorallocate($image, 0, 160, 255); // thin border color
 
         // plotting area left..right
         $left = 70;
@@ -1441,15 +1605,15 @@ class Target
         // edge so the line visibly continues through to the year's end.
         $plotXs = $xs;
 
-    $monthMaxes = [];
-    $monthAllNoAstronomical = [];
-    $monthNoNautCounts = [];
-    // Collect per-sample datapoints for plotting (ensure at least 5 per month)
-    $monthSamples = [];
+        $monthMaxes = [];
+        $monthAllNoAstronomical = [];
+        $monthNoNautCounts = [];
+        // Collect per-sample datapoints for plotting (ensure at least 5 per month)
+        $monthSamples = [];
 
-    // Steps for sampling the night: every 10 minutes (6 steps/hour)
-    $stepsPerHour = 6;
-    $stepMinutes = 60 / $stepsPerHour; // 10
+        // Steps for sampling the night: every 10 minutes (6 steps/hour)
+        $stepsPerHour = 6;
+        $stepMinutes = 60 / $stepsPerHour; // 10
 
         // How many samples per month to take (increase for higher resolution).
         // Higher values increase accuracy but also CPU cost. Ten samples is a
@@ -1671,7 +1835,7 @@ class Target
         }
 
         // Draw month labels and horizontal axis
-        $monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+        $monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
         for ($m = 0; $m < 12; $m++) {
             $labelX = (int) $xs[$m] - 10;
             imagestring($image, 2, $labelX, 370, $monthNames[$m], $textcolor);
@@ -1688,15 +1852,15 @@ class Target
         imagestring($image, 2, $labelXNextJan, 370, 'Jan', $textcolor);
         imageline($image, (int) $right, 365, (int) $right, 355, $axiscolor);
 
-    // Draw Y axis markers (0,30,60,90)
-    imagestring($image, 2, 35, 360, '0'.chr(176), $textcolor);
-    imageline($image, $left, 365, $right, 365, $axiscolor);
-    imagestring($image, 2, 35, 240, '30'.chr(176), $textcolor);
-    imageline($image, $left, 245, $right, 245, $axiscolor);
-    imagestring($image, 2, 35, 120, '60'.chr(176), $textcolor);
-    imageline($image, $left, 125, $right, 125, $axiscolor);
-    imagestring($image, 2, 35, 0, '90'.chr(176), $textcolor);
-    imageline($image, $left, 5, $right, 5, $axiscolor);
+        // Draw Y axis markers (0,30,60,90)
+        imagestring($image, 2, 35, 360, '0' . chr(176), $textcolor);
+        imageline($image, $left, 365, $right, 365, $axiscolor);
+        imagestring($image, 2, 35, 240, '30' . chr(176), $textcolor);
+        imageline($image, $left, 245, $right, 245, $axiscolor);
+        imagestring($image, 2, 35, 120, '60' . chr(176), $textcolor);
+        imageline($image, $left, 125, $right, 125, $axiscolor);
+        imagestring($image, 2, 35, 0, '90' . chr(176), $textcolor);
+        imageline($image, $left, 5, $right, 5, $axiscolor);
 
         // Draw a connected white line through all chronological samples
         // collected across the year. This produces multiple datapoints per
@@ -1720,7 +1884,9 @@ class Target
         }
 
         // They are already chronological by month/sample order, but sort to be safe
-        usort($allSamples, function ($a, $b) { return $a['doy'] <=> $b['doy']; });
+        usort($allSamples, function ($a, $b) {
+            return $a['doy'] <=> $b['doy'];
+        });
 
         $prevX = null;
         $prevY = null;
@@ -1754,8 +1920,343 @@ class Target
         imagepng($image);
         $rawImageBytes = ob_get_clean();
 
-    // rawImageBytes is PNG data
-    return "<img src='data:image/png;base64,".base64_encode($rawImageBytes)."' />";
+        // rawImageBytes is PNG data
+        return "<img src='data:image/png;base64," . base64_encode($rawImageBytes) . "' />";
+    }
+
+    /**
+     * Creates a yearly chart with the magnitude of the target per day.
+     * For planets subclasses should implement `magnitude(Carbon $date): float`.
+     * We sample every day of the year and draw a connected line. Brighter
+     * magnitudes (smaller numbers) are drawn toward the top of the chart.
+     *
+     * @param  GeographicalCoordinates  $geo_coords  The geographical coordinates
+     * @param  Carbon  $date  A representative date (year used)
+     * @return string The generated chart as an embedded image
+     */
+    public function yearMagnitudeGraph(GeographicalCoordinates $geo_coords, Carbon $date, bool $debug = false): string
+    {
+        $image = imagecreatetruecolor(1000, 400);
+
+        // Background black
+        $black = imagecolorallocate($image, 0, 0, 0);
+        imagefilledrectangle($image, 0, 0, 1000, 400, $black);
+
+        $textcolor = imagecolorallocate($image, 255, 255, 255);
+        $axiscolor = imagecolorallocate($image, 150, 150, 150);
+
+        $left = 70;
+        $right = 958;
+        $width = $right - $left;
+
+        $year = $date->year;
+        $yearStart = Carbon::create($year, 1, 1, 12, 0, 0, $date->timezone);
+        $daysInYear = $yearStart->isLeapYear() ? 366 : 365;
+
+        // Collect magnitudes first (daily sampling)
+        $samples = [];
+        $debugLog = [];
+        for ($day = 1; $day <= $daysInYear; $day++) {
+            $sample = $yearStart->copy()->addDays($day - 1);
+            $mag = null;
+            try {
+                $mag = $this->magnitude($sample);
+            } catch (\Throwable $e) {
+                $mag = null;
+                if ($debug) {
+                    $debugLog[] = sprintf("day %d (%s): exception: %s", $day, $sample->toDateString(), $e->getMessage());
+                }
+            }
+
+            // treat sentinel/fallback values as missing
+            if ($mag === null || !is_finite($mag) || $mag === 99.9 || abs($mag) > 50) {
+                // missing
+                if ($debug) {
+                    $debugLog[] = sprintf("day %d (%s): mag=%s (skipped)", $day, $sample->toDateString(), var_export($mag, true));
+                }
+                continue;
+            } else {
+                if ($debug && count($debugLog) < 20) {
+                    $debugLog[] = sprintf("day %d (%s): mag=%s", $day, $sample->toDateString(), var_export($mag, true));
+                }
+            }
+
+            $doy = $sample->dayOfYear;
+            $frac = ($doy - 1) / $daysInYear;
+            $x = (int) ($left + $frac * $width);
+            $samples[] = ['doy' => $doy, 'x' => $x, 'mag' => $mag];
+        }
+
+        // If we found no valid samples, fall back to stored magnitude once per month
+        if (empty($samples)) {
+            for ($m = 1; $m <= 12; $m++) {
+                $sample = Carbon::create($year, $m, 15, 12, 0, 0, $date->timezone);
+                $mag = $this->getMagnitude();
+                if ($mag === null || !is_finite($mag) || $mag === 99.9) continue;
+                $doy = $sample->dayOfYear;
+                $frac = ($doy - 1) / $daysInYear;
+                $x = (int) ($left + $frac * $width);
+                $samples[] = ['doy' => $doy, 'x' => $x, 'mag' => $mag];
+            }
+        }
+
+        // If still empty, return a small placeholder image
+        if (empty($samples)) {
+            if ($debug && !empty($debugLog)) {
+                // render debug log lines onto the image for quick inspection
+                $y = 20;
+                imagestring($image, 3, 10, 2, 'Debug: magnitude sampling (first lines)', $textcolor);
+                foreach (array_slice($debugLog, 0, 18) as $line) {
+                    imagestring($image, 2, 10, $y, $line, $textcolor);
+                    $y += 16;
+                }
+            } else {
+                imagestring($image, 3, 200, 180, 'No magnitude data available', $textcolor);
+            }
+            ob_start();
+            imagepng($image);
+            $rawImageBytes = ob_get_clean();
+            return "<img src='data:image/png;base64," . base64_encode($rawImageBytes) . "' />";
+        }
+
+        // Determine dynamic mag range and pad slightly
+        $mags = array_column($samples, 'mag');
+        $magMin = min($mags);
+        $magMax = max($mags);
+        // Add padding (invert because lower numbers are brighter)
+        $pad = max(0.1, ($magMax - $magMin) * 0.05);
+        $magMin = $magMin - $pad;
+        $magMax = $magMax + $pad;
+        if ($magMin == $magMax) {
+            $magMin -= 1.0;
+            $magMax += 1.0;
+        }
+
+        $yTop = 5;
+        $yBottom = 365;
+
+        // Draw month labels/ticks
+        $monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        for ($m = 0; $m < 12; $m++) {
+            $firstOfMonth = Carbon::create($year, $m + 1, 1, 12, 0, 0, $date->timezone);
+            $doy = $firstOfMonth->dayOfYear;
+            $frac = ($doy - 1) / $daysInYear;
+            $x = (int) ($left + $frac * $width);
+            imagestring($image, 2, $x - 10, 370, $monthNames[$m], $textcolor);
+            imageline($image, $x, 365, $x, 355, $axiscolor);
+        }
+        imagestring($image, 2, $right - 10, 370, 'Jan', $textcolor);
+        imageline($image, $right, 365, $right, 355, $axiscolor);
+
+        // Y axis labels (show top, middle, bottom)
+        imagestring($image, 2, 35, 360, sprintf('%.1f', $magMax), $textcolor);
+        imageline($image, $left, 365, $right, 365, $axiscolor);
+        $mid1 = $magMin + ($magMax - $magMin) * 0.33;
+        $mid2 = $magMin + ($magMax - $magMin) * 0.66;
+        imagestring($image, 2, 35, 240, sprintf('%.1f', $mid2), $textcolor);
+        imageline($image, $left, 245, $right, 245, $axiscolor);
+        imagestring($image, 2, 35, 120, sprintf('%.1f', $mid1), $textcolor);
+        imageline($image, $left, 125, $right, 125, $axiscolor);
+        imagestring($image, 2, 35, 0, sprintf('%.1f', $magMin), $textcolor);
+        imageline($image, $left, 5, $right, 5, $axiscolor);
+
+        // Draw connected points and small markers
+        $prevX = null;
+        $prevY = null;
+        foreach ($samples as $s) {
+            $x = $s['x'];
+            $mag = $s['mag'];
+            $clamped = max($magMin, min($magMax, $mag));
+            $fracY = ($clamped - $magMin) / ($magMax - $magMin);
+            $y = (int) ($yTop + $fracY * ($yBottom - $yTop));
+
+            if ($prevX !== null && $prevY !== null) {
+                imageline($image, (int) $prevX, (int) $prevY, (int) $x, (int) $y, $textcolor);
+            }
+            // small dot marker
+            imagefilledellipse($image, (int) $x, (int) $y, 4, 4, $textcolor);
+            $prevX = $x;
+            $prevY = $y;
+        }
+
+        ob_start();
+        imagepng($image);
+        $rawImageBytes = ob_get_clean();
+        return "<img src='data:image/png;base64," . base64_encode($rawImageBytes) . "' />";
+    }
+
+    /**
+     * Creates a yearly chart with the angular diameter (arcseconds) of the target per day.
+     * For planet subclasses that implement `calculateDiameter(Carbon $date)` this
+     * method will call that to populate `getDiameter()` for each sample. We sample
+     * every day of the year and draw a connected line. Larger diameters (arcsec)
+     * are drawn toward the top of the chart.
+     *
+     * @param  GeographicalCoordinates  $geo_coords  The geographical coordinates
+     * @param  Carbon  $date  A representative date (year used)
+     * @return string The generated chart as an embedded PNG image
+     */
+    public function yearDiameterGraph(GeographicalCoordinates $geo_coords, Carbon $date, bool $debug = false): string
+    {
+        $image = imagecreatetruecolor(1000, 400);
+
+        // Background black
+        $black = imagecolorallocate($image, 0, 0, 0);
+        imagefilledrectangle($image, 0, 0, 1000, 400, $black);
+
+        $textcolor = imagecolorallocate($image, 255, 255, 255);
+        $axiscolor = imagecolorallocate($image, 150, 150, 150);
+
+        $left = 70;
+        $right = 958;
+        $width = $right - $left;
+
+        $year = $date->year;
+        $yearStart = Carbon::create($year, 1, 1, 12, 0, 0, $date->timezone);
+        $daysInYear = $yearStart->isLeapYear() ? 366 : 365;
+
+        // Collect diameters (daily sampling)
+        $samples = [];
+        $debugLog = [];
+        for ($day = 1; $day <= $daysInYear; $day++) {
+            $sample = $yearStart->copy()->addDays($day - 1);
+
+            // If subclass provides calculateDiameter(), call it to populate getDiameter().
+            try {
+                if (method_exists($this, 'calculateDiameter')) {
+                    $this->calculateDiameter($sample);
+                }
+            } catch (\Throwable $e) {
+                if ($debug) {
+                    $debugLog[] = sprintf("day %d (%s): calculateDiameter exception: %s", $day, $sample->toDateString(), $e->getMessage());
+                }
+            }
+
+            $diam = null;
+            try {
+                [$d1, $d2] = $this->getDiameter();
+                $diam = $d1;
+            } catch (\Throwable $e) {
+                $diam = null;
+            }
+
+            // treat missing/non-finite values as absent
+            if ($diam === null || !is_finite($diam) || $diam <= 0.0 || $diam > 1000000.0) {
+                if ($debug) {
+                    $debugLog[] = sprintf("day %d (%s): diam=%s (skipped)", $day, $sample->toDateString(), var_export($diam, true));
+                }
+                continue;
+            }
+
+            if ($debug && count($debugLog) < 20) {
+                $debugLog[] = sprintf("day %d (%s): diam=%s arcsec", $day, $sample->toDateString(), $diam);
+            }
+
+            $doy = $sample->dayOfYear;
+            $frac = ($doy - 1) / $daysInYear;
+            $x = (int) ($left + $frac * $width);
+            $samples[] = ['doy' => $doy, 'x' => $x, 'diam' => $diam];
+        }
+
+        // If we found no valid samples, fall back to stored diameter once per month
+        if (empty($samples)) {
+            for ($m = 1; $m <= 12; $m++) {
+                $sample = Carbon::create($year, $m, 15, 12, 0, 0, $date->timezone);
+                $d = $this->getDiameter();
+                $mag = $d[0] ?? null;
+                if ($mag === null || !is_finite($mag) || $mag <= 0.0) continue;
+                $doy = $sample->dayOfYear;
+                $frac = ($doy - 1) / $daysInYear;
+                $x = (int) ($left + $frac * $width);
+                $samples[] = ['doy' => $doy, 'x' => $x, 'diam' => $mag];
+            }
+        }
+
+        // If still empty, render placeholder (optionally with debug)
+        if (empty($samples)) {
+            if ($debug && !empty($debugLog)) {
+                $y = 20;
+                imagestring($image, 3, 10, 2, 'Debug: diameter sampling (first lines)', $textcolor);
+                foreach (array_slice($debugLog, 0, 18) as $line) {
+                    imagestring($image, 2, 10, $y, $line, $textcolor);
+                    $y += 16;
+                }
+            } else {
+                imagestring($image, 3, 200, 180, 'No diameter data available', $textcolor);
+            }
+            ob_start();
+            imagepng($image);
+            $rawImageBytes = ob_get_clean();
+            return "<img src='data:image/png;base64," . base64_encode($rawImageBytes) . "' />";
+        }
+
+        // Determine dynamic diameter range and pad slightly
+        $diams = array_column($samples, 'diam');
+        $diamMin = min($diams);
+        $diamMax = max($diams);
+        $pad = max(0.01, ($diamMax - $diamMin) * 0.05);
+        $diamMin = $diamMin - $pad;
+        $diamMax = $diamMax + $pad;
+        if ($diamMin == $diamMax) {
+            $diamMin = max(0.0, $diamMin - 1.0);
+            $diamMax = $diamMax + 1.0;
+        }
+
+        $yTop = 5;
+        $yBottom = 365;
+
+        // Draw month labels/ticks
+        $monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        for ($m = 0; $m < 12; $m++) {
+            $firstOfMonth = Carbon::create($year, $m + 1, 1, 12, 0, 0, $date->timezone);
+            $doy = $firstOfMonth->dayOfYear;
+            $frac = ($doy - 1) / $daysInYear;
+            $x = (int) ($left + $frac * $width);
+            imagestring($image, 2, $x - 10, 370, $monthNames[$m], $textcolor);
+            imageline($image, $x, 365, $x, 355, $axiscolor);
+        }
+        imagestring($image, 2, $right - 10, 370, 'Jan', $textcolor);
+        imageline($image, $right, 365, $right, 355, $axiscolor);
+
+        // Y axis labels with largest diameters at the top.
+        // Top (largest)
+        imagestring($image, 2, 35, $yTop - 2, sprintf('%.2f"', $diamMax), $textcolor);
+        imageline($image, $left, $yTop, $right, $yTop, $axiscolor);
+        // Upper-middle
+        $mid2 = $diamMin + ($diamMax - $diamMin) * 0.66;
+        imagestring($image, 2, 35, (int) ($yTop + ($yBottom - $yTop) * 0.33) - 2, sprintf('%.2f"', $mid2), $textcolor);
+        imageline($image, $left, (int) ($yTop + ($yBottom - $yTop) * 0.33), $right, (int) ($yTop + ($yBottom - $yTop) * 0.33), $axiscolor);
+        // Lower-middle
+        $mid1 = $diamMin + ($diamMax - $diamMin) * 0.33;
+        imagestring($image, 2, 35, (int) ($yTop + ($yBottom - $yTop) * 0.66) - 2, sprintf('%.2f"', $mid1), $textcolor);
+        imageline($image, $left, (int) ($yTop + ($yBottom - $yTop) * 0.66), $right, (int) ($yTop + ($yBottom - $yTop) * 0.66), $axiscolor);
+        // Bottom (smallest)
+        imagestring($image, 2, 35, $yBottom +  -5, sprintf('%.2f"', $diamMin), $textcolor);
+        imageline($image, $left, $yBottom, $right, $yBottom, $axiscolor);
+
+        // Draw connected points and small markers. Larger diameters toward top.
+        $prevX = null;
+        $prevY = null;
+        foreach ($samples as $s) {
+            $x = $s['x'];
+            $diam = $s['diam'];
+            $clamped = max($diamMin, min($diamMax, $diam));
+            $fracY = ($clamped - $diamMin) / ($diamMax - $diamMin);
+            // invert so larger diam => smaller y (toward top)
+            $y = (int) ($yBottom - $fracY * ($yBottom - $yTop));
+
+            if ($prevX !== null && $prevY !== null) {
+                imageline($image, (int) $prevX, (int) $prevY, (int) $x, (int) $y, $textcolor);
+            }
+            imagefilledellipse($image, (int) $x, (int) $y, 4, 4, $textcolor);
+            $prevX = $x;
+            $prevY = $y;
+        }
+
+        ob_start();
+        imagepng($image);
+        $rawImageBytes = ob_get_clean();
+        return "<img src='data:image/png;base64," . base64_encode($rawImageBytes) . "' />";
     }
 
     /**
@@ -1838,6 +2339,17 @@ class Target
     public function getMagnitude(): ?float
     {
         return $this->_magnitude;
+    }
+
+    /**
+     * Fallback magnitude method. Planet subclasses implement a public
+     * `magnitude(Carbon $date): float` method; this protected stub provides
+     * a safe default and satisfies static analysis.
+     */
+    protected function magnitude(Carbon $date): float
+    {
+        // Return stored magnitude when available, otherwise use a faint sentinel
+        return $this->_magnitude ?? 99.9;
     }
 
     /**
@@ -1937,27 +2449,27 @@ class Target
         /* ie, if LogAng = 4 and Angle[I] = 3 and Angle[I+1] = 5,
         InterpAngle = .5, or .5 of the way between Angle[I] and Angle{I+1] */
         $interpAngle = ($logAng - $this->_angle[$I])
-                    / ($this->_angle[$I + 1] - $this->_angle[$I]);
+            / ($this->_angle[$I + 1] - $this->_angle[$I]);
         /* add 1 to I because first entry in LTC is
         sky background brightness */
         $interpA = $this->_LTC[$SBIA][$I + 1]
-                    + $interpAngle
-                    * ($this->_LTC[$SBIA][$I + 2]
-                    - $this->_LTC[$SBIA][$I + 1]);
+            + $interpAngle
+            * ($this->_LTC[$SBIA][$I + 2]
+                - $this->_LTC[$SBIA][$I + 1]);
         $interpB = $this->_LTC[$SBIB][$I + 1]
-                    + $interpAngle
-                    * ($this->_LTC[$SBIB][$I + 2]
-                    - $this->_LTC[$SBIB][$I + 1]);
+            + $interpAngle
+            * ($this->_LTC[$SBIB][$I + 2]
+                - $this->_LTC[$SBIB][$I + 1]);
         if ($SB < $this->_LTC[0][0]) {
             $SB = $this->_LTC[0][0];
         }
         if ($intSB >= $this->_LTC[$this->_LTCSize - 1][0]) {
             $logThreshContrast = $interpB
-                        + ($SB - $this->_LTC[$this->_LTCSize - 1][0])
-                        * ($interpB - $interpA);
+                + ($SB - $this->_LTC[$this->_LTCSize - 1][0])
+                * ($interpB - $interpA);
         } else {
             $logThreshContrast = $interpA + ($SB - $intSB)
-                        * ($interpB - $interpA);
+                * ($interpB - $interpA);
         }
 
         if ($logThreshContrast > $maxLog) {

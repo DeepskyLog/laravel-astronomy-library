@@ -622,6 +622,26 @@ print ($venus->getEquatorialCoordinates()->getDeclination()->getCoordinate());
 
 Please see the [changelog](changelog.md) for more information on what has changed recently.
 
+## Yearly magnitude and diameter graphs
+
+You can produce year-long graphs for a planet's magnitude or apparent angular diameter from code.
+
+Example (PHP):
+
+```php
+use deepskylog\AstronomyLibrary\Coordinates\GeographicalCoordinates;
+use deepskylog\AstronomyLibrary\Targets\Venus;
+use Carbon\Carbon;
+
+$date = Carbon::create(2025, 1, 1);
+$geo = new GeographicalCoordinates(52.0, 4.0);
+
+$venus = new Venus();
+// Render HTML <img> with embedded PNG (debug=true embeds skipped-sample reasons in the image)
+echo $venus->yearMagnitudeGraph($geo, $date, true);
+echo $venus->yearDiameterGraph($geo, $date, true);
+```
+
 ## Testing
 
 ``` bash
