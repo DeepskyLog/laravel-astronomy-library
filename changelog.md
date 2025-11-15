@@ -2,6 +2,11 @@
 
 All notable changes to `laravel-astronomy-library` will be documented in this file.
 
+## Version 6.5.1
+
+Changed:
+- Increased diameter precision for planets by removing final rounding in `magnitude()` (reduces 0.1 quantization in graphs). Affected: Jupiter, Mercury, Venus, Mars, Neptune, Uranus, Saturn.
+
 ## Version 6.5
 
 Added:

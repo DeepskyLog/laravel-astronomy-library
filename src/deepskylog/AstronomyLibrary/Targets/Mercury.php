@@ -537,6 +537,6 @@ class Mercury extends Planet
             $helio_coords_earth[2] * sin(deg2rad($helio_coords_earth[1]));
         $delta = sqrt($x ** 2 + $y ** 2 + $z ** 2);
 
-        $this->setDiameter(round(2 * 3.36 / $delta, 1));
+        $this->setDiameter(2 * 3.36 / $delta);
     }
 }
