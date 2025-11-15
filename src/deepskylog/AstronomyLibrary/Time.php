@@ -19,7 +19,6 @@ use Carbon\Carbon;
 use Carbon\Exceptions\InvalidDateException;
 use deepskylog\AstronomyLibrary\Coordinates\GeographicalCoordinates;
 use deepskylog\AstronomyLibrary\Models\DeltaT;
-use Exception;
 
 /**
  * Procedures to work with times.

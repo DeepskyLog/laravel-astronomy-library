@@ -989,7 +989,7 @@ class Target
             $th = new Coordinate($transitHeight, -90.0, 90.0);
         }
         $this->_maxHeight = new Coordinate($transitHeight, -90.0, 90.0);
-        if (!isset($hasAstronomical) && !isset($hasNautical)) {
+        if (! isset($hasAstronomical) && ! isset($hasNautical)) {
             // safety: if bounds weren't computed, set to null
             $this->_maxHeightAtNight = null;
         } elseif (! $hasAstronomical && ! $hasNautical) {
@@ -1795,7 +1795,7 @@ class Target
                 }
             }
 
-            $noAstrByDay[$day] = !$hasAstronomical;
+            $noAstrByDay[$day] = ! $hasAstronomical;
         }
 
         // Find contiguous runs of no-astronomical days and draw them. We map
@@ -1814,8 +1814,12 @@ class Target
                 $endFrac = $runEnd / $daysInYear;
                 $x1 = (int) floor($left + $startFrac * $width) - 1;
                 $x2 = (int) ceil($left + $endFrac * $width) + 1;
-                if ($x1 < $left) $x1 = $left;
-                if ($x2 > $right) $x2 = $right;
+                if ($x1 < $left) {
+                    $x1 = $left;
+                }
+                if ($x2 > $right) {
+                    $x2 = $right;
+                }
                 imagefilledrectangle($image, $x1, 5, $x2, 365, $blue);
                 imagerectangle($image, $x1, 5, $x2, 365, $blueBorder);
                 $inRun = false;
@@ -1828,8 +1832,12 @@ class Target
             $endFrac = $runEnd / $daysInYear;
             $x1 = (int) floor($left + $startFrac * $width) - 1;
             $x2 = (int) ceil($left + $endFrac * $width) + 1;
-            if ($x1 < $left) $x1 = $left;
-            if ($x2 > $right) $x2 = $right;
+            if ($x1 < $left) {
+                $x1 = $left;
+            }
+            if ($x2 > $right) {
+                $x2 = $right;
+            }
             imagefilledrectangle($image, $x1, 5, $x2, 365, $blue);
             imagerectangle($image, $x1, 5, $x2, 365, $blueBorder);
         }
@@ -1869,7 +1877,9 @@ class Target
         // maximum.
         $allSamples = [];
         for ($m = 1; $m <= 12; $m++) {
-            if (! isset($monthSamples[$m - 1])) continue;
+            if (! isset($monthSamples[$m - 1])) {
+                continue;
+            }
             foreach ($monthSamples[$m - 1] as $s) {
                 $sampleDate = Carbon::create($year, $m, $s['day'], 12, 0, 0, $date->timezone);
                 $doy = $sampleDate->dayOfYear;
@@ -1877,8 +1887,12 @@ class Target
                 $x = $left + $frac * $width;
                 $alt = $s['val'];
                 $y = 365 - $alt * 4;
-                if ($y < 5) $y = 5;
-                if ($y > 365) $y = 365;
+                if ($y < 5) {
+                    $y = 5;
+                }
+                if ($y > 365) {
+                    $y = 365;
+                }
                 $allSamples[] = ['doy' => $doy, 'x' => (int) $x, 'y' => (int) $y, 'val' => $alt];
             }
         }
