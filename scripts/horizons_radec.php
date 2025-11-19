@@ -1,7 +1,9 @@
 <?php
 // Usage: php horizons_radec.php <designation> <YYYY-MM-DD HH:MM> <lon> <lat> <alt_m>
+$ephem = $argv[6] ?? null;
+
 if ($argc < 6) {
-    echo json_encode(['error' => 'usage: designation datetime lon lat alt_m']);
+    echo json_encode(['error' => 'usage: designation datetime lon lat alt_m [EPHEM]']);
     exit(1);
 }
 $des = $argv[1];
@@ -13,7 +15,7 @@ $alt_km = $alt_m / 1000.0;
 $start = $dt;
 $stop = date('Y-m-d H:i', strtotime($dt . ' +1 minute'));
 
-function doQuery($command, $site, $start, $stop)
+function doQuery($command, $site, $start, $stop, $ephem = null)
 {
     // Request JSON format when possible for more reliable parsing.
     $post = [
@@ -27,6 +29,11 @@ function doQuery($command, $site, $start, $stop)
         'STEP_SIZE' => "'1 m'",
         'CSV_FORMAT' => 'YES'
     ];
+
+    // Allow client to request a particular JPL ephemeris name (e.g. DE440).
+    if ($ephem !== null && trim($ephem) !== '') {
+        $post['EPHEM'] = trim($ephem);
+    }
     $ch = curl_init('https://ssd.jpl.nasa.gov/api/horizons.api');
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_POST, true);
@@ -73,7 +80,9 @@ function doQuery($command, $site, $start, $stop)
 
 $site = "'{$lon},{$lat},{$alt_km}'";
 $command = "'{$des}'";
-list($resp, $err) = doQuery($command, $site, $start, $stop);
+// Track which command produced the final successful response for debugging.
+$used_command = $command;
+list($resp, $err) = doQuery($command, $site, $start, $stop, $ephem);
 if ($resp === false || empty($resp)) {
     echo json_encode(['error' => 'horizons empty', 'curl' => $err]);
     exit(1);
@@ -86,18 +95,35 @@ if ($resp === false || empty($resp)) {
 if (!preg_match('/\$\$SOE([\s\S]*?)\$\$EOE/', $resp, $m)) {
     $rec = null;
 
-    // 1) Common Horizons numeric IDs often start with 9 and are 6+ digits.
-    if (preg_match_all('/\b(9\d{5,9})\b/', $resp, $mrec)) {
-        $matches = $mrec[1];
-        $rec = end($matches);
+    // 1) Try to parse DASTCOM/Horizons index table rows first and prefer the
+    // most recent epoch-year; attempt each record in descending epoch order
+    // until a $$SOE..$$EOE block is returned.
+    if (preg_match_all('/^\s*(\d{4,9})\s+(\d{4})\s+/m', $resp, $mdat)) {
+        $records = $mdat[1];
+        $epochs = $mdat[2];
+        $pairs = [];
+        for ($i = 0; $i < count($records); $i++) {
+            $pairs[] = ['rec' => $records[$i], 'epoch' => intval($epochs[$i])];
+        }
+        usort($pairs, function ($a, $b) { return $b['epoch'] <=> $a['epoch']; });
+        foreach ($pairs as $p) {
+            $tryRec = $p['rec'];
+            $tryCmd = "'{$tryRec}'";
+            list($resp2, $err2) = doQuery($tryCmd, $site, $start, $stop, $ephem);
+            if ($resp2 !== false && !empty($resp2) && preg_match('/\$\$SOE([\s\S]*?)\$\$EOE/', $resp2)) {
+                $resp = $resp2;
+                $rec = $tryRec;
+                $used_command = $tryCmd;
+                break;
+            }
+        }
     }
 
-    // 2) If not found, try to parse index-like lines beginning with '1) ...', '2) ...'
+    // 2) If not found, try parsing numbered-choice index lines
     if ($rec === null) {
         if (preg_match_all('/^\s*\d+\)\s*(.+)$/m', $resp, $mlines)) {
             foreach ($mlines[1] as $ln) {
-                if (preg_match_all('/\b(\d{4,9})\b/', $ln, $mt)) {
-                    // pick the first candidate token that doesn't look like a year
+                if (preg_match_all('/\b(\d{1,9})\b/', $ln, $mt)) {
                     foreach ($mt[1] as $tok) {
                         $intval = intval($tok);
                         if ($intval < 1800 || $intval > 2200) {
@@ -110,9 +136,9 @@ if (!preg_match('/\$\$SOE([\s\S]*?)\$\$EOE/', $resp, $m)) {
         }
     }
 
-    // 3) Fallback: search all numeric tokens (4-9 digits) and exclude year-like values
+    // 3) Fallback: search all numeric tokens (1-9 digits) and exclude year-like values
     if ($rec === null) {
-        if (preg_match_all('/\b(\d{4,9})\b/', $resp, $mall)) {
+        if (preg_match_all('/\b(\d{1,9})\b/', $resp, $mall)) {
             foreach ($mall[1] as $tok) {
                 $intval = intval($tok);
                 if ($intval < 1800 || $intval > 2200) {
@@ -124,16 +150,36 @@ if (!preg_match('/\$\$SOE([\s\S]*?)\$\$EOE/', $resp, $m)) {
     }
 
     if ($rec !== null) {
-        $command = "'{$rec}'";
-        list($resp2, $err2) = doQuery($command, $site, $start, $stop);
+        $tryCmd = "'{$rec}'";
+        list($resp2, $err2) = doQuery($tryCmd, $site, $start, $stop, $ephem);
         if ($resp2 === false || empty($resp2)) {
             echo json_encode(['error' => 'requery failed', 'curl' => $err2]);
             exit(1);
         }
         $resp = $resp2;
+        $used_command = $tryCmd;
     } else {
-        echo json_encode(['error' => 'no data block and no record id']);
-        exit(1);
+        // If no numeric record was found or all re-queries failed, attempt the
+        // small-body (SB) integrated solution as a fallback when appropriate.
+        $lower = strtolower($resp);
+        if (strpos($lower, 'spk-based ephemeris') !== false
+            || strpos($lower, 'precomputed') !== false
+            || strpos($resp, 'DES=') !== false
+            || strpos($resp, 'There are two trajectories') !== false
+        ) {
+            $sbCmd = "'DES={$des}; CAP;'";
+            list($respSb, $errSb) = doQuery($sbCmd, $site, $start, $stop, $ephem);
+            if ($respSb !== false && !empty($respSb) && preg_match('/\$\$SOE([\s\S]*?)\$\$EOE/', $respSb)) {
+                $resp = $respSb;
+                $used_command = $sbCmd;
+            } else {
+                echo json_encode(['error' => 'no data block and no record id']);
+                exit(1);
+            }
+        } else {
+            echo json_encode(['error' => 'no data block and no record id']);
+            exit(1);
+        }
     }
 }
 if (!preg_match('/\$\$SOE([\s\S]*?)\$\$EOE/', $resp, $mblock)) {
@@ -228,7 +274,7 @@ function dmsToDeg($s)
 }
 $raH = hmsToHours($raStr);
 $decD = dmsToDeg($decStr);
-$out = ['ra_hours' => $raH, 'dec_deg' => $decD, 'raw_ra' => $raStr, 'raw_dec' => $decStr];
+$out = ['ra_hours' => $raH, 'dec_deg' => $decD, 'raw_ra' => $raStr, 'raw_dec' => $decStr, 'used_command' => ($used_command ?? $command)];
 // Save structured JSON output for inspection
 @file_put_contents(__DIR__ . '/horizons_resp.json', json_encode($out));
 echo json_encode($out);
