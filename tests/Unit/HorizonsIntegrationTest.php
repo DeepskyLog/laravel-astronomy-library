@@ -8,10 +8,10 @@ final class HorizonsIntegrationTest extends TestCase
 {
     public function testHorizonsHelperReturnsRaDecFor12P(): void
     {
-        $script = __DIR__ . '/../../scripts/horizons_radec.php';
-        $cmd = escapeshellcmd((PHP_BINARY)) . ' ' . escapeshellarg($script) . ' '
-            . escapeshellarg('12P') . ' ' . escapeshellarg('2025-11-18 16:08') . ' '
-            . escapeshellarg('4.84457') . ' ' . escapeshellarg('49.3447') . ' ' . escapeshellarg('130');
+        $script = __DIR__.'/../../scripts/horizons_radec.php';
+        $cmd = escapeshellcmd(PHP_BINARY).' '.escapeshellarg($script).' '
+            .escapeshellarg('12P').' '.escapeshellarg('2025-11-18 16:08').' '
+            .escapeshellarg('4.84457').' '.escapeshellarg('49.3447').' '.escapeshellarg('130');
 
         $out = null;
         $ret = null;

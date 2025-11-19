@@ -1,4 +1,5 @@
 <?php
+
 // Usage: php horizons_radec.php <designation> <YYYY-MM-DD HH:MM> <lon> <lat> <alt_m>
 if ($argc < 6) {
     echo json_encode(['error' => 'usage: designation datetime lon lat alt_m']);
@@ -11,7 +12,7 @@ $lat = $argv[4];
 $alt_m = floatval($argv[5]);
 $alt_km = $alt_m / 1000.0;
 $start = $dt;
-$stop = date('Y-m-d H:i', strtotime($dt . ' +1 minute'));
+$stop = date('Y-m-d H:i', strtotime($dt.' +1 minute'));
 
 function doQuery($command, $site, $start, $stop)
 {
@@ -25,7 +26,7 @@ function doQuery($command, $site, $start, $stop)
         'START_TIME' => "'{$start}'",
         'STOP_TIME' => "'{$stop}'",
         'STEP_SIZE' => "'1 m'",
-        'CSV_FORMAT' => 'YES'
+        'CSV_FORMAT' => 'YES',
     ];
     $ch = curl_init('https://ssd.jpl.nasa.gov/api/horizons.api');
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -42,15 +43,21 @@ function doQuery($command, $site, $start, $stop)
         // Helper: recursively search for any string that contains $$SOE..$$EOE
         $findBlock = function ($item) use (&$findBlock) {
             if (is_string($item)) {
-                if (strpos($item, '$$SOE') !== false) return $item;
+                if (strpos($item, '$$SOE') !== false) {
+                    return $item;
+                }
+
                 return null;
             }
             if (is_array($item)) {
                 foreach ($item as $v) {
                     $res = $findBlock($v);
-                    if ($res !== null) return $res;
+                    if ($res !== null) {
+                        return $res;
+                    }
                 }
             }
+
             return null;
         };
 
@@ -61,8 +68,12 @@ function doQuery($command, $site, $start, $stop)
 
         // Some API responses include a 'result' string or 'data' key containing
         // the textual output — try those as fallbacks.
-        if (isset($decoded['result']) && is_string($decoded['result'])) return [$decoded['result'], $err];
-        if (isset($decoded['data']) && is_string($decoded['data'])) return [$decoded['data'], $err];
+        if (isset($decoded['result']) && is_string($decoded['result'])) {
+            return [$decoded['result'], $err];
+        }
+        if (isset($decoded['data']) && is_string($decoded['data'])) {
+            return [$decoded['data'], $err];
+        }
 
         // Otherwise return the original raw response so existing fallback parsing
         // can still attempt to find numeric ids or text blocks.
@@ -73,17 +84,17 @@ function doQuery($command, $site, $start, $stop)
 
 $site = "'{$lon},{$lat},{$alt_km}'";
 $command = "'{$des}'";
-list($resp, $err) = doQuery($command, $site, $start, $stop);
+[$resp, $err] = doQuery($command, $site, $start, $stop);
 if ($resp === false || empty($resp)) {
     echo json_encode(['error' => 'horizons empty', 'curl' => $err]);
     exit(1);
 }
 
 // Save full raw response inside the workspace for debugging
-@file_put_contents(__DIR__ . '/horizons_raw.txt', $resp);
+@file_put_contents(__DIR__.'/horizons_raw.txt', $resp);
 
 // If no $$SOE block, attempt to resolve an index-search result and re-query.
-if (!preg_match('/\$\$SOE([\s\S]*?)\$\$EOE/', $resp, $m)) {
+if (! preg_match('/\$\$SOE([\s\S]*?)\$\$EOE/', $resp, $m)) {
     $rec = null;
 
     // 1) Common Horizons numeric IDs often start with 9 and are 6+ digits.
@@ -125,7 +136,7 @@ if (!preg_match('/\$\$SOE([\s\S]*?)\$\$EOE/', $resp, $m)) {
 
     if ($rec !== null) {
         $command = "'{$rec}'";
-        list($resp2, $err2) = doQuery($command, $site, $start, $stop);
+        [$resp2, $err2] = doQuery($command, $site, $start, $stop);
         if ($resp2 === false || empty($resp2)) {
             echo json_encode(['error' => 'requery failed', 'curl' => $err2]);
             exit(1);
@@ -136,22 +147,26 @@ if (!preg_match('/\$\$SOE([\s\S]*?)\$\$EOE/', $resp, $m)) {
         exit(1);
     }
 }
-if (!preg_match('/\$\$SOE([\s\S]*?)\$\$EOE/', $resp, $mblock)) {
+if (! preg_match('/\$\$SOE([\s\S]*?)\$\$EOE/', $resp, $mblock)) {
     echo json_encode(['error' => 'no block after requery']);
     exit(1);
 }
 $block = $mblock[1];
 
 // Save raw block into workspace for quick inspection
-@file_put_contents(__DIR__ . '/horizons_block.txt', $block);
+@file_put_contents(__DIR__.'/horizons_block.txt', $block);
 
 // Split block into lines and choose the best data line (first non-empty, non-header line)
 $lines = preg_split('/\r?\n/', trim($block));
 $dataLine = null;
 foreach ($lines as $ln) {
     $ln = trim($ln);
-    if ($ln === '') continue;
-    if (strpos($ln, '***') === 0) continue;
+    if ($ln === '') {
+        continue;
+    }
+    if (strpos($ln, '***') === 0) {
+        continue;
+    }
     if (strpos($ln, ',') !== false && preg_match('/\d/', $ln)) {
         $dataLine = $ln;
         break;
@@ -169,8 +184,11 @@ $fields = array_map('trim', preg_split('/\s*,\s*/', $dataLine));
 function findFieldIndex(array $fields, string $regex)
 {
     foreach ($fields as $i => $f) {
-        if (preg_match($regex, $f)) return $i;
+        if (preg_match($regex, $f)) {
+            return $i;
+        }
     }
+
     return -1;
 }
 
@@ -180,8 +198,12 @@ $raIdx = findFieldIndex($fields, '/^\s*\d{1,2}[:\s]\d{1,2}[:\s]\d{1,2}(\.\d+)?/'
 $decIdx = findFieldIndex($fields, '/^[\+\-]\d{1,3}[:\s]\d{1,2}[:\s]\d{1,2}(\.\d+)?/');
 
 // Fallback to legacy indices if regex search failed
-if ($raIdx === -1) $raIdx = isset($fields[5]) ? 5 : (isset($fields[3]) ? 3 : 0);
-if ($decIdx === -1) $decIdx = isset($fields[6]) ? 6 : (isset($fields[4]) ? 4 : 1);
+if ($raIdx === -1) {
+    $raIdx = isset($fields[5]) ? 5 : (isset($fields[3]) ? 3 : 0);
+}
+if ($decIdx === -1) {
+    $decIdx = isset($fields[6]) ? 6 : (isset($fields[4]) ? 4 : 1);
+}
 
 $raStr = $fields[$raIdx] ?? '';
 $decStr = $fields[$decIdx] ?? '';
@@ -203,11 +225,15 @@ function hmsToHours($s)
 {
     $s = trim($s);
     if (strpos($s, ':') !== false) {
-        list($h, $m, $sec) = explode(':', $s) + [0, 0, 0];
+        [$h, $m, $sec] = explode(':', $s) + [0, 0, 0];
+
         return intval($h) + intval($m) / 60.0 + floatval($sec) / 3600.0;
     }
     $parts = preg_split('/\s+/', $s);
-    if (count($parts) >= 3) return intval($parts[0]) + intval($parts[1]) / 60.0 + floatval($parts[2]) / 3600.0;
+    if (count($parts) >= 3) {
+        return intval($parts[0]) + intval($parts[1]) / 60.0 + floatval($parts[2]) / 3600.0;
+    }
+
     return floatval($s);
 }
 function dmsToDeg($s)
@@ -215,20 +241,26 @@ function dmsToDeg($s)
     $s = trim($s);
     $sign = 1;
     if ($s[0] === '+' || $s[0] === '-') {
-        if ($s[0] === '-') $sign = -1;
+        if ($s[0] === '-') {
+            $sign = -1;
+        }
         $s = substr($s, 1);
     }
     if (strpos($s, ':') !== false) {
-        list($d, $m, $sec) = explode(':', $s) + [0, 0, 0];
+        [$d, $m, $sec] = explode(':', $s) + [0, 0, 0];
+
         return $sign * (abs(intval($d)) + intval($m) / 60.0 + floatval($sec) / 3600.0);
     }
     $parts = preg_split('/\s+/', $s);
-    if (count($parts) >= 3) return $sign * (abs(intval($parts[0])) + intval($parts[1]) / 60.0 + floatval($parts[2]) / 3600.0);
+    if (count($parts) >= 3) {
+        return $sign * (abs(intval($parts[0])) + intval($parts[1]) / 60.0 + floatval($parts[2]) / 3600.0);
+    }
+
     return $sign * floatval($s);
 }
 $raH = hmsToHours($raStr);
 $decD = dmsToDeg($decStr);
 $out = ['ra_hours' => $raH, 'dec_deg' => $decD, 'raw_ra' => $raStr, 'raw_dec' => $decStr];
 // Save structured JSON output for inspection
-@file_put_contents(__DIR__ . '/horizons_resp.json', json_encode($out));
+@file_put_contents(__DIR__.'/horizons_resp.json', json_encode($out));
 echo json_encode($out);

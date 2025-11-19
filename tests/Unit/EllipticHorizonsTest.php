@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-use PHPUnit\Framework\TestCase;
-use deepskylog\AstronomyLibrary\Targets\Elliptic;
-use deepskylog\AstronomyLibrary\Coordinates\GeographicalCoordinates;
 use Carbon\Carbon;
+use deepskylog\AstronomyLibrary\Coordinates\GeographicalCoordinates;
+use deepskylog\AstronomyLibrary\Targets\Elliptic;
+use PHPUnit\Framework\TestCase;
 
 final class EllipticHorizonsTest extends TestCase
 {

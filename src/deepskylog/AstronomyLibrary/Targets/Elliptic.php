@@ -72,9 +72,13 @@ class Elliptic extends Target
         // - if inclination > 90deg, convert to complementary i' = 180 - i and rotate node/omega by 180deg
         $this->_i = $i;
         $omega_norm = fmod($omega + 360.0, 360.0);
-        if ($omega_norm < 0) $omega_norm += 360.0;
+        if ($omega_norm < 0) {
+            $omega_norm += 360.0;
+        }
         $node_norm = fmod($longitude_ascending_node + 360.0, 360.0);
-        if ($node_norm < 0) $node_norm += 360.0;
+        if ($node_norm < 0) {
+            $node_norm += 360.0;
+        }
 
         if ($this->_i < 0.0) {
             $this->_i = -$this->_i;
@@ -140,10 +144,11 @@ class Elliptic extends Target
                 $this->setEquatorialCoordinatesToday($h);
                 $this->setEquatorialCoordinatesTomorrow($this->_horizonsEquatorialCoordinates($date->addDay(), $geo_coords, $height));
                 $this->setEquatorialCoordinatesYesterday($this->_horizonsEquatorialCoordinates($date->subDays(2), $geo_coords, $height));
+
                 return;
             } catch (\Throwable $e) {
                 // fallback to internal calculation on failure; log error for debugging
-                error_log('Horizons fetch failed: ' . $e->getMessage());
+                error_log('Horizons fetch failed: '.$e->getMessage());
             }
         }
 
@@ -259,29 +264,29 @@ class Elliptic extends Target
     private function _horizonsEquatorialCoordinates(Carbon $date, GeographicalCoordinates $geo_coords, float $heightMeters = 0.0): EquatorialCoordinates
     {
         // Use the external helper script which returns structured JSON.
-        $script = realpath(dirname(__DIR__, 4) . '/scripts/horizons_radec.php');
+        $script = realpath(dirname(__DIR__, 4).'/scripts/horizons_radec.php');
 
         // Require an explicit Horizons designation when using Horizons mode.
-        $des = trim((string)$this->_horizonsDesignation);
+        $des = trim((string) $this->_horizonsDesignation);
         if ($des === '') {
             throw new \RuntimeException('No Horizons designation set for Horizons mode');
         }
 
         if (! $script || ! file_exists($script)) {
-            throw new \RuntimeException('Horizons helper script not found at ' . dirname(__DIR__, 4) . '/scripts/horizons_radec.php');
+            throw new \RuntimeException('Horizons helper script not found at '.dirname(__DIR__, 4).'/scripts/horizons_radec.php');
         }
 
-        $cmd = escapeshellcmd(PHP_BINARY) . ' ' . escapeshellarg($script) . ' '
-            . escapeshellarg($des) . ' ' . escapeshellarg($date->format('Y-m-d H:i')) . ' '
-            . escapeshellarg((string)$geo_coords->getLongitude()->getCoordinate()) . ' '
-            . escapeshellarg((string)$geo_coords->getLatitude()->getCoordinate()) . ' '
-            . escapeshellarg((string)$heightMeters);
+        $cmd = escapeshellcmd(PHP_BINARY).' '.escapeshellarg($script).' '
+            .escapeshellarg($des).' '.escapeshellarg($date->format('Y-m-d H:i')).' '
+            .escapeshellarg((string) $geo_coords->getLongitude()->getCoordinate()).' '
+            .escapeshellarg((string) $geo_coords->getLatitude()->getCoordinate()).' '
+            .escapeshellarg((string) $heightMeters);
 
         $out = null;
         $ret = null;
         exec($cmd, $out, $ret);
         if ($ret !== 0) {
-            throw new \RuntimeException('Horizons helper failed to execute (exit ' . intval($ret) . ')');
+            throw new \RuntimeException('Horizons helper failed to execute (exit '.intval($ret).')');
         }
 
         $json = @json_decode(implode("\n", $out), true);
@@ -297,11 +302,15 @@ class Elliptic extends Target
         $s = trim($s);
         if (strpos($s, ':') !== false) {
             [$h, $m, $sec] = explode(':', $s) + [0, 0, 0];
+
             return intval($h) + intval($m) / 60.0 + floatval($sec) / 3600.0;
         }
         // H M S separated by spaces
         $parts = preg_split('/\s+/', $s);
-        if (count($parts) >= 3) return intval($parts[0]) + intval($parts[1]) / 60.0 + floatval($parts[2]) / 3600.0;
+        if (count($parts) >= 3) {
+            return intval($parts[0]) + intval($parts[1]) / 60.0 + floatval($parts[2]) / 3600.0;
+        }
+
         return floatval($s);
     }
 
@@ -310,15 +319,21 @@ class Elliptic extends Target
         $s = trim($s);
         $sign = 1;
         if ($s[0] === '+' || $s[0] === '-') {
-            if ($s[0] === '-') $sign = -1;
+            if ($s[0] === '-') {
+                $sign = -1;
+            }
             $s = substr($s, 1);
         }
         if (strpos($s, ':') !== false) {
             [$d, $m, $sec] = explode(':', $s) + [0, 0, 0];
+
             return $sign * (abs(intval($d)) + intval($m) / 60.0 + floatval($sec) / 3600.0);
         }
         $parts = preg_split('/\s+/', $s);
-        if (count($parts) >= 3) return $sign * (abs(intval($parts[0])) + intval($parts[1]) / 60.0 + floatval($parts[2]) / 3600.0);
+        if (count($parts) >= 3) {
+            return $sign * (abs(intval($parts[0])) + intval($parts[1]) / 60.0 + floatval($parts[2]) / 3600.0);
+        }
+
         return $sign * floatval($s);
     }
 
