@@ -41,6 +41,8 @@ class Elliptic extends Target
     private float $_longitude_ascending_node;
     private float $_n;
     private Carbon $_perihelion_date;
+    private bool $_useHorizons = false;
+    private string $_horizonsDesignation = '';
 
     /**
      * The constructor.
@@ -64,11 +66,49 @@ class Elliptic extends Target
     {
         $this->_a = $a;
         $this->_e = $e;
+        // Basic canonical normalization for angles and inclination:
+        // - wrap angles into [0,360)
+        // - if inclination is negative, make it positive and rotate node/omega by 180deg
+        // - if inclination > 90deg, convert to complementary i' = 180 - i and rotate node/omega by 180deg
         $this->_i = $i;
-        $this->_omega = $omega;
-        $this->_longitude_ascending_node = $longitude_ascending_node;
+        $omega_norm = fmod($omega + 360.0, 360.0);
+        if ($omega_norm < 0) $omega_norm += 360.0;
+        $node_norm = fmod($longitude_ascending_node + 360.0, 360.0);
+        if ($node_norm < 0) $node_norm += 360.0;
+
+        if ($this->_i < 0.0) {
+            $this->_i = -$this->_i;
+            $omega_norm = fmod($omega_norm + 180.0, 360.0);
+            $node_norm = fmod($node_norm + 180.0, 360.0);
+        }
+
+        if ($this->_i > 90.0) {
+            $this->_i = 180.0 - $this->_i;
+            $omega_norm = fmod($omega_norm + 180.0, 360.0);
+            $node_norm = fmod($node_norm + 180.0, 360.0);
+        }
+
+        $this->_omega = $omega_norm;
+        $this->_longitude_ascending_node = $node_norm;
         $this->_n = 0.9856076686 / ($a * sqrt($a));
         $this->_perihelion_date = $perihelion_date;
+    }
+
+    /**
+     * Enable using JPL Horizons for authoritative ephemerides.
+     */
+    public function setUseHorizons(bool $use): void
+    {
+        $this->_useHorizons = $use;
+    }
+
+    /**
+     * Set the Horizons designation to use (e.g. '12P'). If not set, the
+     * object name will be used where possible.
+     */
+    public function setHorizonsDesignation(string $des): void
+    {
+        $this->_horizonsDesignation = $des;
     }
 
     /**
@@ -92,6 +132,20 @@ class Elliptic extends Target
 
         $epoch = $epoch;
         $height = floatval($height);
+
+        // If Horizons mode is enabled, try to fetch authoritative RA/Dec
+        if ($this->_useHorizons) {
+            try {
+                $h = $this->_horizonsEquatorialCoordinates($date, $geo_coords, $height);
+                $this->setEquatorialCoordinatesToday($h);
+                $this->setEquatorialCoordinatesTomorrow($this->_horizonsEquatorialCoordinates($date->addDay(), $geo_coords, $height));
+                $this->setEquatorialCoordinatesYesterday($this->_horizonsEquatorialCoordinates($date->subDays(2), $geo_coords, $height));
+                return;
+            } catch (\Throwable $e) {
+                // fallback to internal calculation on failure; log error for debugging
+                error_log('Horizons fetch failed: ' . $e->getMessage());
+            }
+        }
 
         $this->setEquatorialCoordinatesToday(
             $this->_calculateEquatorialCoordinates($date, $geo_coords, $epoch, $height)
@@ -128,7 +182,7 @@ class Elliptic extends Target
         $c = sqrt($H ** 2 + $R ** 2);
 
         $diff_in_date = $this->_perihelion_date->diffInSeconds($date) / 3600.0 / 24.0;
-        $M = -$diff_in_date * 0.300171252;
+        $M = -$diff_in_date * $this->_n;
 
         $E = $this->eccentricAnomaly($this->_e, $M, 0.000001);
 
@@ -153,7 +207,7 @@ class Elliptic extends Target
         $newDate = Time::fromJd($jd - $tau);
 
         $diff_in_date = $this->_perihelion_date->diffInSeconds($newDate) / 3600.0 / 24.0;
-        $M = -$diff_in_date * 0.300171252;
+        $M = -$diff_in_date * $this->_n;
 
         $E = $this->eccentricAnomaly($this->_e, $M, 0.000001);
 
@@ -164,7 +218,7 @@ class Elliptic extends Target
         $z = $r * $c * sin(deg2rad($C + $this->_omega + $v));
 
         $sun = new Sun();
-        $XYZ = $sun->calculateGeometricCoordinates($date);
+        $XYZ = $sun->calculateGeometricCoordinates($newDate);
 
         $ksi = $XYZ->getX()->getCoordinate() + $x;
         $eta = $XYZ->getY()->getCoordinate() + $y;
@@ -189,12 +243,83 @@ class Elliptic extends Target
 
         $deltara = rad2deg(atan(-$earthsGlobe[1] * sin(deg2rad($pi / 3600.0)) * sin(deg2rad($hour_angle)) / (cos(deg2rad($equa_coords->getDeclination()->getCoordinate())) - $earthsGlobe[1] * sin(deg2rad($pi / 3600.0)) * sin(deg2rad($hour_angle)))));
         $dec = rad2deg(atan((sin(deg2rad($equa_coords->getDeclination()->getCoordinate())) - $earthsGlobe[0] * sin(deg2rad($pi / 3600.0))) * cos(deg2rad($deltara / 3600.0))
-                                / (cos(deg2rad($equa_coords->getDeclination()->getCoordinate())) - $earthsGlobe[1] * sin(deg2rad($pi / 3600.0)) * cos(deg2rad($height)))));
+            / (cos(deg2rad($equa_coords->getDeclination()->getCoordinate())) - $earthsGlobe[1] * sin(deg2rad($pi / 3600.0)) * cos(deg2rad($height)))));
 
         $equa_coords->setRA($ra + $deltara);
         $equa_coords->setDeclination($dec);
 
         return $equa_coords;
+    }
+
+    /**
+     * Query JPL Horizons for apparent equatorial coordinates (RA hours, Dec deg)
+     * for this object on the given date and geographic location.
+     * Returns an EquatorialCoordinates instance.
+     */
+    private function _horizonsEquatorialCoordinates(Carbon $date, GeographicalCoordinates $geo_coords, float $heightMeters = 0.0): EquatorialCoordinates
+    {
+        // Use the external helper script which returns structured JSON.
+        $script = realpath(dirname(__DIR__, 4) . '/scripts/horizons_radec.php');
+
+        // Require an explicit Horizons designation when using Horizons mode.
+        $des = trim((string)$this->_horizonsDesignation);
+        if ($des === '') {
+            throw new \RuntimeException('No Horizons designation set for Horizons mode');
+        }
+
+        if (! $script || ! file_exists($script)) {
+            throw new \RuntimeException('Horizons helper script not found at ' . dirname(__DIR__, 4) . '/scripts/horizons_radec.php');
+        }
+
+        $cmd = escapeshellcmd(PHP_BINARY) . ' ' . escapeshellarg($script) . ' '
+            . escapeshellarg($des) . ' ' . escapeshellarg($date->format('Y-m-d H:i')) . ' '
+            . escapeshellarg((string)$geo_coords->getLongitude()->getCoordinate()) . ' '
+            . escapeshellarg((string)$geo_coords->getLatitude()->getCoordinate()) . ' '
+            . escapeshellarg((string)$heightMeters);
+
+        $out = null;
+        $ret = null;
+        exec($cmd, $out, $ret);
+        if ($ret !== 0) {
+            throw new \RuntimeException('Horizons helper failed to execute (exit ' . intval($ret) . ')');
+        }
+
+        $json = @json_decode(implode("\n", $out), true);
+        if (! is_array($json) || ! isset($json['ra_hours']) || ! isset($json['dec_deg'])) {
+            throw new \RuntimeException('Invalid JSON from Horizons helper');
+        }
+
+        return new EquatorialCoordinates(floatval($json['ra_hours']), floatval($json['dec_deg']));
+    }
+
+    private function _hmsToHours(string $s): float
+    {
+        $s = trim($s);
+        if (strpos($s, ':') !== false) {
+            [$h, $m, $sec] = explode(':', $s) + [0, 0, 0];
+            return intval($h) + intval($m) / 60.0 + floatval($sec) / 3600.0;
+        }
+        // H M S separated by spaces
+        $parts = preg_split('/\s+/', $s);
+        if (count($parts) >= 3) return intval($parts[0]) + intval($parts[1]) / 60.0 + floatval($parts[2]) / 3600.0;
+        return floatval($s);
+    }
+
+    private function _dmsToDegrees(string $s): float
+    {
+        $s = trim($s);
+        $sign = 1;
+        if ($s[0] === '+' || $s[0] === '-') {
+            if ($s[0] === '-') $sign = -1;
+            $s = substr($s, 1);
+        }
+        if (strpos($s, ':') !== false) {
+            [$d, $m, $sec] = explode(':', $s) + [0, 0, 0];
+            return $sign * (abs(intval($d)) + intval($m) / 60.0 + floatval($sec) / 3600.0);
+        }
+        $parts = preg_split('/\s+/', $s);
+        if (count($parts) >= 3) return $sign * (abs(intval($parts[0])) + intval($parts[1]) / 60.0 + floatval($parts[2]) / 3600.0);
+        return $sign * floatval($s);
     }
 
     /**

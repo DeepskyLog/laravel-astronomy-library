@@ -2,6 +2,24 @@
 
 All notable changes to `laravel-astronomy-library` will be documented in this file.
 
+## Version 6.6.0
+
+Added:
+- `scripts/horizons_radec.php` — a small CLI helper that queries the JPL Horizons ephemeris service and returns structured JSON (apparent RA/Dec) for observer-based ephemerides. The helper writes optional debug artifacts to `scripts/horizons_raw.txt`, `scripts/horizons_block.txt` and `scripts/horizons_resp.json` to aid troubleshooting.
+- PHPUnit integration tests that exercise the Horizons helper and library integration (unit/integration tests under `tests/Unit/*Horizons*`).
+- `docs/getting_radec.md` — documentation covering how to obtain authoritative RA/Dec for small bodies using the Horizons helper and how to enable Horizons mode in `Elliptic` targets.
+
+Changed:
+- `Elliptic` target: added a Horizons integration path — when enabled the library will invoke the helper to obtain authoritative apparent RA/Dec for observer-based ephemerides instead of using only internal propagation. Also added setters to enable Horizons mode and to provide an explicit Horizons designation.
+- Improved canonicalisation of orbital elements in `Elliptic::setOrbitalElements()` (angle wrapping and inclination handling) to reduce ambiguity when propagating elements.
+
+Fixed:
+- Hardened parsing and record-resolution heuristics for Horizons responses (helper now prefers JSON output, extracts $$SOE..$$EOE blocks robustly, and retries record-id resolution when an index search is returned).
+
+Notes:
+- A lightweight cache/alias mechanism for Horizons id resolution is planned to make repetitive integration tests more deterministic (not yet added in this release).
+
+
 ## Version 6.5.1
 
 Changed:
