@@ -55,6 +55,30 @@ abstract class Planet extends Target
         // Accept variadic args for compatibility. Optional first arg: $VSOP87 (bool)
         $VSOP87 = $args[0] ?? true;
 
+        // Allow string modes to request external ephemeris (e.g. 'DE440' or 'horizons')
+        $useHorizons = false;
+        if (is_string($VSOP87)) {
+            $mode = strtolower(trim($VSOP87));
+            if (in_array($mode, ['horizons', 'de440', 'jpl', 'de'], true)) {
+                $useHorizons = true;
+            }
+        }
+
+        if ($useHorizons) {
+            // Use helper script to query JPL/Horizons for apparent RA/Dec.
+            $geo = new GeographicalCoordinates(0.0, 0.0);
+            $this->setEquatorialCoordinatesToday(
+                $this->_horizonsEquatorialCoordinates($date, $geo, 0.0, (string)$VSOP87)
+            );
+            $this->setEquatorialCoordinatesTomorrow(
+                $this->_horizonsEquatorialCoordinates($date->addDay(), $geo, 0.0, (string)$VSOP87)
+            );
+            $this->setEquatorialCoordinatesYesterday(
+                $this->_horizonsEquatorialCoordinates($date->subDays(2), $geo, 0.0, (string)$VSOP87)
+            );
+            return;
+        }
+
         // Default behavior: use VSOP87 apparent coords
         $this->setEquatorialCoordinatesToday(
             $this->_calculateApparentEquatorialCoordinates($date)
@@ -83,11 +107,33 @@ abstract class Planet extends Target
         $height = $args[1] ?? 0.0;
         $VSOP87 = $args[2] ?? false;
 
+        // If a string mode is provided (e.g. 'DE440' or 'horizons'), prefer Horizons helper
+        $useHorizons = false;
+        if (is_string($VSOP87)) {
+            $mode = strtolower(trim($VSOP87));
+            if (in_array($mode, ['horizons', 'de440', 'jpl', 'de'], true)) {
+                $useHorizons = true;
+            }
+        }
+
         if (! $geo_coords instanceof GeographicalCoordinates) {
             $geo_coords = new GeographicalCoordinates(0.0, 0.0);
         }
 
         $height = floatval($height);
+
+        if ($useHorizons) {
+            $this->setEquatorialCoordinatesToday(
+                $this->_horizonsEquatorialCoordinates($date, $geo_coords, $height, (string)$VSOP87)
+            );
+            $this->setEquatorialCoordinatesTomorrow(
+                $this->_horizonsEquatorialCoordinates($date->addDay(), $geo_coords, $height, (string)$VSOP87)
+            );
+            $this->setEquatorialCoordinatesYesterday(
+                $this->_horizonsEquatorialCoordinates($date->subDays(2), $geo_coords, $height, (string)$VSOP87)
+            );
+            return;
+        }
 
         $this->setEquatorialCoordinatesToday(
             $this->_calculateEquatorialCoordinates($date, $geo_coords, $height)
@@ -237,12 +283,206 @@ abstract class Planet extends Target
 
         $deltara = rad2deg(atan(-$earthsGlobe[1] * sin(deg2rad($pi / 3600.0)) * sin(deg2rad($hour_angle)) / (cos(deg2rad($equa_coords->getDeclination()->getCoordinate())) - $earthsGlobe[1] * sin(deg2rad($pi / 3600.0)) * sin(deg2rad($hour_angle)))));
         $dec = rad2deg(atan((sin(deg2rad($equa_coords->getDeclination()->getCoordinate())) - $earthsGlobe[0] * sin(deg2rad($pi / 3600.0))) * cos(deg2rad($deltara / 3600.0))
-                        / (cos(deg2rad($equa_coords->getDeclination()->getCoordinate())) - $earthsGlobe[1] * sin(deg2rad($pi / 3600.0)) * cos(deg2rad($height)))));
+            / (cos(deg2rad($equa_coords->getDeclination()->getCoordinate())) - $earthsGlobe[1] * sin(deg2rad($pi / 3600.0)) * cos(deg2rad($height)))));
 
         $equa_coords->setRA($equa_coords->getRA()->getCoordinate() + $deltara);
         $equa_coords->setDeclination($dec);
 
         return $equa_coords;
+    }
+
+    /**
+     * Query the horizons helper for apparent equatorial coordinates using a
+     * specified JPL ephemeris (e.g. DE440). Falls back to internal calculation
+     * on any error.
+     */
+    private function _horizonsEquatorialCoordinates(Carbon $date, GeographicalCoordinates $geo_coords, float $height, string $ephem = 'DE440'): EquatorialCoordinates
+    {
+        $script = realpath(__DIR__ . '/../../../../scripts/horizons_radec.php');
+        if ($script === false || !is_file($script)) {
+            return $this->_calculateEquatorialCoordinates($date, $geo_coords, $height);
+        }
+
+        // Determine a sensible designation for Horizons (planet name)
+        $class = (new \ReflectionClass($this))->getShortName();
+        $map = [
+            'Mercury' => 'Mercury',
+            'Venus' => 'Venus',
+            'Mars' => 'Mars',
+            'Jupiter' => 'Jupiter',
+            'Saturn' => 'Saturn',
+            'Uranus' => 'Uranus',
+            'Neptune' => 'Neptune',
+        ];
+        $designation = $map[$class] ?? $class;
+
+        $dt = $date->format('Y-m-d H:i');
+
+        $lon = $geo_coords->getLongitude()->getCoordinate();
+        $lat = $geo_coords->getLatitude()->getCoordinate();
+
+        // First try to query the Horizons API directly from PHP to avoid spawning CLI
+        $start = $dt;
+        $stop = date('Y-m-d H:i', strtotime($dt . ' +1 minute'));
+        $site = "'{$lon},{$lat}," . ($height / 1000.0) . "'";
+
+        $post = [
+            'format' => 'json',
+            'COMMAND' => "'{$designation}'",
+            'EPHEM_TYPE' => 'OBSERVER',
+            'CENTER' => 'coord@399',
+            'SITE_COORD' => $site,
+            'START_TIME' => "'{$start}'",
+            'STOP_TIME' => "'{$stop}'",
+            'STEP_SIZE' => "'1 m'",
+            'CSV_FORMAT' => 'YES',
+            'EPHEM' => $ephem,
+        ];
+
+        $resp = false;
+        // Use curl extension if available
+        if (function_exists('curl_init')) {
+            $ch = curl_init('https://ssd.jpl.nasa.gov/api/horizons.api');
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($post));
+            curl_setopt($ch, CURLOPT_USERAGENT, 'Deepsky-AstronomyLibrary/1.0');
+            $resp = curl_exec($ch);
+            curl_close($ch);
+        } else {
+            // fallback to file_get_contents with stream context
+            $opts = [
+                'http' => [
+                    'method' => 'POST',
+                    'header' => 'Content-Type: application/x-www-form-urlencoded\r\n',
+                    'content' => http_build_query($post),
+                    'user_agent' => 'Deepsky-AstronomyLibrary/1.0',
+                    'timeout' => 10,
+                ],
+            ];
+            $context = stream_context_create($opts);
+            $resp = @file_get_contents('https://ssd.jpl.nasa.gov/api/horizons.api', false, $context);
+        }
+
+        $json = null;
+        if ($resp !== false && is_string($resp)) {
+            $decoded = @json_decode($resp, true);
+            if (is_array($decoded)) {
+                // attempt to find a data block inside JSON
+                $findBlock = function ($item) use (&$findBlock) {
+                    if (is_string($item)) {
+                        if (strpos($item, '$$SOE') !== false) return $item;
+                        return null;
+                    }
+                    if (is_array($item)) {
+                        foreach ($item as $v) {
+                            $res = $findBlock($v);
+                            if ($res !== null) return $res;
+                        }
+                    }
+                    return null;
+                };
+                $block = $findBlock($decoded);
+                if ($block === null && isset($decoded['result']) && is_string($decoded['result'])) $block = $decoded['result'];
+                if ($block === null && isset($decoded['data']) && is_string($decoded['data'])) $block = $decoded['data'];
+
+                if ($block !== null) {
+                    if (preg_match('/\$\$SOE([\s\S]*?)\$\$EOE/', $block, $mblock)) {
+                        $lines = preg_split('/\r?\n/', trim($mblock[1]));
+                        $dataLine = null;
+                        foreach ($lines as $ln) {
+                            $ln = trim($ln);
+                            if ($ln === '') continue;
+                            if (strpos($ln, '***') === 0) continue;
+                            if (strpos($ln, ',') !== false && preg_match('/\d/', $ln)) {
+                                $dataLine = $ln;
+                                break;
+                            }
+                        }
+                        if ($dataLine !== null) {
+                            $fields = array_map('trim', preg_split('/\s*,\s*/', $dataLine));
+                            $raStr = $fields[5] ?? ($fields[3] ?? '');
+                            $decStr = $fields[6] ?? ($fields[4] ?? '');
+
+                            $hmsToHours = function ($s) {
+                                $s = trim($s);
+                                if (strpos($s, ':') !== false) {
+                                    list($h, $m, $sec) = explode(':', $s) + [0, 0, 0];
+                                    return intval($h) + intval($m) / 60.0 + floatval($sec) / 3600.0;
+                                }
+                                $parts = preg_split('/\s+/', $s);
+                                if (count($parts) >= 3) return intval($parts[0]) + intval($parts[1]) / 60.0 + floatval($parts[2]) / 3600.0;
+                                return floatval($s);
+                            };
+                            $dmsToDeg = function ($s) {
+                                $s = trim($s);
+                                $sign = 1;
+                                if ($s[0] === '+' || $s[0] === '-') {
+                                    if ($s[0] === '-') $sign = -1;
+                                    $s = substr($s, 1);
+                                }
+                                if (strpos($s, ':') !== false) {
+                                    list($d, $m, $sec) = explode(':', $s) + [0, 0, 0];
+                                    return $sign * (abs(intval($d)) + intval($m) / 60.0 + floatval($sec) / 3600.0);
+                                }
+                                $parts = preg_split('/\s+/', $s);
+                                if (count($parts) >= 3) return $sign * (abs(intval($parts[0])) + intval($parts[1]) / 60.0 + floatval($parts[2]) / 3600.0);
+                                return $sign * floatval($s);
+                            };
+
+                            $raH = $hmsToHours($raStr);
+                            $decD = $dmsToDeg($decStr);
+                            $json = ['ra_hours' => $raH, 'dec_deg' => $decD];
+                        }
+                    }
+                }
+            }
+        }
+
+        // If we couldn't parse HTTP response, fall back to executing helper script (robust parsing handled later)
+        if (!is_array($json) || !isset($json['ra_hours']) || !isset($json['dec_deg'])) {
+            // Use the same PHP binary the process is running with to avoid mismatched php.ini
+            $php = defined('PHP_BINARY') ? PHP_BINARY : 'php';
+            $parts = [
+                escapeshellarg($php),
+                escapeshellarg($script),
+                escapeshellarg($designation),
+                escapeshellarg($dt),
+                escapeshellarg((string)$lon),
+                escapeshellarg((string)$lat),
+                escapeshellarg((string)$height),
+                escapeshellarg($ephem),
+            ];
+            $cmd = implode(' ', $parts) . ' 2>&1';
+            $out = [];
+            $ret = 0;
+            exec($cmd, $out, $ret);
+            $resp = implode("\n", $out);
+
+            // Try to extract JSON from helper output
+            $maybe = @json_decode($resp, true);
+            if (is_array($maybe) && isset($maybe['ra_hours']) && isset($maybe['dec_deg'])) {
+                $json = $maybe;
+            } elseif (preg_match('/\{[\s\S]*\}/', $resp, $m)) {
+                $try = @json_decode($m[0], true);
+                if (is_array($try) && isset($try['ra_hours']) && isset($try['dec_deg'])) $json = $try;
+            } else {
+                $cached = dirname($script) . '/horizons_resp.json';
+                if (is_file($cached)) {
+                    $try = @json_decode(@file_get_contents($cached), true);
+                    if (is_array($try) && isset($try['ra_hours']) && isset($try['dec_deg'])) $json = $try;
+                }
+            }
+        }
+
+        if (!is_array($json) || !isset($json['ra_hours']) || !isset($json['dec_deg'])) {
+            return $this->_calculateEquatorialCoordinates($date, $geo_coords, $height);
+        }
+
+        $raH = floatval($json['ra_hours']);
+        $decD = floatval($json['dec_deg']);
+
+        return new EquatorialCoordinates($raH, $decD);
     }
 
     /**
