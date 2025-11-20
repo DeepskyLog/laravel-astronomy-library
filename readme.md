@@ -27,6 +27,34 @@ php artisan vendor:publish --provider="deepskylog\AstronomyLibrary\AstronomyLibr
 php artisan migrate
 ```
 
+### Applying migrations (package users)
+
+When installing the package you need to publish the package migration stubs into your application and run your migrations.
+
+- Fresh install (no existing `comets_orbital_elements` table):
+
+```bash
+php artisan vendor:publish --provider="deepskylog\AstronomyLibrary\AstronomyLibraryServiceProvider" --tag="migrations"
+php artisan migrate
+```
+
+- Existing install (table already present):
+
+1. Publish the package migrations (this copies an ALTER migration stub into your app):
+
+```bash
+php artisan vendor:publish --provider="deepskylog\AstronomyLibrary\AstronomyLibraryServiceProvider" --tag="migrations"
+```
+
+2. Run your migrations. The published ALTER migration will add the optional photometry columns (`H`, `n`, `phase_coeff`, `n_pre`, `n_post`) if they don't already exist:
+
+```bash
+php artisan migrate
+```
+
+Note: the package includes both a create-table stub (for new installs) and a safe ALTER stub (for existing installs); publishing then migrating is the recommended flow in both cases.
+
+
 The database table with the delta t values can be updated using the following command:
 
 ```bash
@@ -167,6 +195,51 @@ $nelm = Magnitude::bortleToNelm($bortle, $fstOffset);
 
 // Convert from bortle scale to SQM value
 $sqm = Magnitude::bortleToNelm($bortle, $fstOffset);
+```
+
+### Magnitude examples
+
+The following short examples show how to compute the visual magnitude for an asteroid (IAU H–G system) and a comet (empirical H + 5 log10(delta) + n log10(r) model with optional phase term).
+
+```php
+// Asteroid (elliptic orbit) — IAU H-G
+use deepskylog\\AstronomyLibrary\\Targets\\Elliptic;
+use Carbon\\Carbon;
+
+$date = Carbon::create(2025, 11, 20, 0, 0, 0, 'UTC');
+
+$asteroid = new Elliptic();
+// setOrbitalElements(a, e, i, w, node, perihelionDate)
+$peridate = Carbon::create(2020, 1, 1, 0, 0, 0, 'UTC');
+$asteroid->setOrbitalElements(2.5, 0.12, 5.0, 150.0, 80.0, $peridate);
+
+// Set H and G (absolute magnitude and slope parameter)
+$asteroid->setHG(15.3, 0.15);
+
+// Compute magnitude for a given date
+$m = $asteroid->magnitude($date);
+echo "Asteroid magnitude: {$m}\n";
+```
+
+```php
+// Comet (parabolic orbit) — simple H + 5 log10(delta) + n log10(r) model
+use deepskylog\\AstronomyLibrary\\Targets\\Parabolic;
+use Carbon\\Carbon;
+
+$date = Carbon::create(2025, 11, 20, 0, 0, 0, 'UTC');
+
+$comet = new Parabolic();
+// setOrbitalElements(q, i, omega, w, perihelionDate) — see orbital-elements section for exact ordering
+$peridate = Carbon::create(1998, 4, 14, 10, 27, 33, 'UTC');
+$comet->setOrbitalElements(1.487469, 104.69219, 1.32431, 222.10887, $peridate);
+
+// Set comet photometric parameters: H (m at 1 AU), n (power-law index)
+// Optional: third argument is a linear phase coefficient (mag/deg), and you can provide n_pre / n_post
+$comet->setCometParams(6.5, 4.0, 0.02, 3.5, 4.5);
+
+// Compute magnitude for a given date
+$m = $comet->magnitude($date);
+echo "Comet magnitude: {$m}\n";
 ```
 
 ## Coordinate methods
