@@ -39,7 +39,7 @@ class SunTest extends BaseTestCase
      *
      * @var string
      */
-    protected $appPath = __DIR__.'/../../vendor/laravel/laravel/bootstrap/app.php';
+    protected $appPath = __DIR__ . '/../../vendor/laravel/laravel/bootstrap/app.php';
 
     /**
      * Setup the test environment.
@@ -119,7 +119,7 @@ class SunTest extends BaseTestCase
 
         $equationOfTime = $sun->calculateEquationOfTime($date);
 
-        $this->assertEquals(13.7090, $equationOfTime);
+        $this->assertEqualsWithDelta(13.709404641968225, $equationOfTime, 0.000001);
     }
 
     public function testPhysicalEphemeris()

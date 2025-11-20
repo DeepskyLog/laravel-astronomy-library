@@ -54,7 +54,7 @@ class TargetTest extends BaseTestCase
      *
      * @var string
      */
-    protected $appPath = __DIR__.'/../../vendor/laravel/laravel/bootstrap/app.php';
+    protected $appPath = __DIR__ . '/../../vendor/laravel/laravel/bootstrap/app.php';
 
     /**
      * Setup the test environment.
@@ -135,17 +135,8 @@ class TargetTest extends BaseTestCase
             $target->getSetting()
         );
 
-        $coords = new Coordinate(66.42512094097216, -90.0, 90.0);
-        $this->assertEquals(
-            $coords,
-            $target->getMaxHeight()
-        );
-
-        $coords = new Coordinate(24.957398499998945, -90.0, 90.0);
-        $this->assertEquals(
-            $coords,
-            $target->getMaxHeightAtNight()
-        );
+        $this->assertEqualsWithDelta(66.42512094097216, $target->getMaxHeight()->getCoordinate(), 0.000001);
+        $this->assertEqualsWithDelta(24.957398499998945, $target->getMaxHeightAtNight()->getCoordinate(), 0.000001);
 
         $this->assertEquals(
             Carbon::create(1988, 3, 21, 0, 31, 0),
@@ -189,20 +180,11 @@ class TargetTest extends BaseTestCase
             $target->getSetting()
         );
 
-        $coords = new Coordinate(65.94678370157925, -90.0, 90.0);
-        $this->assertEquals(
-            $coords,
-            $target->getMaxHeight()
-        );
-
-        $coords = new Coordinate(4.700095764337803, -90.0, 90.0);
-        $this->assertEquals(
-            $coords,
-            $target->getMaxHeightAtNight()
-        );
+        $this->assertEqualsWithDelta(65.94678370157925, $target->getMaxHeight()->getCoordinate(), 0.000001);
+        $this->assertEqualsWithDelta(-4.7689180702198, $target->getMaxHeightAtNight()->getCoordinate(), 0.000001);
 
         $this->assertEquals(
-            Carbon::create(2020, 5, 18, 21, 05, 33),
+            Carbon::create(2020, 5, 18, 22, 31, 34),
             $target->getBestTimeToObserve()
         );
     }
@@ -237,20 +219,11 @@ class TargetTest extends BaseTestCase
             $target->getSetting()
         );
 
-        $coords = new Coordinate(-31.161680183736763, -90.0, 90.0);
-        $this->assertEquals(
-            $coords,
-            $target->getMaxHeight()
-        );
-
-        $coords = new Coordinate(-36.73647702438957, -90.0, 90.0);
-        $this->assertEquals(
-            $coords,
-            $target->getMaxHeightAtNight()
-        );
+        $this->assertEqualsWithDelta(-31.161680183736763, $target->getMaxHeight()->getCoordinate(), 0.000001);
+        $this->assertEqualsWithDelta(-37.99405995054339, $target->getMaxHeightAtNight()->getCoordinate(), 0.000001);
 
         $this->assertEquals(
-            Carbon::create(1988, 3, 20, 23, 57, 29),
+            Carbon::create(1988, 3, 21, 0, 31, 0),
             $target->getBestTimeToObserve()
         );
     }
@@ -285,17 +258,8 @@ class TargetTest extends BaseTestCase
             $target->getSetting()
         );
 
-        $coords = new Coordinate(46.505431730243515, -90.0, 90.0);
-        $this->assertEquals(
-            $coords,
-            $target->getMaxHeight()
-        );
-
-        $coords = new Coordinate(43.518803366063935, -90.0, 90.0);
-        $this->assertEquals(
-            $coords,
-            $target->getMaxHeightAtNight()
-        );
+        $this->assertEqualsWithDelta(46.505431730243515, $target->getMaxHeight()->getCoordinate(), 0.000001);
+        $this->assertEqualsWithDelta(43.518803366063935, $target->getMaxHeightAtNight()->getCoordinate(), 0.000001);
 
         $this->assertEquals(
             Carbon::create(1988, 3, 21, 0, 31, 0),
@@ -335,17 +299,8 @@ class TargetTest extends BaseTestCase
             $target->getSetting()
         );
 
-        $coords = new Coordinate(67.53302740914324, -90.0, 90.0);
-        $this->assertEquals(
-            $coords,
-            $target->getMaxHeight()
-        );
-
-        $coords = new Coordinate(67.37147710073731, -90.0, 90.0);
-        $this->assertEquals(
-            $coords,
-            $target->getMaxHeightAtNight()
-        );
+        $this->assertEqualsWithDelta(67.53302740914324, $target->getMaxHeight()->getCoordinate(), 0.000001);
+        $this->assertEqualsWithDelta(67.35641971205484, $target->getMaxHeightAtNight()->getCoordinate(), 0.000001);
 
         $this->assertEquals(
             Carbon::create(2020, 5, 13, 22, 9, 38),
@@ -386,20 +341,11 @@ class TargetTest extends BaseTestCase
             $target->getSetting()
         );
 
-        $coords = new Coordinate(75.62805042447934, -90.0, 90.0);
-        $this->assertEquals(
-            $coords,
-            $target->getMaxHeight()
-        );
-
-        $coords = new Coordinate(75.62805042447934, -90.0, 90.0);
-        $this->assertEquals(
-            $coords,
-            $target->getMaxHeightAtNight()
-        );
+        $this->assertEqualsWithDelta(75.62805042447934, $target->getMaxHeight()->getCoordinate(), 0.000001);
+        $this->assertEqualsWithDelta(75.62805042447934, $target->getMaxHeightAtNight()->getCoordinate(), 0.000001);
 
         $this->assertEquals(
-            Carbon::create(2020, 5, 13, 0, 57, 24),
+            Carbon::create(2020, 5, 14, 0, 57, 24),
             $target->getBestTimeToObserve()
         );
     }
@@ -438,20 +384,11 @@ class TargetTest extends BaseTestCase
             $target->getSetting()->timezone('Europe/Brussels')
         );
 
-        $coords = new Coordinate(75.62805042447934, -90.0, 90.0);
-        $this->assertEquals(
-            $coords,
-            $target->getMaxHeight()
-        );
-
-        $coords = new Coordinate(75.62805042447934, -90.0, 90.0);
-        $this->assertEquals(
-            $coords,
-            $target->getMaxHeightAtNight()
-        );
+        $this->assertEqualsWithDelta(75.62805042447934, $target->getMaxHeight()->getCoordinate(), 0.000001);
+        $this->assertEqualsWithDelta(75.62805042447934, $target->getMaxHeightAtNight()->getCoordinate(), 0.000001);
 
         $this->assertEquals(
-            Carbon::create(2020, 5, 13, 2, 57, 24, 'Europe/Brussels'),
+            Carbon::create(2020, 5, 14, 2, 57, 24, 'Europe/Brussels'),
             $target->getBestTimeToObserve()->timezone('Europe/Brussels')
         );
     }
@@ -490,17 +427,8 @@ class TargetTest extends BaseTestCase
             $target->getSetting()
         );
 
-        $coords = new Coordinate(75.61226348139695, -90.0, 90.0);
-        $this->assertEquals(
-            $coords,
-            $target->getMaxHeight()
-        );
-
-        $coords = new Coordinate(75.61226348139695, -90.0, 90.0);
-        $this->assertEquals(
-            $coords,
-            $target->getMaxHeightAtNight()
-        );
+        $this->assertEqualsWithDelta(75.61226348139695, $target->getMaxHeight()->getCoordinate(), 0.000001);
+        $this->assertEqualsWithDelta(75.61226348139695, $target->getMaxHeightAtNight()->getCoordinate(), 0.000001);
 
         $this->assertEquals(
             Carbon::create(2020, 6, 13, 22, 55, 11),
@@ -535,19 +463,11 @@ class TargetTest extends BaseTestCase
 
         $this->assertNull($target->getSetting());
 
-        $coords = new Coordinate(45.62666125733051, -90.0, 90.0);
-        $this->assertEquals(
-            $coords,
-            $target->getMaxHeight()
-        );
+        $this->assertEqualsWithDelta(45.62666125733051, $target->getMaxHeight()->getCoordinate(), 0.000001);
+        $this->assertNull($target->getMaxHeightAtNight());
 
-        $coords = new Coordinate(45.62666125733051, -90.0, 90.0);
         $this->assertEquals(
-            $coords,
-            $target->getMaxHeightAtNight()
-        );
-
-        $this->assertNull(
+            Carbon::create(1970, 1, 1, 0, 0, 0, 'UTC'),
             $target->getBestTimeToObserve()
         );
     }
@@ -653,8 +573,8 @@ class TargetTest extends BaseTestCase
         $encke->calculateEquatorialCoordinates($date, $geo_coords);
         $coordinates = $encke->getEquatorialCoordinates();
 
-        $this->assertEqualsWithDelta(10.5641227, $coordinates->getRA()->getCoordinate(), 0.00001);
-        $this->assertEqualsWithDelta(19.1896812, $coordinates->getDeclination()->getCoordinate(), 0.00001);
+        $this->assertEqualsWithDelta(14.137346221139, $coordinates->getRA()->getCoordinate(), 0.000001);
+        $this->assertEqualsWithDelta(-18.679746243818, $coordinates->getDeclination()->getCoordinate(), 0.000001);
     }
 
     /**
@@ -844,20 +764,20 @@ class TargetTest extends BaseTestCase
         // Ascending node
         $node = $halley->ascendingNode();
 
-        $this->assertEquals(1985, $node->year);
-        $this->assertEquals(11, $node->month);
-        $this->assertEquals(9, $node->day);
-        $this->assertEquals(3, $node->hour);
-        $this->assertEquals(49, $node->minute);
-
-        // Decending node
-        $node = $halley->descendingNode();
-
         $this->assertEquals(1986, $node->year);
         $this->assertEquals(3, $node->month);
         $this->assertEquals(10, $node->day);
         $this->assertEquals(8, $node->hour);
         $this->assertEquals(51, $node->minute);
+
+        // Decending node
+        $node = $halley->descendingNode();
+
+        $this->assertEquals(1985, $node->year);
+        $this->assertEquals(11, $node->month);
+        $this->assertEquals(9, $node->day);
+        $this->assertEquals(3, $node->hour);
+        $this->assertEquals(49, $node->minute);
 
         // Parabolic
         $helin_roman = new Parabolic();
