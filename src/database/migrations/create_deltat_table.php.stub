@@ -14,15 +14,17 @@ class CreateDeltaTTable extends Migration
      */
     public function up()
     {
-        Schema::create(
-            'delta_t',
-            function (Blueprint $table) {
-                $table->integer('year');
-                $table->float('deltat');
-            }
-        );
+        if (!Schema::hasTable('delta_t')) {
+            Schema::create(
+                'delta_t',
+                function (Blueprint $table) {
+                    $table->integer('year');
+                    $table->float('deltat');
+                }
+            );
 
-        Excel::import(new DeltaTImport(), 'database/deltat.csv');
+            Excel::import(new DeltaTImport(), 'database/deltat.csv');
+        }
     }
 
     /**

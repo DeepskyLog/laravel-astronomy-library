@@ -2,6 +2,15 @@
 
 All notable changes to `laravel-astronomy-library` will be documented in this file.
 
+## Version 6.7.1
+
+Changed:
+
+- Hardened package migrations and stubs to be idempotent: create-table stubs and data-import migrations now check `Schema::hasTable`/`Schema::hasColumn` before creating/importing to avoid "table already exists" errors when published into projects that already have the tables.
+- Fixed `CreateAsteroidsOrbitalElementsTable` `down()` method which previously dropped the wrong table name.
+- Added a publishable photometry migration stub: `src/database/migrations/add_photometry_to_comets_orbital_elements_table.php.stub` and updated the service provider to publish it so host apps will receive the migration via `vendor:publish`.
+- Made the photometry migration idempotent (guards around each added column) and made rollback safe by dropping only existing columns.
+
 ## Version 6.7.0
 
 Added:
