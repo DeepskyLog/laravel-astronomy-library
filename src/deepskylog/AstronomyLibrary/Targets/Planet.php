@@ -68,14 +68,15 @@ abstract class Planet extends Target
             // Use helper script to query JPL/Horizons for apparent RA/Dec.
             $geo = new GeographicalCoordinates(0.0, 0.0);
             $this->setEquatorialCoordinatesToday(
-                $this->_horizonsEquatorialCoordinates($date, $geo, 0.0, (string)$VSOP87)
+                $this->_horizonsEquatorialCoordinates($date, $geo, 0.0, (string) $VSOP87)
             );
             $this->setEquatorialCoordinatesTomorrow(
-                $this->_horizonsEquatorialCoordinates($date->addDay(), $geo, 0.0, (string)$VSOP87)
+                $this->_horizonsEquatorialCoordinates($date->addDay(), $geo, 0.0, (string) $VSOP87)
             );
             $this->setEquatorialCoordinatesYesterday(
-                $this->_horizonsEquatorialCoordinates($date->subDays(2), $geo, 0.0, (string)$VSOP87)
+                $this->_horizonsEquatorialCoordinates($date->subDays(2), $geo, 0.0, (string) $VSOP87)
             );
+
             return;
         }
 
@@ -124,14 +125,15 @@ abstract class Planet extends Target
 
         if ($useHorizons) {
             $this->setEquatorialCoordinatesToday(
-                $this->_horizonsEquatorialCoordinates($date, $geo_coords, $height, (string)$VSOP87)
+                $this->_horizonsEquatorialCoordinates($date, $geo_coords, $height, (string) $VSOP87)
             );
             $this->setEquatorialCoordinatesTomorrow(
-                $this->_horizonsEquatorialCoordinates($date->addDay(), $geo_coords, $height, (string)$VSOP87)
+                $this->_horizonsEquatorialCoordinates($date->addDay(), $geo_coords, $height, (string) $VSOP87)
             );
             $this->setEquatorialCoordinatesYesterday(
-                $this->_horizonsEquatorialCoordinates($date->subDays(2), $geo_coords, $height, (string)$VSOP87)
+                $this->_horizonsEquatorialCoordinates($date->subDays(2), $geo_coords, $height, (string) $VSOP87)
             );
+
             return;
         }
 
@@ -298,8 +300,8 @@ abstract class Planet extends Target
      */
     private function _horizonsEquatorialCoordinates(Carbon $date, GeographicalCoordinates $geo_coords, float $height, string $ephem = 'DE440'): EquatorialCoordinates
     {
-        $script = realpath(__DIR__ . '/../../../../scripts/horizons_radec.php');
-        if ($script === false || !is_file($script)) {
+        $script = realpath(__DIR__.'/../../../../scripts/horizons_radec.php');
+        if ($script === false || ! is_file($script)) {
             return $this->_calculateEquatorialCoordinates($date, $geo_coords, $height);
         }
 
@@ -323,8 +325,8 @@ abstract class Planet extends Target
 
         // First try to query the Horizons API directly from PHP to avoid spawning CLI
         $start = $dt;
-        $stop = date('Y-m-d H:i', strtotime($dt . ' +1 minute'));
-        $site = "'{$lon},{$lat}," . ($height / 1000.0) . "'";
+        $stop = date('Y-m-d H:i', strtotime($dt.' +1 minute'));
+        $site = "'{$lon},{$lat},".($height / 1000.0)."'";
 
         $post = [
             'format' => 'json',
@@ -371,20 +373,30 @@ abstract class Planet extends Target
                 // attempt to find a data block inside JSON
                 $findBlock = function ($item) use (&$findBlock) {
                     if (is_string($item)) {
-                        if (strpos($item, '$$SOE') !== false) return $item;
+                        if (strpos($item, '$$SOE') !== false) {
+                            return $item;
+                        }
+
                         return null;
                     }
                     if (is_array($item)) {
                         foreach ($item as $v) {
                             $res = $findBlock($v);
-                            if ($res !== null) return $res;
+                            if ($res !== null) {
+                                return $res;
+                            }
                         }
                     }
+
                     return null;
                 };
                 $block = $findBlock($decoded);
-                if ($block === null && isset($decoded['result']) && is_string($decoded['result'])) $block = $decoded['result'];
-                if ($block === null && isset($decoded['data']) && is_string($decoded['data'])) $block = $decoded['data'];
+                if ($block === null && isset($decoded['result']) && is_string($decoded['result'])) {
+                    $block = $decoded['result'];
+                }
+                if ($block === null && isset($decoded['data']) && is_string($decoded['data'])) {
+                    $block = $decoded['data'];
+                }
 
                 if ($block !== null) {
                     if (preg_match('/\$\$SOE([\s\S]*?)\$\$EOE/', $block, $mblock)) {
@@ -392,8 +404,12 @@ abstract class Planet extends Target
                         $dataLine = null;
                         foreach ($lines as $ln) {
                             $ln = trim($ln);
-                            if ($ln === '') continue;
-                            if (strpos($ln, '***') === 0) continue;
+                            if ($ln === '') {
+                                continue;
+                            }
+                            if (strpos($ln, '***') === 0) {
+                                continue;
+                            }
                             if (strpos($ln, ',') !== false && preg_match('/\d/', $ln)) {
                                 $dataLine = $ln;
                                 break;
@@ -407,26 +423,36 @@ abstract class Planet extends Target
                             $hmsToHours = function ($s) {
                                 $s = trim($s);
                                 if (strpos($s, ':') !== false) {
-                                    list($h, $m, $sec) = explode(':', $s) + [0, 0, 0];
+                                    [$h, $m, $sec] = explode(':', $s) + [0, 0, 0];
+
                                     return intval($h) + intval($m) / 60.0 + floatval($sec) / 3600.0;
                                 }
                                 $parts = preg_split('/\s+/', $s);
-                                if (count($parts) >= 3) return intval($parts[0]) + intval($parts[1]) / 60.0 + floatval($parts[2]) / 3600.0;
+                                if (count($parts) >= 3) {
+                                    return intval($parts[0]) + intval($parts[1]) / 60.0 + floatval($parts[2]) / 3600.0;
+                                }
+
                                 return floatval($s);
                             };
                             $dmsToDeg = function ($s) {
                                 $s = trim($s);
                                 $sign = 1;
                                 if ($s[0] === '+' || $s[0] === '-') {
-                                    if ($s[0] === '-') $sign = -1;
+                                    if ($s[0] === '-') {
+                                        $sign = -1;
+                                    }
                                     $s = substr($s, 1);
                                 }
                                 if (strpos($s, ':') !== false) {
-                                    list($d, $m, $sec) = explode(':', $s) + [0, 0, 0];
+                                    [$d, $m, $sec] = explode(':', $s) + [0, 0, 0];
+
                                     return $sign * (abs(intval($d)) + intval($m) / 60.0 + floatval($sec) / 3600.0);
                                 }
                                 $parts = preg_split('/\s+/', $s);
-                                if (count($parts) >= 3) return $sign * (abs(intval($parts[0])) + intval($parts[1]) / 60.0 + floatval($parts[2]) / 3600.0);
+                                if (count($parts) >= 3) {
+                                    return $sign * (abs(intval($parts[0])) + intval($parts[1]) / 60.0 + floatval($parts[2]) / 3600.0);
+                                }
+
                                 return $sign * floatval($s);
                             };
 
@@ -440,7 +466,7 @@ abstract class Planet extends Target
         }
 
         // If we couldn't parse HTTP response, fall back to executing helper script (robust parsing handled later)
-        if (!is_array($json) || !isset($json['ra_hours']) || !isset($json['dec_deg'])) {
+        if (! is_array($json) || ! isset($json['ra_hours']) || ! isset($json['dec_deg'])) {
             // Use the same PHP binary the process is running with to avoid mismatched php.ini
             $php = defined('PHP_BINARY') ? PHP_BINARY : 'php';
             $parts = [
@@ -448,12 +474,12 @@ abstract class Planet extends Target
                 escapeshellarg($script),
                 escapeshellarg($designation),
                 escapeshellarg($dt),
-                escapeshellarg((string)$lon),
-                escapeshellarg((string)$lat),
-                escapeshellarg((string)$height),
+                escapeshellarg((string) $lon),
+                escapeshellarg((string) $lat),
+                escapeshellarg((string) $height),
                 escapeshellarg($ephem),
             ];
-            $cmd = implode(' ', $parts) . ' 2>&1';
+            $cmd = implode(' ', $parts).' 2>&1';
             $out = [];
             $ret = 0;
             exec($cmd, $out, $ret);
@@ -465,17 +491,21 @@ abstract class Planet extends Target
                 $json = $maybe;
             } elseif (preg_match('/\{[\s\S]*\}/', $resp, $m)) {
                 $try = @json_decode($m[0], true);
-                if (is_array($try) && isset($try['ra_hours']) && isset($try['dec_deg'])) $json = $try;
+                if (is_array($try) && isset($try['ra_hours']) && isset($try['dec_deg'])) {
+                    $json = $try;
+                }
             } else {
-                $cached = dirname($script) . '/horizons_resp.json';
+                $cached = dirname($script).'/horizons_resp.json';
                 if (is_file($cached)) {
                     $try = @json_decode(@file_get_contents($cached), true);
-                    if (is_array($try) && isset($try['ra_hours']) && isset($try['dec_deg'])) $json = $try;
+                    if (is_array($try) && isset($try['ra_hours']) && isset($try['dec_deg'])) {
+                        $json = $try;
+                    }
                 }
             }
         }
 
-        if (!is_array($json) || !isset($json['ra_hours']) || !isset($json['dec_deg'])) {
+        if (! is_array($json) || ! isset($json['ra_hours']) || ! isset($json['dec_deg'])) {
             return $this->_calculateEquatorialCoordinates($date, $geo_coords, $height);
         }
 
