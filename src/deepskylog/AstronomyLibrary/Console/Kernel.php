@@ -2,7 +2,7 @@
 
 namespace deepskylog\AstronomyLibrary\Console;
 
-use App\Console\Kernel as ConsoleKernel;
+use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 use Illuminate\Console\Scheduling\Schedule;
 
 class Kernel extends ConsoleKernel

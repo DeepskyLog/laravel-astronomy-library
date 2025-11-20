@@ -11,6 +11,20 @@ class CometsOrbitalElements extends Model
     protected $table = 'comets_orbital_elements';
 
     protected $fillable = [
-        'name', 'epoch', 'q', 'e', 'w', 'i', 'node', 'Tp', 'ref',
+        'name',
+        'epoch',
+        'q',
+        'e',
+        'w',
+        'i',
+        'node',
+        'Tp',
+        'ref',
+        // Photometry
+        'H',
+        'n',
+        'phase_coeff',
+        'n_pre',
+        'n_post',
     ];
 }

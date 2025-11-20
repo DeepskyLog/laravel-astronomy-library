@@ -22,6 +22,12 @@ class CreateCometsOrbitalElementsTable extends Migration
                 $table->float('w', 10, 5);
                 $table->float('node', 10, 5);
                 $table->float('Tp', 15, 5);
+                // Photometry fields (optional)
+                $table->float('H', 6, 3)->nullable();
+                $table->float('n', 6, 3)->nullable();
+                $table->float('phase_coeff', 6, 4)->nullable();
+                $table->float('n_pre', 6, 3)->nullable();
+                $table->float('n_post', 6, 3)->nullable();
                 $table->string('ref');
             }
         );
