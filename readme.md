@@ -46,14 +46,13 @@ php artisan migrate
 php artisan vendor:publish --provider="deepskylog\AstronomyLibrary\AstronomyLibraryServiceProvider" --tag="migrations"
 ```
 
-2. Run your migrations. The published ALTER migration will add the optional photometry columns (`H`, `n`, `phase_coeff`, `n_pre`, `n_post`) if they don't already exist:
+1. Run your migrations. The published ALTER migration will add the optional photometry columns (`H`, `n`, `phase_coeff`, `n_pre`, `n_post`) if they don't already exist:
 
 ```bash
 php artisan migrate
 ```
 
 Note: the package includes both a create-table stub (for new installs) and a safe ALTER stub (for existing installs); publishing then migrating is the recommended flow in both cases.
-
 
 The database table with the delta t values can be updated using the following command:
 
@@ -412,9 +411,9 @@ $equatorial = $coords->convertToEquatorial();
 
 Target is a class to keep information about an object and perform calculations on it. Target is a base class and can be used for stars and deep-sky objects. There are three subclasses:
 
-+ Moon
-+ Planet
-+ Sun
+- Moon
+- Planet
+- Sun
 
 Moving targets (like the sun, moon or planets) need the equatorial coordinates for the given date, for the day before and the next day.
 
@@ -631,35 +630,35 @@ $diameter = $mercury->getDiameter();
 
 The orbital elements of comets and asteroids are kept in the database tables:
 
-+ asteroids_orbital_elements
-+ comets_orbital_elements
+- asteroids_orbital_elements
+- comets_orbital_elements
 
 The orbital elements for the comets can be accessed from laravel using the **CometsOrbitalElements** class.  The information available in the class is:
 
-+ name
-+ epoch
-+ q: The perihelion distance in AU
-+ e: The eccentricity of the orbit
-+ i: The inclination of the orbit
-+ w: The argument of perihelion
-+ node: Longitude of the ascending node
-+ Tp: Time of perihelion passage in YYYYMMDD.DDD
-+ Ref: The orbital solution reference
+- name
+- epoch
+- q: The perihelion distance in AU
+- e: The eccentricity of the orbit
+- i: The inclination of the orbit
+- w: The argument of perihelion
+- node: Longitude of the ascending node
+- Tp: Time of perihelion passage in YYYYMMDD.DDD
+- Ref: The orbital solution reference
 
 The orbital elements for the asteroids can be accessed from laravel using the **AsteroidsOrbitalElements** class.  The information available in the class is:
 
-+ number
-+ name
-+ epoch
-+ a: The semi-major axis in AU
-+ e: The eccentricity of the orbit
-+ i: The inclination of the orbit
-+ w: The argument of perihelion
-+ node: Longitude of the ascending node
-+ M: Mean anomaly
-+ H: Absolute magnitude
-+ G: Magnitude slope parameter
-+ Ref: The orbital solution reference
+- number
+- name
+- epoch
+- a: The semi-major axis in AU
+- e: The eccentricity of the orbit
+- i: The inclination of the orbit
+- w: The argument of perihelion
+- node: Longitude of the ascending node
+- M: Mean anomaly
+- H: Absolute magnitude
+- G: Magnitude slope parameter
+- Ref: The orbital solution reference
 
 ## Example
 
@@ -727,12 +726,12 @@ Please see [contributing.md](contributing.md) for details and a todolist.
 
 ## Security
 
-If you discover any security related issues, please email developers@deepskylog.be instead of using the issue tracker.
+If you discover any security related issues, please email <developers@deepskylog.be> instead of using the issue tracker.
 
 ## Credits
 
-+ [The DeepskyLog Team][link-author]
-+ [All Contributors][link-contributors]
+- [The DeepskyLog Team][link-author]
+- [All Contributors][link-contributors]
 
 ## License
 

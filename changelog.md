@@ -2,70 +2,112 @@
 
 All notable changes to `laravel-astronomy-library` will be documented in this file.
 
+## Version 6.7.0
+
+Added:
+
+- Prefer DASTCOM element files for small-body orbital elements when available to reduce ambiguous designation lookups.
+- Fallback resolution using SB-CAP (small-body catalog) when DASTCOM lookups fail.
+- `--used-command` debug output exposed by the Horizons helper (`scripts/horizons_radec.php`) and included in JSON responses to aid troubleshooting.
+- Comet photometry support:
+  - Runtime migration: `src/deepskylog/AstronomyLibrary/Database/Migrations/2025_11_20_000001_add_photometry_to_comets_table.php` (adds `H`, `n`, `phase_coeff`, `n_pre`, `n_post`).
+  - Migration stub: `src/database/migrations/add_photometry_to_comets_orbital_elements_table.php.stub`.
+- Artisan command: `astronomy:updateCometPhotometry` (`src/deepskylog/AstronomyLibrary/Commands/UpdateCometPhotometry.php`) to fetch photometric parameters (attempts Seiichi Yoshida / `aerith.net`).
+- Command registration: `AstronomyLibraryServiceProvider.php` and `Console/Kernel.php` register the new command.
+- Model: `src/deepskylog/AstronomyLibrary/Models/CometsOrbitalElements.php` exposes and persists photometry fields when available.
+- README/docs: migration instructions and worked examples for comet photometry and magnitude calculations were added to `readme.md`.
+- Tests: unit tests covering comet photometry ingestion and Horizons-based coordinate checks were added/updated (see `tests/Unit/*Comets*`, `CometsHorizonsTest`, `PlanetHorizonsDE440Test`).
+
+Changed:
+
+- `scripts/horizons_radec.php`: prefer JSON output, extract `$$SOE`..`$$EOE` blocks reliably, retry record-id resolution, prefer DASTCOM records and try SB-CAP fallback when needed, and surface the `used_command` used for queries.
+- Targets: photometric magnitude models and API updates implemented in `src/deepskylog/AstronomyLibrary/Targets/Elliptic.php`, `src/deepskylog/AstronomyLibrary/Targets/Parabolic.php` and `src/deepskylog/AstronomyLibrary/Targets/NearParabolic.php` (asteroid H–G model, comet H + 5 log10(delta) + n log10(r) with optional phase term and pre/post-perihelion exponents).
+- Planetary Horizons: optional JPL/Horizons ephemeris lookup added to `src/deepskylog/AstronomyLibrary/Targets/Planet.php` (uses `scripts/horizons_radec.php`).
+- Tests & fixtures: new DE440-based Horizons tests (`tests/Unit/PlanetHorizonsDE440Test.php`, `tests/Unit/PrintPlanetCoordsTest.php`) and updated fixtures in `scripts/` (including `scripts/horizons_resp_Jupiter.json`, `scripts/horizons_resp_Mars.json`, updated `scripts/horizons_resp.json`, `scripts/horizons_raw.txt`, `scripts/horizons_block.txt`).
+- Commands / scheduling: `UpdateOrbitalElements` and related scheduling notes updated so orbital-element and photometry updates are runnable (weekly scheduling noted in `readme.md`).
+
+Fixed:
+
+- Hardened parsing and record-resolution heuristics for Horizons responses to avoid sporadic failures when Horizons returns index pages or ambiguous matches.
+- Comet magnitude computation: hardened handling for missing photometry (falls back to sensible defaults) and correct application of pre-/post-perihelion `n` exponents and optional phase coefficients when present.
+- Tests: relaxed numeric assertions where appropriate and added tests that validate the new Horizons integration and photometry ingestion.
+
 ## Version 6.6.0
 
 Added:
+
 - `scripts/horizons_radec.php` — a small CLI helper that queries the JPL Horizons ephemeris service and returns structured JSON (apparent RA/Dec) for observer-based ephemerides. The helper writes optional debug artifacts to `scripts/horizons_raw.txt`, `scripts/horizons_block.txt` and `scripts/horizons_resp.json` to aid troubleshooting.
 - PHPUnit integration tests that exercise the Horizons helper and library integration (unit/integration tests under `tests/Unit/*Horizons*`).
 - `docs/getting_radec.md` — documentation covering how to obtain authoritative RA/Dec for small bodies using the Horizons helper and how to enable Horizons mode in `Elliptic` targets.
 
 Changed:
+
 - `Elliptic` target: added a Horizons integration path — when enabled the library will invoke the helper to obtain authoritative apparent RA/Dec for observer-based ephemerides instead of using only internal propagation. Also added setters to enable Horizons mode and to provide an explicit Horizons designation.
 - Improved canonicalisation of orbital elements in `Elliptic::setOrbitalElements()` (angle wrapping and inclination handling) to reduce ambiguity when propagating elements.
 
 Fixed:
+
 - Hardened parsing and record-resolution heuristics for Horizons responses (helper now prefers JSON output, extracts $$SOE..$$EOE blocks robustly, and retries record-id resolution when an index search is returned).
 
 Notes:
-- A lightweight cache/alias mechanism for Horizons id resolution is planned to make repetitive integration tests more deterministic (not yet added in this release).
 
+- A lightweight cache/alias mechanism for Horizons id resolution is planned to make repetitive integration tests more deterministic (not yet added in this release).
 
 ## Version 6.5.1
 
 Changed:
+
 - Increased diameter precision for planets by removing final rounding in `magnitude()` (reduces 0.1 quantization in graphs). Affected: Jupiter, Mercury, Venus, Mars, Neptune, Uranus, Saturn.
 
 ## Version 6.5
 
 Added:
+
 - `Target::yearDiameterGraph(GeographicalCoordinates $geo_coords, Carbon $date, bool $debug = false)` — generate a year-long plot of the planet's apparent angular diameter (arcseconds).
 
 Changed:
+
 - `Target::yearMagnitudeGraph(..., $debug = true)` now emits debug logging for skipped samples and exceptions (rendered into the placeholder/debug image when `debug` is true).
 - Increased magnitude precision for several planet magnitude implementations by removing final rounding in `magnitude()` (reduces 0.1-mag quantization in graphs). Affected: Jupiter, Mercury, Venus, Mars, Neptune, Uranus, Saturn.
 
 ## Version 6.4
 
 Added:
+
 - Targets can now generate a graph of the maximum altitude during a whole year
 
 Fixed:
+
 - A lot of fixes in the calculation of the maximum altitude during the night and best time to observe a target.
 - the altitude graph now shows the correct colors for nautical twilight.
 
 ## Version 6.3.1
 
 Fixed:
+
 - Fixed syntax error
 
 ## Version 6.3
 
 Added:
+
 - Added moon elevation to the altitude graph.
 - Only show the elevation graph when the target is above the horizon.
 
 Changed:
-- Improved scheduling of package commands.
 
+- Improved scheduling of package commands.
 
 ## Version 6.2.4
 
 Changed:
+
 - Allow laravel 12.
 
 ## Version 6.2.3
 
 Changed:
+
 - Added delta t value for 2025
 
 ## Version 6.2.2
@@ -86,7 +128,8 @@ Fixed:
 
 Changed:
 
-- Fix equation of time for March 21 and 22. 
+- Fix equation of time for March 21 and 22.
+- Fix equation of time for March 21 and 22.
 - Return equation of time as float and not as CarbonInterval (which fails for negative values).
 
 ## Version 6.1.2
