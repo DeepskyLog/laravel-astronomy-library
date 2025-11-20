@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-use PHPUnit\Framework\TestCase;
+use Carbon\Carbon;
 use deepskylog\AstronomyLibrary\Coordinates\GeographicalCoordinates;
 use deepskylog\AstronomyLibrary\Targets\Mars;
-use Carbon\Carbon;
+use PHPUnit\Framework\TestCase;
 
 final class PlanetHorizonsDE440Test extends TestCase
 {
     public function testPlanetUsesHorizonsHelperWithDE440(): void
     {
-        $script = __DIR__ . '/../../scripts/horizons_radec.php';
+        $script = __DIR__.'/../../scripts/horizons_radec.php';
         $dt = '2025-11-18 16:08';
         $lon = '4.84457';
         $lat = '49.3447';
@@ -23,15 +23,15 @@ final class PlanetHorizonsDE440Test extends TestCase
             $this->markTestSkipped('Horizons helper script not found');
         }
 
-        $cmd = escapeshellcmd((PHP_BINARY)) . ' ' . escapeshellarg($scriptPath) . ' '
-            . escapeshellarg('Mars') . ' ' . escapeshellarg($dt) . ' '
-            . escapeshellarg($lon) . ' ' . escapeshellarg($lat) . ' ' . escapeshellarg($alt) . ' ' . escapeshellarg('DE440');
+        $cmd = escapeshellcmd(PHP_BINARY).' '.escapeshellarg($scriptPath).' '
+            .escapeshellarg('Mars').' '.escapeshellarg($dt).' '
+            .escapeshellarg($lon).' '.escapeshellarg($lat).' '.escapeshellarg($alt).' '.escapeshellarg('DE440');
 
         $out = null;
         $ret = null;
         exec($cmd, $out, $ret);
         if ($ret !== 0) {
-            $this->markTestSkipped('Horizons helper failed to produce JSON: ' . implode("\n", $out));
+            $this->markTestSkipped('Horizons helper failed to produce JSON: '.implode("\n", $out));
         }
 
         $json = @json_decode(implode("\n", $out), true);
