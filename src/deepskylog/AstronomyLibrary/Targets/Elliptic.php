@@ -43,6 +43,9 @@ class Elliptic extends Target
     private Carbon $_perihelion_date;
     private bool $_useHorizons = false;
     private string $_horizonsDesignation = '';
+    // Photometric parameters (optional)
+    private ?float $_H = null; // Absolute magnitude H
+    private ?float $_G = null; // Slope parameter G (IAU H-G)
 
     /**
      * The constructor.
@@ -92,6 +95,113 @@ class Elliptic extends Target
         $this->_longitude_ascending_node = $node_norm;
         $this->_n = 0.9856076686 / ($a * sqrt($a));
         $this->_perihelion_date = $perihelion_date;
+    }
+
+    /**
+     * Set asteroid photometric parameters H and G (IAU H-G system).
+     */
+    public function setHG(float $H, float $G = 0.15): void
+    {
+        $this->_H = $H;
+        $this->_G = $G;
+    }
+
+    /**
+     * Calculate the magnitude for an elliptic object (asteroid).
+     * Uses the H-G system when H/G are available; otherwise falls back
+     * to stored magnitude or faint sentinel.
+     */
+    public function magnitude(Carbon $date): float
+    {
+        // If explicit stored magnitude provided, prefer that
+        if ($this->getMagnitude() !== null) {
+            return $this->getMagnitude();
+        }
+
+        if ($this->_H === null) {
+            // No photometric parameters available
+            return 99.9;
+        }
+
+        // Compute heliocentric position (r) and geocentric distance (delta)
+        $nutation = Time::nutation(2451545.0);
+
+        $sine = sin(deg2rad($nutation[2]));
+        $cose = cos(deg2rad($nutation[2]));
+
+        $F = cos(deg2rad($this->_longitude_ascending_node));
+        $G = sin(deg2rad($this->_longitude_ascending_node)) * $cose;
+        $H = sin(deg2rad($this->_longitude_ascending_node)) * $sine;
+
+        $P = -sin(deg2rad($this->_longitude_ascending_node)) * cos(deg2rad($this->_i));
+        $Q = cos(deg2rad($this->_longitude_ascending_node)) * cos(deg2rad($this->_i)) * $cose - sin(deg2rad($this->_i)) * $sine;
+        $R = cos(deg2rad($this->_longitude_ascending_node)) * cos(deg2rad($this->_i)) * $sine + sin(deg2rad($this->_i)) * $cose;
+
+        $A = rad2deg(atan2($F, $P));
+        $B = rad2deg(atan2($G, $Q));
+        $C = rad2deg(atan2($H, $R));
+
+        $a = sqrt($F ** 2 + $P ** 2);
+        $b = sqrt($G ** 2 + $Q ** 2);
+        $c = sqrt($H ** 2 + $R ** 2);
+
+        $diff_in_date = $this->_perihelion_date->diffInSeconds($date) / 3600.0 / 24.0;
+        $M = -$diff_in_date * $this->_n;
+
+        $E = $this->eccentricAnomaly($this->_e, $M, 0.000001);
+
+        $v = rad2deg(2 * atan(sqrt((1 + $this->_e) / (1 - $this->_e)) * tan(deg2rad($E / 2))));
+        $r = $this->_a * (1 - $this->_e * cos(deg2rad($E)));
+        $x = $r * $a * sin(deg2rad($A + $this->_omega + $v));
+        $y = $r * $b * sin(deg2rad($B + $this->_omega + $v));
+        $z = $r * $c * sin(deg2rad($C + $this->_omega + $v));
+
+        // Earth heliocentric coordinates
+        $earth = new Earth();
+        $helio_coords_earth = $earth->calculateHeliocentricCoordinates($date);
+        $R0 = $helio_coords_earth[2];
+
+        // Convert Earth's spherical heliocentric (L,B,R0) into Cartesian
+        $L0 = deg2rad($helio_coords_earth[0]);
+        $B0 = deg2rad($helio_coords_earth[1]);
+        $xE = $R0 * cos($B0) * cos($L0);
+        $yE = $R0 * cos($B0) * sin($L0);
+        $zE = $R0 * sin($B0);
+
+        // Object heliocentric Cartesian (already in ecliptic-based frame from orbital transform)
+        $xObj = $x;
+        $yObj = $y;
+        $zObj = $z;
+
+        // Geocentric vector = object heliocentric - earth heliocentric
+        $dx = $xObj - $xE;
+        $dy = $yObj - $yE;
+        $dz = $zObj - $zE;
+        $delta = sqrt($dx ** 2 + $dy ** 2 + $dz ** 2);
+
+        // Phase angle (Sun-target-Earth). Compute angle between object->Sun and object->Earth
+        // Vector from object to Sun is - (object heliocentric)
+        $vxSun = -$xObj;
+        $vySun = -$yObj;
+        $vzSun = -$zObj;
+        $dot = $vxSun * ($xE - $xObj) + $vySun * ($yE - $yObj) + $vzSun * ($zE - $zObj);
+        $mag1 = sqrt($vxSun ** 2 + $vySun ** 2 + $vzSun ** 2);
+        $mag2 = sqrt(($xE - $xObj) ** 2 + ($yE - $yObj) ** 2 + ($zE - $zObj) ** 2);
+        $alpha = 0.0;
+        if ($mag1 > 0 && $mag2 > 0) {
+            $alpha = rad2deg(acos(max(-1.0, min(1.0, $dot / ($mag1 * $mag2)))));
+        }
+
+        // H-G system phase functions (Bowell et al.)
+        $phi1 = exp(-3.33 * pow(tan(deg2rad($alpha) / 2.0), 0.63));
+        $phi2 = exp(-1.87 * pow(tan(deg2rad($alpha) / 2.0), 1.22));
+
+        $H = $this->_H;
+        $G = $this->_G ?? 0.15;
+
+        $V = $H - 2.5 * log10((1 - $G) * $phi1 + $G * $phi2) + 5 * log10($r * $delta);
+
+        return floatval($V);
     }
 
     /**

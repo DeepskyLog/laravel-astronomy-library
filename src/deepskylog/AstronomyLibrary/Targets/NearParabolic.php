@@ -38,6 +38,13 @@ class NearParabolic extends Target
     private float $_omega;
     private float $_longitude_ascending_node;
     private Carbon $_perihelion_date;
+    // Photometric parameters for comets: H (absolute), n (activity exponent),
+    // optional phase coefficient (mag/deg) and asymmetric n values pre/post perihelion.
+    private ?float $_Hc = null;
+    private ?float $_n = null;
+    private ?float $_phaseCoeff = null;
+    private ?float $_n_pre = null;
+    private ?float $_n_post = null;
 
     /**
      * The constructor.
@@ -65,6 +72,147 @@ class NearParabolic extends Target
         $this->_omega = $omega;
         $this->_longitude_ascending_node = $longitude_ascending_node;
         $this->_perihelion_date = $perihelion_date;
+    }
+
+    /**
+     * Set comet photometric parameters. Parameters:
+     *  - $H: absolute magnitude constant
+     *  - $n: activity exponent (default 4.0)
+     *  - $phaseCoeff: optional linear phase coefficient (mag per degree)
+     *  - $n_pre, $n_post: optional asymmetric exponents to use before/after perihelion
+     */
+    public function setCometParams(float $H, float $n = 4.0, ?float $phaseCoeff = null, ?float $n_pre = null, ?float $n_post = null): void
+    {
+        $this->_Hc = $H;
+        $this->_n = $n;
+        $this->_phaseCoeff = $phaseCoeff;
+        $this->_n_pre = $n_pre;
+        $this->_n_post = $n_post;
+    }
+
+    /**
+     * Compute comet magnitude using improved model:
+     *   m = H + 5 log10(delta) + n * log10(r) + phaseCoeff * phaseAngle
+     * where n may be chosen pre/post perihelion when available.
+     */
+    public function magnitude(Carbon $date): float
+    {
+        if ($this->getMagnitude() !== null) {
+            return $this->getMagnitude();
+        }
+        if ($this->_Hc === null) {
+            return 99.9;
+        }
+
+        $diff_in_date = $this->_perihelion_date->diffInSeconds($date) / 3600.0 / 24.0;
+
+        $k = 0.01720209895;
+        $Q = $k / (2 * $this->_q) * sqrt((1 + $this->_e) / $this->_q);
+        $gamma = (1 - $this->_e) / (1 + $this->_e);
+
+        if ($diff_in_date == 0) {
+            $r = $this->_q;
+            $v = 0.0;
+        } else {
+            $q2 = $Q * $diff_in_date;
+            $s = 2 / (3 * abs($q2));
+            $s = 2 / tan(2 * atan(tan(atan($s) / 2) ** (1 / 3)));
+            if ($diff_in_date < 0) {
+                $s = -$s;
+            }
+            if ($this->_e != 1.0) {
+                $l = 0;
+                do {
+                    $s0 = $s;
+                    $z = 1;
+                    $y = $s * $s;
+                    $g1 = -$y * $s;
+                    $q3 = $q2 + 2 * $gamma * $s * $y / 3;
+                    do {
+                        $z = $z + 1;
+                        $g1 = -$g1 * $gamma * $y;
+                        $z1 = ($z - ($z + 1) * $gamma) / (2 * $z + 1);
+                        $f = $z1 * $g1;
+                        $q3 = $q3 + $f;
+                    } while (abs($f) > 1e-9 && $z < 500);
+                    $l++;
+                    do {
+                        $s1 = $s;
+                        $s = (2 * $s * $s * $s / 3 + $q3) / ($s * $s + 1);
+                    } while (abs($s - $s1) > 1e-9);
+                } while (abs($s - $s0) > 1e-9 && $l < 500);
+            }
+            $v = 2 * atan($s);
+            $r = $this->_q * (1 + $this->_e) / (1 + $this->_e * cos($v));
+            $v = rad2deg($v);
+        }
+
+        $F = cos(deg2rad($this->_longitude_ascending_node));
+        $Gf = sin(deg2rad($this->_longitude_ascending_node)) * 0.917482062;
+        $Hf = sin(deg2rad($this->_longitude_ascending_node)) * 0.397777156;
+
+        $P = -sin(deg2rad($this->_longitude_ascending_node)) * cos(deg2rad($this->_i));
+        $Q = cos(deg2rad($this->_longitude_ascending_node)) * cos(deg2rad($this->_i)) * 0.917482062 - sin(deg2rad($this->_i)) * 0.397777156;
+        $R = cos(deg2rad($this->_longitude_ascending_node)) * cos(deg2rad($this->_i)) * 0.397777156 + sin(deg2rad($this->_i)) * 0.917482062;
+
+        $A = rad2deg(atan2($F, $P));
+        $B = rad2deg(atan2($Gf, $Q));
+        $C = rad2deg(atan2($Hf, $R));
+
+        $a = sqrt($F ** 2 + $P ** 2);
+        $b = sqrt($Gf ** 2 + $Q ** 2);
+        $c = sqrt($Hf ** 2 + $R ** 2);
+
+        $x = $r * $a * sin(deg2rad($A + $this->_omega + $v));
+        $y = $r * $b * sin(deg2rad($B + $this->_omega + $v));
+        $z = $r * $c * sin(deg2rad($C + $this->_omega + $v));
+
+        $sun = new Sun();
+        $XYZ = $sun->calculateGeometricCoordinates($date);
+
+        $xObj = $XYZ->getX()->getCoordinate() + $x;
+        $yObj = $XYZ->getY()->getCoordinate() + $y;
+        $zObj = $XYZ->getZ()->getCoordinate() + $z;
+
+        $earth = new Earth();
+        $helio_coords_earth = $earth->calculateHeliocentricCoordinates($date);
+        $R0 = $helio_coords_earth[2];
+        $L0 = deg2rad($helio_coords_earth[0]);
+        $B0 = deg2rad($helio_coords_earth[1]);
+        $xE = $R0 * cos($B0) * cos($L0);
+        $yE = $R0 * cos($B0) * sin($L0);
+        $zE = $R0 * sin($B0);
+
+        $dx = $xObj - $xE;
+        $dy = $yObj - $yE;
+        $dz = $zObj - $zE;
+        $delta = sqrt($dx ** 2 + $dy ** 2 + $dz ** 2);
+
+        $vxSun = -$xObj; $vySun = -$yObj; $vzSun = -$zObj;
+        $vxE = $xE - $xObj; $vyE = $yE - $yObj; $vzE = $zE - $zObj;
+        $dot = $vxSun * $vxE + $vySun * $vyE + $vzSun * $vzE;
+        $mag1 = sqrt($vxSun ** 2 + $vySun ** 2 + $vzSun ** 2);
+        $mag2 = sqrt($vxE ** 2 + $vyE ** 2 + $vzE ** 2);
+        $alpha = 0.0;
+        if ($mag1 > 0 && $mag2 > 0) {
+            $alpha = rad2deg(acos(max(-1.0, min(1.0, $dot / ($mag1 * $mag2)))));
+        }
+
+        $nVal = $this->_n ?? 4.0;
+        if ($this->_n_pre !== null || $this->_n_post !== null) {
+            if ($date < $this->_perihelion_date && $this->_n_pre !== null) {
+                $nVal = $this->_n_pre;
+            } elseif ($date >= $this->_perihelion_date && $this->_n_post !== null) {
+                $nVal = $this->_n_post;
+            }
+        }
+
+        $m = $this->_Hc + 5 * log10($delta) + $nVal * log10($r);
+        if ($this->_phaseCoeff !== null) {
+            $m += $this->_phaseCoeff * $alpha;
+        }
+
+        return floatval($m);
     }
 
     /**
