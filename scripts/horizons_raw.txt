@@ -1,18 +1,1 @@
-*******************************************************************************
-JPL/DASTCOM            Small-body Index Search Results     2025-Nov-18 23:59:25
-
- Comet AND asteroid index search:
-
-    DES = 12P;
-
- Matching small-bodies: 
-
-    Record #  Epoch-yr  >MATCH DESIG<  Primary Desig  Name  
-    --------  --------  -------------  -------------  -------------------------
-    90000221    1812    12P            12P             Pons-Brooks
-    90000222    1884    12P            12P             Pons-Brooks
-    90000223    1897    12P            12P             Pons-Brooks
-    90000224    2023    12P            12P             Pons-Brooks
-
- (4 matches. To SELECT, enter record # (integer), followed by semi-colon.)
-*******************************************************************************
+{"code":"400","message":"one or more query parameter was not recognized"}

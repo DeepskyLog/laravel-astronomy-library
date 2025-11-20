@@ -105,7 +105,9 @@ if (!preg_match('/\$\$SOE([\s\S]*?)\$\$EOE/', $resp, $m)) {
         for ($i = 0; $i < count($records); $i++) {
             $pairs[] = ['rec' => $records[$i], 'epoch' => intval($epochs[$i])];
         }
-        usort($pairs, function ($a, $b) { return $b['epoch'] <=> $a['epoch']; });
+        usort($pairs, function ($a, $b) {
+            return $b['epoch'] <=> $a['epoch'];
+        });
         foreach ($pairs as $p) {
             $tryRec = $p['rec'];
             $tryCmd = "'{$tryRec}'";
@@ -162,7 +164,8 @@ if (!preg_match('/\$\$SOE([\s\S]*?)\$\$EOE/', $resp, $m)) {
         // If no numeric record was found or all re-queries failed, attempt the
         // small-body (SB) integrated solution as a fallback when appropriate.
         $lower = strtolower($resp);
-        if (strpos($lower, 'spk-based ephemeris') !== false
+        if (
+            strpos($lower, 'spk-based ephemeris') !== false
             || strpos($lower, 'precomputed') !== false
             || strpos($resp, 'DES=') !== false
             || strpos($resp, 'There are two trajectories') !== false
