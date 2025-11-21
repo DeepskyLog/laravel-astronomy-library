@@ -188,8 +188,12 @@ class NearParabolic extends Target
         $dz = $zObj - $zE;
         $delta = sqrt($dx ** 2 + $dy ** 2 + $dz ** 2);
 
-        $vxSun = -$xObj; $vySun = -$yObj; $vzSun = -$zObj;
-        $vxE = $xE - $xObj; $vyE = $yE - $yObj; $vzE = $zE - $zObj;
+        $vxSun = -$xObj;
+        $vySun = -$yObj;
+        $vzSun = -$zObj;
+        $vxE = $xE - $xObj;
+        $vyE = $yE - $yObj;
+        $vzE = $zE - $zObj;
         $dot = $vxSun * $vxE + $vySun * $vyE + $vzSun * $vzE;
         $mag1 = sqrt($vxSun ** 2 + $vySun ** 2 + $vzSun ** 2);
         $mag2 = sqrt($vxE ** 2 + $vyE ** 2 + $vzE ** 2);

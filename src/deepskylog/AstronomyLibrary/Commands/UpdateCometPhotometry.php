@@ -3,10 +3,10 @@
 namespace deepskylog\AstronomyLibrary\Commands;
 
 use deepskylog\AstronomyLibrary\Models\CometsOrbitalElements;
-use Illuminate\Console\Command;
-use GuzzleHttp\Client;
 use DOMDocument;
 use DOMXPath;
+use GuzzleHttp\Client;
+use Illuminate\Console\Command;
 
 class UpdateCometPhotometry extends Command
 {
@@ -64,7 +64,7 @@ class UpdateCometPhotometry extends Command
                     $this->line("No photometry found for {$name} at {$url}");
                 }
             } catch (\Exception $e) {
-                $this->line("Failed to fetch {$url}: " . $e->getMessage());
+                $this->line("Failed to fetch {$url}: ".$e->getMessage());
             }
         }
 
