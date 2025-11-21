@@ -2,6 +2,13 @@
 
 All notable changes to `laravel-astronomy-library` will be documented in this file.
 
+## Version 6.7.2
+
+Fixed:
+
+- Removed a duplicated PHP block from the photometry migration stub so published migrations no longer contain two `<?php` tags (preventing parse errors when host apps run `php artisan migrate`). The corrected stub is `src/database/migrations/add_photometry_to_comets_orbital_elements_table.php.stub` and contains a single idempotent migration class.
+- Ensured the package publishes the photometry migration stub (service provider updated) and verified the migration is idempotent and rollback-safe.
+
 ## Version 6.7.1
 
 Changed:
