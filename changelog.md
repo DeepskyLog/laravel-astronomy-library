@@ -2,6 +2,12 @@
 
 All notable changes to `laravel-astronomy-library` will be documented in this file.
 
+## Version 6.7.3
+
+Fixed:
+
+- Renamed the photometry migration class in the publishable stub from `AddPhotometryToCometsTable` to `AddPhotometryToCometsOrbitalElementsTable` to avoid duplicate-class collisions when multiple published migration files exist in host applications. Re-publish migrations to pick up the updated class name.
+
 ## Version 6.7.2
 
 Fixed:
