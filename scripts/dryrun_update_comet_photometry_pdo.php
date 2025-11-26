@@ -1,15 +1,16 @@
 #!/usr/bin/env php
 <?php
+
 // Dry-run: connect to MySQL via PDO, read comets_orbital_elements,
 // try aerith.net candidate URLs per comet, print matches and non-matches,
 // and write CSV to scripts/aerith_matches.csv
 
-require __DIR__ . '/../vendor/autoload.php';
+require __DIR__.'/../vendor/autoload.php';
 
-use GuzzleHttp\Client;
-use GuzzleHttp\Exception\RequestException;
 use DOMDocument;
 use DOMXPath;
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\RequestException;
 
 $dbHost = '127.0.0.1';
 $dbName = 'deepskylogLaravel';
@@ -22,12 +23,12 @@ try {
     $dsn = "mysql:host={$dbHost};dbname={$dbName};charset=utf8mb4";
     $pdo = new PDO($dsn, $dbUser, $dbPass, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
 } catch (Exception $e) {
-    echo "Failed to connect to DB: " . $e->getMessage() . "\n";
+    echo 'Failed to connect to DB: '.$e->getMessage()."\n";
     exit(2);
 }
 // We'll query all rows below after discovering columns
 // Discover columns in the table and choose sensible defaults for id/name/designation
-$colsStmt = $pdo->query("SHOW COLUMNS FROM comets_orbital_elements");
+$colsStmt = $pdo->query('SHOW COLUMNS FROM comets_orbital_elements');
 $cols = $colsStmt->fetchAll(PDO::FETCH_COLUMN);
 
 $idCol = null;
@@ -58,14 +59,20 @@ foreach ($preferDesig as $c) {
 }
 
 // Fall back to first columns if nothing matched
-if ($idCol === null && count($cols) > 0) $idCol = $cols[0];
-if ($nameCol === null && count($cols) > 0) $nameCol = $cols[0];
-if ($desigCol === null && count($cols) > 1) $desigCol = $cols[1];
+if ($idCol === null && count($cols) > 0) {
+    $idCol = $cols[0];
+}
+if ($nameCol === null && count($cols) > 0) {
+    $nameCol = $cols[0];
+}
+if ($desigCol === null && count($cols) > 1) {
+    $desigCol = $cols[1];
+}
 
 $selectSql = 'SELECT * FROM comets_orbital_elements';
 $stmt = $pdo->query($selectSql);
 $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
-echo "Found " . count($rows) . " comets in table.\n";
+echo 'Found '.count($rows)." comets in table.\n";
 
 // Build Guzzle client honoring env vars
 $clientOptions = ['timeout' => 10, 'allow_redirects' => true];
@@ -87,10 +94,10 @@ if ($aerithVerify !== false && $aerithVerify !== null && $aerithVerify !== '') {
 
 $client = new Client($clientOptions);
 $headers = [
-    'User-Agent' => 'Mozilla/5.0 (compatible; laravel-astronomy-library-dryrun/1.0)'
+    'User-Agent' => 'Mozilla/5.0 (compatible; laravel-astronomy-library-dryrun/1.0)',
 ];
 
-$outCsv = __DIR__ . '/aerith_matches.csv';
+$outCsv = __DIR__.'/aerith_matches.csv';
 $fh = fopen($outCsv, 'w');
 fputcsv($fh, ['id', 'name', 'designation', 'matched_url']);
 
@@ -125,10 +132,10 @@ foreach ($rows as $r) {
                             $years[] = $mm[1];
                         }
                     }
-                    if (!empty($years)) {
+                    if (! empty($years)) {
                         rsort($years, SORT_NUMERIC);
                         foreach ($years as $yr) {
-                            $yearUrl = rtrim($url, '/') . '/' . $yr . '.html';
+                            $yearUrl = rtrim($url, '/').'/'.$yr.'.html';
                             try {
                                 $ry = $client->get($yearUrl, ['headers' => $headers]);
                                 if ($ry->getStatusCode() === 200) {
@@ -165,7 +172,7 @@ foreach ($rows as $r) {
         // Try SBDB fallback for H value
         $sbdb = sbdbLookup($designation ?: $name, $client);
         if ($sbdb) {
-            $matchedUrl = 'SBDB:' . ($sbdb['query'] ?? $designation ?: $name);
+            $matchedUrl = 'SBDB:'.($sbdb['query'] ?? $designation ?: $name);
             echo "SBDB MATCH (H={$sbdb['H']}) -> {$matchedUrl}\n";
             fputcsv($fh, [$id, $name, $designation, $matchedUrl]);
             $matches[] = ['id' => $id, 'name' => $name, 'designation' => $designation, 'url' => $matchedUrl, 'H' => $sbdb['H']];
@@ -179,10 +186,10 @@ foreach ($rows as $r) {
 
 fclose($fh);
 
-echo "\nDry-run complete. Matches: " . count($matches) . ", No matches: " . count($noMatches) . "\n";
+echo "\nDry-run complete. Matches: ".count($matches).', No matches: '.count($noMatches)."\n";
 echo "CSV saved to: {$outCsv}\n";
 
-if (!empty($noMatches)) {
+if (! empty($noMatches)) {
     echo "\nComets without matches:\n";
     foreach ($noMatches as $nm) {
         echo "[{$nm['id']}] {$nm['name']} ({$nm['designation']})\n";
@@ -200,20 +207,20 @@ function generateAerithCandidates(string $name, string $designation = ''): array
     if ($designation) {
         $d = strtoupper(trim($designation));
         if (preg_match('/^\d{4}[A-Z]\d+$/', $d)) {
-            $candidates[] = $base . $d . '/';
-            $candidates[] = $base . $d . '/' . $d . '.html';
-            $candidates[] = $base . $d . '.html';
+            $candidates[] = $base.$d.'/';
+            $candidates[] = $base.$d.'/'.$d.'.html';
+            $candidates[] = $base.$d.'.html';
         }
         // periodic like 103P
         if (preg_match('/^(\d+)([A-Za-z])$/i', $d, $mm)) {
             $num = intval($mm[1]);
             $type = strtoupper($mm[2]);
             $padded = sprintf('%04d%s', $num, $type);
-            $plain = $num . $type;
-            $candidates[] = $base . $padded . '/';
-            $candidates[] = $base . $plain . '/';
-            $candidates[] = $base . $padded . '.html';
-            $candidates[] = $base . $plain . '.html';
+            $plain = $num.$type;
+            $candidates[] = $base.$padded.'/';
+            $candidates[] = $base.$plain.'/';
+            $candidates[] = $base.$padded.'.html';
+            $candidates[] = $base.$plain.'.html';
         }
     }
 
@@ -221,8 +228,8 @@ function generateAerithCandidates(string $name, string $designation = ''): array
     if ($name) {
         $slug = strtolower(preg_replace('/[^a-z0-9]/', '', $name));
         if ($slug) {
-            $candidates[] = $base . $slug . '.html';
-            $candidates[] = $base . $slug . '/';
+            $candidates[] = $base.$slug.'.html';
+            $candidates[] = $base.$slug.'/';
         }
     }
 
@@ -231,11 +238,11 @@ function generateAerithCandidates(string $name, string $designation = ''): array
         $num = intval($m[1]);
         $type = strtoupper($m[2]);
         $padded = sprintf('%04d%s', $num, $type);
-        $plain = $num . $type;
-        $candidates[] = $base . $padded . '/';
-        $candidates[] = $base . $plain . '/';
-        $candidates[] = $base . $padded . '.html';
-        $candidates[] = $base . $plain . '.html';
+        $plain = $num.$type;
+        $candidates[] = $base.$padded.'/';
+        $candidates[] = $base.$plain.'/';
+        $candidates[] = $base.$padded.'.html';
+        $candidates[] = $base.$plain.'.html';
     }
 
     // Default: catalog root
@@ -244,9 +251,14 @@ function generateAerithCandidates(string $name, string $designation = ''): array
     // Dedup
     $out = [];
     foreach ($candidates as $c) {
-        if (!$c) continue;
-        if (!in_array($c, $out, true)) $out[] = $c;
+        if (! $c) {
+            continue;
+        }
+        if (! in_array($c, $out, true)) {
+            $out[] = $c;
+        }
     }
+
     return $out;
 }
 
@@ -256,13 +268,19 @@ function generateAerithCandidates(string $name, string $designation = ''): array
 function sbdbLookup(string $query, Client $client): ?array
 {
     $q = trim($query);
-    if ($q === '') return null;
-    $url = 'https://ssd-api.jpl.nasa.gov/sbdb.api?des=' . urlencode($q) . '&phys-par=1';
+    if ($q === '') {
+        return null;
+    }
+    $url = 'https://ssd-api.jpl.nasa.gov/sbdb.api?des='.urlencode($q).'&phys-par=1';
     try {
         $res = $client->get($url, ['headers' => ['User-Agent' => 'laravel-astronomy-library-dryrun/1.0']]);
-        if ($res->getStatusCode() !== 200) return null;
+        if ($res->getStatusCode() !== 200) {
+            return null;
+        }
         $json = json_decode((string) $res->getBody(), true);
-        if (!is_array($json)) return null;
+        if (! is_array($json)) {
+            return null;
+        }
         if (isset($json['phys_par']) && is_array($json['phys_par'])) {
             if (isset($json['phys_par']['H'])) {
                 return ['H' => floatval($json['phys_par']['H']), 'query' => $q];
@@ -273,10 +291,13 @@ function sbdbLookup(string $query, Client $client): ?array
         }
         // defensive: search nested arrays
         foreach ($json as $v) {
-            if (is_array($v) && isset($v['H'])) return ['H' => floatval($v['H']), 'query' => $q];
+            if (is_array($v) && isset($v['H'])) {
+                return ['H' => floatval($v['H']), 'query' => $q];
+            }
         }
     } catch (Exception $e) {
         return null;
     }
+
     return null;
 }

@@ -3,10 +3,10 @@
 namespace deepskylog\AstronomyLibrary\Commands;
 
 use deepskylog\AstronomyLibrary\Models\CometsOrbitalElements;
-use Illuminate\Console\Command;
-use GuzzleHttp\Client;
 use DOMDocument;
 use DOMXPath;
+use GuzzleHttp\Client;
+use Illuminate\Console\Command;
 
 class UpdateCometPhotometry extends Command
 {
@@ -55,7 +55,7 @@ class UpdateCometPhotometry extends Command
 
             // Use a browser-like User-Agent to avoid simple blocking
             $headers = [
-                'User-Agent' => 'Mozilla/5.0 (compatible; laravel-astronomy-library/1.0; +https://github.com/DeepskyLog)'
+                'User-Agent' => 'Mozilla/5.0 (compatible; laravel-astronomy-library/1.0; +https://github.com/DeepskyLog)',
             ];
 
             foreach ($candidates as $url) {
@@ -81,10 +81,10 @@ class UpdateCometPhotometry extends Command
                                 }
                             }
 
-                            if (!empty($years)) {
+                            if (! empty($years)) {
                                 rsort($years, SORT_NUMERIC);
                                 foreach ($years as $yr) {
-                                    $yearUrl = rtrim($url, '/') . '/' . $yr . '.html';
+                                    $yearUrl = rtrim($url, '/').'/'.$yr.'.html';
                                     try {
                                         $ry = $client->get($yearUrl, ['headers' => $headers]);
                                         if ($ry->getStatusCode() === 200) {
@@ -115,16 +115,16 @@ class UpdateCometPhotometry extends Command
                         }
                     }
                     // For other errors, log and continue trying other candidates.
-                    $this->line("Failed to fetch {$url}: " . $e->getMessage());
+                    $this->line("Failed to fetch {$url}: ".$e->getMessage());
                     continue;
                 } catch (\Exception $e) {
-                    $this->line("Failed to fetch {$url}: " . $e->getMessage());
+                    $this->line("Failed to fetch {$url}: ".$e->getMessage());
                     continue;
                 }
             }
 
             if ($html === null) {
-                $this->line("No aerith.net page found for {$name} (tried " . count($candidates) . " candidates)");
+                $this->line("No aerith.net page found for {$name} (tried ".count($candidates).' candidates)');
                 continue;
             }
 
@@ -171,7 +171,7 @@ class UpdateCometPhotometry extends Command
      * Generate candidate aerith.net URLs for a given comet name.
      * Tries name-based slugs and numeric designation directory patterns (e.g. 0103P/).
      *
-     * @param string $name
+     * @param  string  $name
      * @return array
      */
     private function generateAerithCandidates(string $name): array
@@ -182,8 +182,8 @@ class UpdateCometPhotometry extends Command
         // Basic name-based slug: strip to alnum lowercase
         $slug = strtolower(preg_replace('/[^a-z0-9]/', '', $name));
         if ($slug) {
-            $candidates[] = $base . $slug . '.html';
-            $candidates[] = $base . $slug . '/';
+            $candidates[] = $base.$slug.'.html';
+            $candidates[] = $base.$slug.'/';
         }
 
         // Try to extract a numeric designation like "103P" from the name (periodic)
@@ -192,14 +192,14 @@ class UpdateCometPhotometry extends Command
             $type = strtoupper($m[2]);
             // zero-pad to 4 digits as used by aerith (e.g. 0103P)
             $padded = sprintf('%04d%s', $num, $type);
-            $plain = $num . $type;
+            $plain = $num.$type;
 
-            $candidates[] = $base . $padded . '/';
-            $candidates[] = $base . $plain . '/';
-            $candidates[] = $base . $padded . '.html';
-            $candidates[] = $base . $plain . '.html';
-            $candidates[] = $base . $padded . '/index.html';
-            $candidates[] = $base . $padded . '/index-j.html';
+            $candidates[] = $base.$padded.'/';
+            $candidates[] = $base.$plain.'/';
+            $candidates[] = $base.$padded.'.html';
+            $candidates[] = $base.$plain.'.html';
+            $candidates[] = $base.$padded.'/index.html';
+            $candidates[] = $base.$padded.'/index-j.html';
         }
 
         // Non-periodic designations like 2025A6 or 2020F3 (year + letter + number)
@@ -207,9 +207,9 @@ class UpdateCometPhotometry extends Command
         // and a year page named e.g. 2025A6.html
         if (preg_match('/(\d{4}[A-Za-z]\d+)/', $name, $m2)) {
             $desig = strtoupper($m2[1]);
-            $candidates[] = $base . $desig . '/';
-            $candidates[] = $base . $desig . '/' . $desig . '.html';
-            $candidates[] = $base . $desig . '.html';
+            $candidates[] = $base.$desig.'/';
+            $candidates[] = $base.$desig.'/'.$desig.'.html';
+            $candidates[] = $base.$desig.'.html';
         }
 
         // Also try an index-style directory for common cases
@@ -219,8 +219,10 @@ class UpdateCometPhotometry extends Command
         $seen = [];
         $out = [];
         foreach ($candidates as $c) {
-            if (!$c) continue;
-            if (!isset($seen[$c])) {
+            if (! $c) {
+                continue;
+            }
+            if (! isset($seen[$c])) {
                 $seen[$c] = true;
                 $out[] = $c;
             }
@@ -242,25 +244,39 @@ class UpdateCometPhotometry extends Command
             $query = trim($name);
         }
 
-        if (!$query) return null;
+        if (! $query) {
+            return null;
+        }
 
-        $url = 'https://ssd-api.jpl.nasa.gov/sbdb.api?des=' . urlencode($query) . '&phys-par=1';
+        $url = 'https://ssd-api.jpl.nasa.gov/sbdb.api?des='.urlencode($query).'&phys-par=1';
 
         try {
             $res = $client->get($url, ['headers' => ['User-Agent' => 'laravel-astronomy-library-sbdb/1.0']]);
-            if ($res->getStatusCode() !== 200) return null;
+            if ($res->getStatusCode() !== 200) {
+                return null;
+            }
 
             $json = json_decode((string) $res->getBody(), true);
-            if (!is_array($json)) return null;
+            if (! is_array($json)) {
+                return null;
+            }
 
             // Look for physical parameters. Different endpoints may use 'phys_par' or 'phys_par' nested structure.
             $h = null;
             $g = null;
             if (isset($json['phys_par']) && is_array($json['phys_par'])) {
-                if (isset($json['phys_par']['H'])) $h = $json['phys_par']['H'];
-                if (isset($json['phys_par']['h'])) $h = $json['phys_par']['h'];
-                if (isset($json['phys_par']['G'])) $g = $json['phys_par']['G'];
-                if (isset($json['phys_par']['g'])) $g = $json['phys_par']['g'];
+                if (isset($json['phys_par']['H'])) {
+                    $h = $json['phys_par']['H'];
+                }
+                if (isset($json['phys_par']['h'])) {
+                    $h = $json['phys_par']['h'];
+                }
+                if (isset($json['phys_par']['G'])) {
+                    $g = $json['phys_par']['G'];
+                }
+                if (isset($json['phys_par']['g'])) {
+                    $g = $json['phys_par']['g'];
+                }
             }
 
             // Some responses embed phys_par under 'object' or other keys — be defensive
