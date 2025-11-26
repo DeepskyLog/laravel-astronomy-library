@@ -2,6 +2,22 @@
 
 All notable changes to `laravel-astronomy-library` will be documented in this file.
 
+## Version 6.7.4
+
+Changed:
+
+- Improved the `astronomy:updateCometPhotometry` artisan command (`src/deepskylog/AstronomyLibrary/Commands/UpdateCometPhotometry.php`):
+  - Add configurable HTTP client verification via environment variables: `AERITH_VERIFY` (accepts `true`/`false` or a path to a CA bundle) and `AERITH_CA_BUNDLE` to allow running in environments with custom CA bundles or where verification needs disabling for troubleshooting.
+  - Use a short request timeout and a browser-like `User-Agent` to reduce simple blocking by `aerith.net`.
+  - Expand and harden aerith.net lookup heuristics: generate multiple candidate URLs (name-based slugs, zero-padded periodic designations such as `0103P`, plain designation directories, and year-specific pages), try directory pages and prefer newest year pages when available, and fall back gracefully to directory/index pages.
+  - More robust HTML parsing for photometry: scan page text nodes for `H = ...`, `n = ...` and phase coefficient patterns and persist discovered values to the `comets_orbital_elements` model (`H`, `n`, `phase_coeff`). Improved logging when photometry is found or not.
+  - Improved error handling around HTTP requests (404 handling, request exception logging and continued attempts against other candidate URLs).
+  - Added an SBDB fallback helper method (`sbdbFallback`) to query JPL's SBDB API for an `H` value when aerith.net scraping does not yield photometry (method included for fallback resolution).
+
+Fixed / Notes:
+
+- The photometry updater is now more resilient to variation in aerith.net page layout and index pages; environments with custom CA bundles or strict SSL settings should set `AERITH_VERIFY`/`AERITH_CA_BUNDLE` appropriately.
+
 ## Version 6.7.3
 
 Fixed:
@@ -32,7 +48,6 @@ Added:
 - Fallback resolution using SB-CAP (small-body catalog) when DASTCOM lookups fail.
 - `--used-command` debug output exposed by the Horizons helper (`scripts/horizons_radec.php`) and included in JSON responses to aid troubleshooting.
 - Comet photometry support:
-  - Runtime migration: `src/deepskylog/AstronomyLibrary/Database/Migrations/2025_11_20_000001_add_photometry_to_comets_table.php` (adds `H`, `n`, `phase_coeff`, `n_pre`, `n_post`).
   - Migration stub: `src/database/migrations/add_photometry_to_comets_orbital_elements_table.php.stub`.
 - Artisan command: `astronomy:updateCometPhotometry` (`src/deepskylog/AstronomyLibrary/Commands/UpdateCometPhotometry.php`) to fetch photometric parameters (attempts Seiichi Yoshida / `aerith.net`).
 - Command registration: `AstronomyLibraryServiceProvider.php` and `Console/Kernel.php` register the new command.
