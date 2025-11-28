@@ -2,6 +2,20 @@
 
 All notable changes to `laravel-astronomy-library` will be documented in this file.
 
+## Version 6.7.5
+
+Changed:
+
+- Improved aerith/SBDB fallback behavior and photometry persistence (already introduced earlier, documented here for visibility):
+  - The command still attempts aerith.net year-specific pages and directory candidates, and falls back to JPL SBDB when aerith scraping yields no photometry.
+  - Photometry values discovered (absolute magnitude `H`, slope `n`, and phase coefficient/G when available) are persisted to the `comets_orbital_elements` model.
+
+Changed (Model):
+
+- `CometsOrbitalElements` (`src/deepskylog/AstronomyLibrary/Models/CometsOrbitalElements.php`):
+  - Exposes photometry fields in `$fillable`: `H`, `n`, `phase_coeff`, `n_pre`, `n_post` so the `astronomy:updateCometPhotometry` command can persist discovered values.
+  - Uses `name` as the primary key and disables timestamps (no behavior change, documented for clarity).
+
 ## Version 6.7.4
 
 Changed:

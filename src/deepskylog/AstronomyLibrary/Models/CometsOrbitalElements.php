@@ -10,6 +10,11 @@ class CometsOrbitalElements extends Model
 
     protected $table = 'comets_orbital_elements';
 
+    // The `comets_orbital_elements` table uses the `name` column as
+    // the primary key (string), so configure Eloquent accordingly.
+    protected $primaryKey = 'name';
+    public $incrementing = false;
+    protected $keyType = 'string';
     protected $fillable = [
         'name',
         'epoch',
