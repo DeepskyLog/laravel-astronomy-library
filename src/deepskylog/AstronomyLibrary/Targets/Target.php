@@ -1525,13 +1525,13 @@ class Target
             // Label it 'Moon'
             imagestring($image, 2, $legendX + $sampleLen + 8, $legendY - 2, 'Moon', $textcolor);
             // Show only positive elevation axis (0..90)
-            imagestring($image, 2, 35, 360, '0' . chr(176), $textcolor);
+            imagestring($image, 2, 35, 360, '0'.chr(176), $textcolor);
             imageline($image, 70, 365, 958, 365, $axiscolor);
-            imagestring($image, 2, 35, 240, '30' . chr(176), $textcolor);
+            imagestring($image, 2, 35, 240, '30'.chr(176), $textcolor);
             imageline($image, 70, 245, 958, 245, $axiscolor);
-            imagestring($image, 2, 35, 120, '60' . chr(176), $textcolor);
+            imagestring($image, 2, 35, 120, '60'.chr(176), $textcolor);
             imageline($image, 70, 125, 958, 125, $axiscolor);
-            imagestring($image, 2, 35, 0, '90' . chr(176), $textcolor);
+            imagestring($image, 2, 35, 0, '90'.chr(176), $textcolor);
             imageline($image, 70, 5, 958, 5, $axiscolor);
 
             // Begin capturing the byte stream
@@ -1544,7 +1544,7 @@ class Target
             $rawImageBytes = ob_get_clean();
 
             $this->_altitudeChart = "<img src='data:image/jpeg;base64,"
-                . base64_encode($rawImageBytes) . "' />";
+                .base64_encode($rawImageBytes)."' />";
         }
 
         return $this->_altitudeChart;
@@ -1861,13 +1861,13 @@ class Target
         imageline($image, (int) $right, 365, (int) $right, 355, $axiscolor);
 
         // Draw Y axis markers (0,30,60,90)
-        imagestring($image, 2, 35, 360, '0' . chr(176), $textcolor);
+        imagestring($image, 2, 35, 360, '0'.chr(176), $textcolor);
         imageline($image, $left, 365, $right, 365, $axiscolor);
-        imagestring($image, 2, 35, 240, '30' . chr(176), $textcolor);
+        imagestring($image, 2, 35, 240, '30'.chr(176), $textcolor);
         imageline($image, $left, 245, $right, 245, $axiscolor);
-        imagestring($image, 2, 35, 120, '60' . chr(176), $textcolor);
+        imagestring($image, 2, 35, 120, '60'.chr(176), $textcolor);
         imageline($image, $left, 125, $right, 125, $axiscolor);
-        imagestring($image, 2, 35, 0, '90' . chr(176), $textcolor);
+        imagestring($image, 2, 35, 0, '90'.chr(176), $textcolor);
         imageline($image, $left, 5, $right, 5, $axiscolor);
 
         // Draw a connected white line through all chronological samples
@@ -1935,7 +1935,7 @@ class Target
         $rawImageBytes = ob_get_clean();
 
         // rawImageBytes is PNG data
-        return "<img src='data:image/png;base64," . base64_encode($rawImageBytes) . "' />";
+        return "<img src='data:image/png;base64,".base64_encode($rawImageBytes)."' />";
     }
 
     /**
@@ -1978,20 +1978,20 @@ class Target
             } catch (\Throwable $e) {
                 $mag = null;
                 if ($debug) {
-                    $debugLog[] = sprintf("day %d (%s): exception: %s", $day, $sample->toDateString(), $e->getMessage());
+                    $debugLog[] = sprintf('day %d (%s): exception: %s', $day, $sample->toDateString(), $e->getMessage());
                 }
             }
 
             // treat sentinel/fallback values as missing
-            if ($mag === null || !is_finite($mag) || $mag === 99.9 || abs($mag) > 50) {
+            if ($mag === null || ! is_finite($mag) || $mag === 99.9 || abs($mag) > 50) {
                 // missing
                 if ($debug) {
-                    $debugLog[] = sprintf("day %d (%s): mag=%s (skipped)", $day, $sample->toDateString(), var_export($mag, true));
+                    $debugLog[] = sprintf('day %d (%s): mag=%s (skipped)', $day, $sample->toDateString(), var_export($mag, true));
                 }
                 continue;
             } else {
                 if ($debug && count($debugLog) < 20) {
-                    $debugLog[] = sprintf("day %d (%s): mag=%s", $day, $sample->toDateString(), var_export($mag, true));
+                    $debugLog[] = sprintf('day %d (%s): mag=%s', $day, $sample->toDateString(), var_export($mag, true));
                 }
             }
 
@@ -2006,7 +2006,9 @@ class Target
             for ($m = 1; $m <= 12; $m++) {
                 $sample = Carbon::create($year, $m, 15, 12, 0, 0, $date->timezone);
                 $mag = $this->getMagnitude();
-                if ($mag === null || !is_finite($mag) || $mag === 99.9) continue;
+                if ($mag === null || ! is_finite($mag) || $mag === 99.9) {
+                    continue;
+                }
                 $doy = $sample->dayOfYear;
                 $frac = ($doy - 1) / $daysInYear;
                 $x = (int) ($left + $frac * $width);
@@ -2016,7 +2018,7 @@ class Target
 
         // If still empty, return a small placeholder image
         if (empty($samples)) {
-            if ($debug && !empty($debugLog)) {
+            if ($debug && ! empty($debugLog)) {
                 // render debug log lines onto the image for quick inspection
                 $y = 20;
                 imagestring($image, 3, 10, 2, 'Debug: magnitude sampling (first lines)', $textcolor);
@@ -2030,7 +2032,8 @@ class Target
             ob_start();
             imagepng($image);
             $rawImageBytes = ob_get_clean();
-            return "<img src='data:image/png;base64," . base64_encode($rawImageBytes) . "' />";
+
+            return "<img src='data:image/png;base64,".base64_encode($rawImageBytes)."' />";
         }
 
         // Determine dynamic mag range and pad slightly
@@ -2096,7 +2099,8 @@ class Target
         ob_start();
         imagepng($image);
         $rawImageBytes = ob_get_clean();
-        return "<img src='data:image/png;base64," . base64_encode($rawImageBytes) . "' />";
+
+        return "<img src='data:image/png;base64,".base64_encode($rawImageBytes)."' />";
     }
 
     /**
@@ -2142,7 +2146,7 @@ class Target
                 }
             } catch (\Throwable $e) {
                 if ($debug) {
-                    $debugLog[] = sprintf("day %d (%s): calculateDiameter exception: %s", $day, $sample->toDateString(), $e->getMessage());
+                    $debugLog[] = sprintf('day %d (%s): calculateDiameter exception: %s', $day, $sample->toDateString(), $e->getMessage());
                 }
             }
 
@@ -2155,15 +2159,15 @@ class Target
             }
 
             // treat missing/non-finite values as absent
-            if ($diam === null || !is_finite($diam) || $diam <= 0.0 || $diam > 1000000.0) {
+            if ($diam === null || ! is_finite($diam) || $diam <= 0.0 || $diam > 1000000.0) {
                 if ($debug) {
-                    $debugLog[] = sprintf("day %d (%s): diam=%s (skipped)", $day, $sample->toDateString(), var_export($diam, true));
+                    $debugLog[] = sprintf('day %d (%s): diam=%s (skipped)', $day, $sample->toDateString(), var_export($diam, true));
                 }
                 continue;
             }
 
             if ($debug && count($debugLog) < 20) {
-                $debugLog[] = sprintf("day %d (%s): diam=%s arcsec", $day, $sample->toDateString(), $diam);
+                $debugLog[] = sprintf('day %d (%s): diam=%s arcsec', $day, $sample->toDateString(), $diam);
             }
 
             $doy = $sample->dayOfYear;
@@ -2178,7 +2182,9 @@ class Target
                 $sample = Carbon::create($year, $m, 15, 12, 0, 0, $date->timezone);
                 $d = $this->getDiameter();
                 $mag = $d[0] ?? null;
-                if ($mag === null || !is_finite($mag) || $mag <= 0.0) continue;
+                if ($mag === null || ! is_finite($mag) || $mag <= 0.0) {
+                    continue;
+                }
                 $doy = $sample->dayOfYear;
                 $frac = ($doy - 1) / $daysInYear;
                 $x = (int) ($left + $frac * $width);
@@ -2188,7 +2194,7 @@ class Target
 
         // If still empty, render placeholder (optionally with debug)
         if (empty($samples)) {
-            if ($debug && !empty($debugLog)) {
+            if ($debug && ! empty($debugLog)) {
                 $y = 20;
                 imagestring($image, 3, 10, 2, 'Debug: diameter sampling (first lines)', $textcolor);
                 foreach (array_slice($debugLog, 0, 18) as $line) {
@@ -2201,7 +2207,8 @@ class Target
             ob_start();
             imagepng($image);
             $rawImageBytes = ob_get_clean();
-            return "<img src='data:image/png;base64," . base64_encode($rawImageBytes) . "' />";
+
+            return "<img src='data:image/png;base64,".base64_encode($rawImageBytes)."' />";
         }
 
         // Determine dynamic diameter range and pad slightly
@@ -2245,7 +2252,7 @@ class Target
         imagestring($image, 2, 35, (int) ($yTop + ($yBottom - $yTop) * 0.66) - 2, sprintf('%.2f"', $mid1), $textcolor);
         imageline($image, $left, (int) ($yTop + ($yBottom - $yTop) * 0.66), $right, (int) ($yTop + ($yBottom - $yTop) * 0.66), $axiscolor);
         // Bottom (smallest)
-        imagestring($image, 2, 35, $yBottom +  -5, sprintf('%.2f"', $diamMin), $textcolor);
+        imagestring($image, 2, 35, $yBottom + -5, sprintf('%.2f"', $diamMin), $textcolor);
         imageline($image, $left, $yBottom, $right, $yBottom, $axiscolor);
 
         // Draw connected points and small markers. Larger diameters toward top.
@@ -2270,7 +2277,8 @@ class Target
         ob_start();
         imagepng($image);
         $rawImageBytes = ob_get_clean();
-        return "<img src='data:image/png;base64," . base64_encode($rawImageBytes) . "' />";
+
+        return "<img src='data:image/png;base64,".base64_encode($rawImageBytes)."' />";
     }
 
     /**

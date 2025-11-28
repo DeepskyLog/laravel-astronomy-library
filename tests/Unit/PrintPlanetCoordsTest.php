@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-use PHPUnit\Framework\TestCase;
 use Carbon\Carbon;
 use deepskylog\AstronomyLibrary\Coordinates\GeographicalCoordinates;
-use deepskylog\AstronomyLibrary\Targets\Mars;
 use deepskylog\AstronomyLibrary\Targets\Jupiter;
+use deepskylog\AstronomyLibrary\Targets\Mars;
+use PHPUnit\Framework\TestCase;
 
 final class PrintPlanetCoordsTest extends TestCase
 {
@@ -28,7 +28,7 @@ final class PrintPlanetCoordsTest extends TestCase
             'Jupiter' => new Jupiter(),
         ];
 
-        $script = realpath(__DIR__ . '/../../scripts/horizons_radec.php');
+        $script = realpath(__DIR__.'/../../scripts/horizons_radec.php');
         $helperAvailable = $script && file_exists($script);
 
         fwrite(STDOUT, "\n=== Planet coordinates dump ===\n");
@@ -45,14 +45,14 @@ final class PrintPlanetCoordsTest extends TestCase
 
             // Quick check: call helper directly to ensure it can produce JSON for this target/time
             $dt = $date->format('Y-m-d H:i');
-            $cmd = escapeshellcmd(PHP_BINARY) . ' ' . escapeshellarg($script) . ' '
-                . escapeshellarg($name) . ' ' . escapeshellarg($dt) . ' '
-                . escapeshellarg((string)$lon) . ' ' . escapeshellarg((string)$lat) . ' ' . escapeshellarg((string)$height) . ' ' . escapeshellarg('DE440');
+            $cmd = escapeshellcmd(PHP_BINARY).' '.escapeshellarg($script).' '
+                .escapeshellarg($name).' '.escapeshellarg($dt).' '
+                .escapeshellarg((string) $lon).' '.escapeshellarg((string) $lat).' '.escapeshellarg((string) $height).' '.escapeshellarg('DE440');
 
             // Try querying Horizons directly with curl to avoid PHP helper Xdebug issues
             $start = $date->format('Y-m-d H:i');
-            $stop = date('Y-m-d H:i', strtotime($start . ' +1 minute'));
-            $site = sprintf("'%s,%s,%s'", (string)$lon, (string)$lat, (string)($height / 1000.0));
+            $stop = date('Y-m-d H:i', strtotime($start.' +1 minute'));
+            $site = sprintf("'%s,%s,%s'", (string) $lon, (string) $lat, (string) ($height / 1000.0));
 
             $post = http_build_query([
                 'format' => 'json',
@@ -67,7 +67,7 @@ final class PrintPlanetCoordsTest extends TestCase
                 'EPHEM' => 'DE440',
             ]);
 
-            $curlCmd = "curl -s -X POST 'https://ssd.jpl.nasa.gov/api/horizons.api' -d " . escapeshellarg($post);
+            $curlCmd = "curl -s -X POST 'https://ssd.jpl.nasa.gov/api/horizons.api' -d ".escapeshellarg($post);
             $curlOut = null;
             $curlRet = null;
             exec($curlCmd, $curlOut, $curlRet);
@@ -82,20 +82,30 @@ final class PrintPlanetCoordsTest extends TestCase
                     $block = null;
                     $findBlock = function ($item) use (&$findBlock) {
                         if (is_string($item)) {
-                            if (strpos($item, '$$SOE') !== false) return $item;
+                            if (strpos($item, '$$SOE') !== false) {
+                                return $item;
+                            }
+
                             return null;
                         }
                         if (is_array($item)) {
                             foreach ($item as $v) {
                                 $res = $findBlock($v);
-                                if ($res !== null) return $res;
+                                if ($res !== null) {
+                                    return $res;
+                                }
                             }
                         }
+
                         return null;
                     };
                     $block = $findBlock($decoded);
-                    if ($block === null && isset($decoded['result']) && is_string($decoded['result'])) $block = $decoded['result'];
-                    if ($block === null && isset($decoded['data']) && is_string($decoded['data'])) $block = $decoded['data'];
+                    if ($block === null && isset($decoded['result']) && is_string($decoded['result'])) {
+                        $block = $decoded['result'];
+                    }
+                    if ($block === null && isset($decoded['data']) && is_string($decoded['data'])) {
+                        $block = $decoded['data'];
+                    }
 
                     if ($block !== null) {
                         // extract first data line
@@ -104,8 +114,12 @@ final class PrintPlanetCoordsTest extends TestCase
                             $dataLine = null;
                             foreach ($lines as $ln) {
                                 $ln = trim($ln);
-                                if ($ln === '') continue;
-                                if (strpos($ln, '***') === 0) continue;
+                                if ($ln === '') {
+                                    continue;
+                                }
+                                if (strpos($ln, '***') === 0) {
+                                    continue;
+                                }
                                 if (strpos($ln, ',') !== false && preg_match('/\d/', $ln)) {
                                     $dataLine = $ln;
                                     break;
@@ -120,26 +134,36 @@ final class PrintPlanetCoordsTest extends TestCase
                                 $hmsToHours = function ($s) {
                                     $s = trim($s);
                                     if (strpos($s, ':') !== false) {
-                                        list($h, $m, $sec) = explode(':', $s) + [0, 0, 0];
+                                        [$h, $m, $sec] = explode(':', $s) + [0, 0, 0];
+
                                         return intval($h) + intval($m) / 60.0 + floatval($sec) / 3600.0;
                                     }
                                     $parts = preg_split('/\s+/', $s);
-                                    if (count($parts) >= 3) return intval($parts[0]) + intval($parts[1]) / 60.0 + floatval($parts[2]) / 3600.0;
+                                    if (count($parts) >= 3) {
+                                        return intval($parts[0]) + intval($parts[1]) / 60.0 + floatval($parts[2]) / 3600.0;
+                                    }
+
                                     return floatval($s);
                                 };
                                 $dmsToDeg = function ($s) {
                                     $s = trim($s);
                                     $sign = 1;
                                     if ($s[0] === '+' || $s[0] === '-') {
-                                        if ($s[0] === '-') $sign = -1;
+                                        if ($s[0] === '-') {
+                                            $sign = -1;
+                                        }
                                         $s = substr($s, 1);
                                     }
                                     if (strpos($s, ':') !== false) {
-                                        list($d, $m, $sec) = explode(':', $s) + [0, 0, 0];
+                                        [$d, $m, $sec] = explode(':', $s) + [0, 0, 0];
+
                                         return $sign * (abs(intval($d)) + intval($m) / 60.0 + floatval($sec) / 3600.0);
                                     }
                                     $parts = preg_split('/\s+/', $s);
-                                    if (count($parts) >= 3) return $sign * (abs(intval($parts[0])) + intval($parts[1]) / 60.0 + floatval($parts[2]) / 3600.0);
+                                    if (count($parts) >= 3) {
+                                        return $sign * (abs(intval($parts[0])) + intval($parts[1]) / 60.0 + floatval($parts[2]) / 3600.0);
+                                    }
+
                                     return $sign * floatval($s);
                                 };
                                 $raH = $hmsToHours($raStr);
@@ -159,14 +183,16 @@ final class PrintPlanetCoordsTest extends TestCase
                 exec($cmd, $out, $ret);
                 if ($ret === 0) {
                     $maybe = @json_decode(implode("\n", $out), true);
-                    if (is_array($maybe) && isset($maybe['ra_hours'])) $json = $maybe;
+                    if (is_array($maybe) && isset($maybe['ra_hours'])) {
+                        $json = $maybe;
+                    }
                 }
             }
 
             if (! is_array($json) || ! isset($json['ra_hours'])) {
                 // Prefer a per-target cached response (more deterministic for tests)
-                $perTarget = __DIR__ . '/../../scripts/horizons_resp_' . $name . '.json';
-                $generic = __DIR__ . '/../../scripts/horizons_resp.json';
+                $perTarget = __DIR__.'/../../scripts/horizons_resp_'.$name.'.json';
+                $generic = __DIR__.'/../../scripts/horizons_resp.json';
                 if (file_exists($perTarget)) {
                     $savedJson = @json_decode(@file_get_contents($perTarget), true);
                     if (is_array($savedJson) && isset($savedJson['ra_hours'])) {
