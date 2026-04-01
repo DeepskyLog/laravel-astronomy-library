@@ -160,8 +160,12 @@ class Parabolic extends Target
         $delta = sqrt($dx ** 2 + $dy ** 2 + $dz ** 2);
 
         // Phase angle: angle Sun-Object-Earth
-        $vxSun = -$xObj; $vySun = -$yObj; $vzSun = -$zObj; // object->Sun
-        $vxE = $xE - $xObj; $vyE = $yE - $yObj; $vzE = $zE - $zObj; // object->Earth
+        $vxSun = -$xObj;
+        $vySun = -$yObj;
+        $vzSun = -$zObj; // object->Sun
+        $vxE = $xE - $xObj;
+        $vyE = $yE - $yObj;
+        $vzE = $zE - $zObj; // object->Earth
         $dot = $vxSun * $vxE + $vySun * $vyE + $vzSun * $vzE;
         $mag1 = sqrt($vxSun ** 2 + $vySun ** 2 + $vzSun ** 2);
         $mag2 = sqrt($vxE ** 2 + $vyE ** 2 + $vzE ** 2);
