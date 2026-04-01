@@ -136,10 +136,12 @@ class NearParabolic extends Target
                         $q3 = $q3 + $f;
                     } while (abs($f) > 1e-9 && $z < 500);
                     $l++;
+                    $innerIter = 0;
                     do {
                         $s1 = $s;
                         $s = (2 * $s * $s * $s / 3 + $q3) / ($s * $s + 1);
-                    } while (abs($s - $s1) > 1e-9);
+                        $innerIter++;
+                    } while (abs($s - $s1) > 1e-9 && $innerIter < 500);
                 } while (abs($s - $s0) > 1e-9 && $l < 500);
             }
             $v = 2 * atan($s);
@@ -270,10 +272,12 @@ class NearParabolic extends Target
                         $q3 = $q3 + $f;
                     } while (abs($f) > 1e-9 && $z < 500);
                     $l++;
+                    $innerIter = 0;
                     do {
                         $s1 = $s;
                         $s = (2 * $s * $s * $s / 3 + $q3) / ($s * $s + 1);
-                    } while (abs($s - $s1) > 1e-9);
+                        $innerIter++;
+                    } while (abs($s - $s1) > 1e-9 && $innerIter < 500);
                 } while (abs($s - $s0) > 1e-9 && $l < 500);
             }
             $v = 2 * atan($s);

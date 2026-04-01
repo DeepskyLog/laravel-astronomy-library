@@ -2,6 +2,16 @@
 
 All notable changes to `laravel-astronomy-library` will be documented in this file.
 
+## Version 6.7.6
+
+Changed:
+
+- Added Laravel 13 support by updating `composer.json` to allow `laravel/framework` ^13.0 and to include `laravel/laravel` ^12.0|^13.0 in `require-dev`.
+
+Notes:
+
+- Run `composer update` and `vendor/bin/phpunit` to validate compatibility and address any failing tests.
+
 ## Version 6.7.5
 
 Changed:
