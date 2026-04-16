@@ -41,6 +41,7 @@ class UpdateOrbitalElements extends Command
         $handle = fopen('https://ssd.jpl.nasa.gov/dat/ELEMENTS.COMET', 'r');
         if ($handle === false) {
             $this->error('Failed to download comet orbital elements.');
+
             return 1;
         }
 
@@ -92,7 +93,7 @@ class UpdateOrbitalElements extends Command
             $cnt++;
         }
         fclose($handle);
-        if (!empty($batch)) {
+        if (! empty($batch)) {
             CometsOrbitalElements::insert($batch);
         }
 
@@ -100,6 +101,7 @@ class UpdateOrbitalElements extends Command
         $handle = fopen('https://ssd.jpl.nasa.gov/dat/ELEMENTS.NUMBR', 'r');
         if ($handle === false) {
             $this->error('Failed to download asteroid orbital elements.');
+
             return 1;
         }
 
@@ -160,7 +162,7 @@ class UpdateOrbitalElements extends Command
             $cnt++;
         }
         fclose($handle);
-        if (!empty($batch)) {
+        if (! empty($batch)) {
             AsteroidsOrbitalElements::insert($batch);
         }
     }

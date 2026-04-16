@@ -11,11 +11,11 @@
  * - If your machine cannot reach JPL, the script will report the failure.
  */
 
-require __DIR__ . '/../vendor/autoload.php';
+require __DIR__.'/../vendor/autoload.php';
 
 use Carbon\Carbon;
-use deepskylog\AstronomyLibrary\Targets\Elliptic;
 use deepskylog\AstronomyLibrary\Coordinates\GeographicalCoordinates;
+use deepskylog\AstronomyLibrary\Targets\Elliptic;
 
 // Date to compute (UTC)
 $date = Carbon::create(2025, 11, 24, 0, 0, 0, 'UTC');
@@ -28,7 +28,7 @@ $obj->setUseHorizons(true);
 // Optional: set a geographic location for topocentric corrections (lon, lat in degrees)
 $geo = new GeographicalCoordinates(0.0, 0.0);
 
-echo "Computing 12P/Pons-Brooks ephemeris for " . $date->toIso8601String() . " (UTC)\n";
+echo 'Computing 12P/Pons-Brooks ephemeris for '.$date->toIso8601String()." (UTC)\n";
 
 try {
     // calculateEquatorialCoordinates expects the date and optional args: (GeographicalCoordinates, epoch, heightMeters)
@@ -50,7 +50,7 @@ try {
         printf("Magnitude : %.2f\n", $mag);
     }
 } catch (\Throwable $e) {
-    echo "Error computing ephemeris: " . $e->getMessage() . "\n";
+    echo 'Error computing ephemeris: '.$e->getMessage()."\n";
     echo "If you are offline or the Horizons helper fails, try running Horizons helper directly:\n";
     echo "  php scripts/horizons_radec.php '12P' '2025-11-24 00:00' 0.0 0.0 0\n";
 }
