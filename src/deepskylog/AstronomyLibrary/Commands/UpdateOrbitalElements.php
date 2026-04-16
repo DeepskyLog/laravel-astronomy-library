@@ -37,17 +37,20 @@ class UpdateOrbitalElements extends Command
      */
     public function handle()
     {
-        // Download new orbital elements for comets from the JPL website
-        $contents = file_get_contents(
-            'https://ssd.jpl.nasa.gov/dat/ELEMENTS.COMET'
-        );
+        // Download new orbital elements for comets from the JPL website (stream line by line)
+        $handle = fopen('https://ssd.jpl.nasa.gov/dat/ELEMENTS.COMET', 'r');
+        if ($handle === false) {
+            $this->error('Failed to download comet orbital elements.');
+            return 1;
+        }
 
         // Remove the old entries
         CometsOrbitalElements::truncate();
 
         $cnt = 0;
-        // Loop over the orbital elements line by line
-        foreach (preg_split("/((\r?\n)|(\r\n?))/", $contents) as $line) {
+        $batch = [];
+        while (($line = fgets($handle)) !== false) {
+            $line = rtrim($line, "\r\n");
             if ($cnt > 1) {
                 // The first 43 characters are the name
                 $name = trim(substr($line, 0, 43));
@@ -69,35 +72,44 @@ class UpdateOrbitalElements extends Command
                 $ref = trim(substr($line, 120));
 
                 if ($name != '') {
-                    CometsOrbitalElements::create(
-                        [
-                            'name' => $name,
-                            'epoch' => $epoch,
-                            'q' => $q,
-                            'e' => $e,
-                            'i' => $i,
-                            'w' => $w,
-                            'node' => $node,
-                            'Tp' => $Tp,
-                            'ref' => $ref,
-                        ]
-                    );
+                    $batch[] = [
+                        'name' => $name,
+                        'epoch' => $epoch,
+                        'q' => $q,
+                        'e' => $e,
+                        'i' => $i,
+                        'w' => $w,
+                        'node' => $node,
+                        'Tp' => $Tp,
+                        'ref' => $ref,
+                    ];
+                    if (count($batch) >= 500) {
+                        CometsOrbitalElements::insert($batch);
+                        $batch = [];
+                    }
                 }
             }
             $cnt++;
         }
+        fclose($handle);
+        if (!empty($batch)) {
+            CometsOrbitalElements::insert($batch);
+        }
 
-        // Download new orbital elements for asteroids from the JPL website
-        $contents = file_get_contents(
-            'https://ssd.jpl.nasa.gov/dat/ELEMENTS.NUMBR'
-        );
+        // Download new orbital elements for asteroids from the JPL website (stream line by line)
+        $handle = fopen('https://ssd.jpl.nasa.gov/dat/ELEMENTS.NUMBR', 'r');
+        if ($handle === false) {
+            $this->error('Failed to download asteroid orbital elements.');
+            return 1;
+        }
 
         // Remove the old entries
         AsteroidsOrbitalElements::truncate();
 
         $cnt = 0;
-        // Loop over the orbital elements line by line
-        foreach (preg_split("/((\r?\n)|(\r\n?))/", $contents) as $line) {
+        $batch = [];
+        while (($line = fgets($handle)) !== false) {
+            $line = rtrim($line, "\r\n");
             if ($cnt > 1) {
                 // Character 0 - 6 is the number
                 $number = intval(substr($line, 0, 6));
@@ -125,26 +137,31 @@ class UpdateOrbitalElements extends Command
                 $ref = trim(substr($line, 107));
 
                 if ($name != '') {
-                    AsteroidsOrbitalElements::create(
-                        [
-                            'number' => $number,
-                            'name' => $name,
-                            'epoch' => $epoch,
-                            'a' => $a,
-                            'e' => $e,
-                            'i' => $i,
-                            'w' => $w,
-                            'node' => $node,
-                            'M' => $M,
-                            'H' => $H,
-                            'G' => $G,
-                            'Tp' => $Tp,
-                            'ref' => $ref,
-                        ]
-                    );
+                    $batch[] = [
+                        'number' => $number,
+                        'name' => $name,
+                        'epoch' => $epoch,
+                        'a' => $a,
+                        'e' => $e,
+                        'i' => $i,
+                        'w' => $w,
+                        'node' => $node,
+                        'M' => $M,
+                        'H' => $H,
+                        'G' => $G,
+                        'ref' => $ref,
+                    ];
+                    if (count($batch) >= 500) {
+                        AsteroidsOrbitalElements::insert($batch);
+                        $batch = [];
+                    }
                 }
             }
             $cnt++;
+        }
+        fclose($handle);
+        if (!empty($batch)) {
+            AsteroidsOrbitalElements::insert($batch);
         }
     }
 }

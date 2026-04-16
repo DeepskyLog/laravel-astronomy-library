@@ -2,6 +2,13 @@
 
 All notable changes to `laravel-astronomy-library` will be documented in this file.
 
+## Version 6.7.7
+
+Added:
+
+- Artisan command `astronomy:updateOrbitalElements` (`src/deepskylog/AstronomyLibrary/Commands/UpdateOrbitalElements.php`): downloads JPL small-body element files (`ELEMENTS.COMET` and `ELEMENTS.NUMBR`), parses comet and asteroid orbital elements and imports them into the `CometsOrbitalElements` and `AsteroidsOrbitalElements` models. Performs epoch conversion (adds 2400000.5), truncates target tables before import, and uses batched inserts (500 rows) for performance. Includes basic error handling for download failures.
+
+
 ## Version 6.7.6
 
 Changed:
