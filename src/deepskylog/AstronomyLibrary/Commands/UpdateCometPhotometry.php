@@ -3,10 +3,10 @@
 namespace deepskylog\AstronomyLibrary\Commands;
 
 use deepskylog\AstronomyLibrary\Models\CometsOrbitalElements;
-use Illuminate\Console\Command;
-use GuzzleHttp\Client;
 use DOMDocument;
 use DOMXPath;
+use GuzzleHttp\Client;
+use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 
 class UpdateCometPhotometry extends Command
@@ -56,6 +56,7 @@ class UpdateCometPhotometry extends Command
 
             if ($comets->isEmpty()) {
                 $this->line("No comet found matching '{$target}' in comets_orbital_elements.");
+
                 return 0;
             }
         } else {
@@ -91,6 +92,7 @@ class UpdateCometPhotometry extends Command
             }
 
             $this->info('Finished updating comet photometry.');
+
             return 0;
         }
         foreach ($comets as $comet) {
@@ -104,7 +106,7 @@ class UpdateCometPhotometry extends Command
 
             // Use a browser-like User-Agent to avoid simple blocking
             $headers = [
-                'User-Agent' => 'Mozilla/5.0 (compatible; laravel-astronomy-library/1.0; +https://github.com/DeepskyLog)'
+                'User-Agent' => 'Mozilla/5.0 (compatible; laravel-astronomy-library/1.0; +https://github.com/DeepskyLog)',
             ];
 
             foreach ($candidates as $url) {
@@ -146,7 +148,7 @@ class UpdateCometPhotometry extends Command
                                     // and not other path fragments containing digits.
                                     // Accept only if the href ends with the matched token optionally followed by '/'.
                                     $token = $mm2[1];
-                                    if (preg_match('/' . preg_quote($token, '/') . '\/?$/i', $href)) {
+                                    if (preg_match('/'.preg_quote($token, '/').'\/?$/i', $href)) {
                                         $years[] = $token;
                                         continue;
                                     }
@@ -161,7 +163,7 @@ class UpdateCometPhotometry extends Command
                             // directory links discovered (not logged to reduce verbosity)
 
                             $foundYearPage = false;
-                            if (!empty($years)) {
+                            if (! empty($years)) {
                                 // Group matches by their 4-digit year prefix and attempt
                                 // pages starting from the most recent year, trying more
                                 // specific designation filenames first (e.g. '2002C1').
@@ -173,7 +175,7 @@ class UpdateCometPhotometry extends Command
                                     }
                                 }
 
-                                if (!empty($byYear)) {
+                                if (! empty($byYear)) {
                                     krsort($byYear, SORT_NUMERIC);
                                     foreach ($byYear as $yr => $cands) {
                                         // Prefer longer/more specific names first (e.g. '2002C1')
@@ -182,7 +184,7 @@ class UpdateCometPhotometry extends Command
                                         });
 
                                         foreach ($cands as $candName) {
-                                            $yearUrl = rtrim($url, '/') . '/' . $candName . '.html';
+                                            $yearUrl = rtrim($url, '/').'/'.$candName.'.html';
                                             try {
                                                 $ry = $client->get($yearUrl, ['headers' => $headers]);
                                                 if ($ry->getStatusCode() === 200) {
@@ -232,7 +234,7 @@ class UpdateCometPhotometry extends Command
                                 $current = intval(date('Y'));
                                 $foundYearPage = false;
                                 for ($y = $current; $y >= $current - 30; $y--) {
-                                    $yearUrl = rtrim($url, '/') . '/' . $y . '.html';
+                                    $yearUrl = rtrim($url, '/').'/'.$y.'.html';
                                     try {
                                         $ry = $client->get($yearUrl, ['headers' => $headers]);
                                         if ($ry->getStatusCode() === 200) {
@@ -274,7 +276,7 @@ class UpdateCometPhotometry extends Command
                         }
 
                         // If we found a year page above, stop trying further candidates
-                        if (!empty($foundYearPage)) {
+                        if (! empty($foundYearPage)) {
                             break; // exit the candidates loop and proceed to parsing
                         }
                     }
@@ -282,13 +284,13 @@ class UpdateCometPhotometry extends Command
                     // Silent on RequestException; continue to next candidate.
                     continue;
                 } catch (\Exception $e) {
-                    $this->line("Failed to fetch {$url}: " . $e->getMessage());
+                    $this->line("Failed to fetch {$url}: ".$e->getMessage());
                     continue;
                 }
             }
 
             if ($html === null) {
-                $this->line("No aerith.net page found for {$name} (tried " . count($candidates) . " candidates)");
+                $this->line("No aerith.net page found for {$name} (tried ".count($candidates).' candidates)');
 
                 // Try JPL SBDB as a fallback when no aerith page is available.
                 $this->line("Attempting SBDB fallback for {$name} (no aerith page)...");
@@ -391,9 +393,11 @@ class UpdateCometPhotometry extends Command
                             }
 
                             if ($hval !== null) {
-                                $this->info("Punting H for {$name} from aerith magnitudes: H={$hval}" . ($gval !== null ? " G={$gval}" : ""));
+                                $this->info("Punting H for {$name} from aerith magnitudes: H={$hval}".($gval !== null ? " G={$gval}" : ''));
                                 $comet->H = $hval;
-                                if ($gval !== null) $comet->phase_coeff = $gval;
+                                if ($gval !== null) {
+                                    $comet->phase_coeff = $gval;
+                                }
                                 $comet->save();
                             }
                         }
@@ -409,7 +413,7 @@ class UpdateCometPhotometry extends Command
      * Generate candidate aerith.net URLs for a given comet name.
      * Tries name-based slugs and numeric designation directory patterns (e.g. 0103P/).
      *
-     * @param string $name
+     * @param  string  $name
      * @return array
      */
     private function generateAerithCandidates(string $name): array
@@ -420,8 +424,8 @@ class UpdateCometPhotometry extends Command
         // Basic name-based slug: strip to alnum lowercase
         $slug = strtolower(preg_replace('/[^a-z0-9]/', '', $name));
         if ($slug) {
-            $candidates[] = $base . $slug . '.html';
-            $candidates[] = $base . $slug . '/';
+            $candidates[] = $base.$slug.'.html';
+            $candidates[] = $base.$slug.'/';
         }
 
         // Try to extract a numeric designation like "103P" from the name (periodic)
@@ -430,14 +434,14 @@ class UpdateCometPhotometry extends Command
             $type = strtoupper($m[2]);
             // zero-pad to 4 digits as used by aerith (e.g. 0103P)
             $padded = sprintf('%04d%s', $num, $type);
-            $plain = $num . $type;
+            $plain = $num.$type;
 
-            $candidates[] = $base . $padded . '/';
-            $candidates[] = $base . $plain . '/';
-            $candidates[] = $base . $padded . '.html';
-            $candidates[] = $base . $plain . '.html';
-            $candidates[] = $base . $padded . '/index.html';
-            $candidates[] = $base . $padded . '/index-j.html';
+            $candidates[] = $base.$padded.'/';
+            $candidates[] = $base.$plain.'/';
+            $candidates[] = $base.$padded.'.html';
+            $candidates[] = $base.$plain.'.html';
+            $candidates[] = $base.$padded.'/index.html';
+            $candidates[] = $base.$padded.'/index-j.html';
         }
 
         // Non-periodic designations like 2025A6 or 2020F3 (year + letter + number)
@@ -445,9 +449,9 @@ class UpdateCometPhotometry extends Command
         // and a year page named e.g. 2025A6.html
         if (preg_match('/(\d{4}[A-Za-z]\d+)/', $name, $m2)) {
             $desig = strtoupper($m2[1]);
-            $candidates[] = $base . $desig . '/';
-            $candidates[] = $base . $desig . '/' . $desig . '.html';
-            $candidates[] = $base . $desig . '.html';
+            $candidates[] = $base.$desig.'/';
+            $candidates[] = $base.$desig.'/'.$desig.'.html';
+            $candidates[] = $base.$desig.'.html';
         }
 
         // Also try an index-style directory for common cases
@@ -457,8 +461,10 @@ class UpdateCometPhotometry extends Command
         $seen = [];
         $out = [];
         foreach ($candidates as $c) {
-            if (!$c) continue;
-            if (!isset($seen[$c])) {
+            if (! $c) {
+                continue;
+            }
+            if (! isset($seen[$c])) {
                 $seen[$c] = true;
                 $out[] = $c;
             }
@@ -481,18 +487,22 @@ class UpdateCometPhotometry extends Command
 
         // Helper: extract a compact periodic designation like '104P' or '153P'
         $extractPeriodic = function (?string $s) {
-            if (!$s) return null;
+            if (! $s) {
+                return null;
+            }
             // Match things like '104P', '153P', or year-based like '1972 E1'/'1972E1'.
             // Capture optional trailing digits after the letter (e.g. 'E1').
             if (preg_match('/(\d{1,4}\s*[A-Za-z]\d*)/i', $s, $m)) {
                 // Normalize: remove internal whitespace and uppercase the letter part
                 $p = preg_replace('/\s+/', '', $m[1]);
+
                 return strtoupper($p);
             }
             // Also match patterns like '104P/' or '1972E1' at the start
             if (preg_match('/^(\d{1,4}[A-Za-z]\d*)\b/', $s, $m2)) {
                 return strtoupper($m2[1]);
             }
+
             return null;
         };
 
@@ -518,13 +528,17 @@ class UpdateCometPhotometry extends Command
             }
         }
 
-        if (!$query) return null;
+        if (! $query) {
+            return null;
+        }
 
         // Build a list of candidate query variants to increase chances of matching
         // objects with non-standard or parenthetical suffixes (e.g. "C/1997 U9 (SOHO)").
         $variants = [];
         $orig = trim($query);
-        if ($orig !== '') $variants[] = $orig;
+        if ($orig !== '') {
+            $variants[] = $orig;
+        }
 
         // Also include the provided name as a candidate if different
         if ($name && trim($name) !== '' && trim($name) !== $orig) {
@@ -533,16 +547,18 @@ class UpdateCometPhotometry extends Command
 
         // Strip parenthetical suffixes: "Name (SOHO)" -> "Name"
         $noParen = preg_replace('/\s*\(.*\)\s*/', '', $orig);
-        if ($noParen !== '' && $noParen !== $orig) $variants[] = $noParen;
+        if ($noParen !== '' && $noParen !== $orig) {
+            $variants[] = $noParen;
+        }
 
         // Normalize spacing: '1997 U9' and '1997U9'
         $variants[] = preg_replace('/\s+/', ' ', $noParen);
         $variants[] = str_replace(' ', '', $noParen);
 
         // Add common comet prefixes if absent: 'C/' and 'P/' variants
-        if (!preg_match('#^[CP]/#i', $noParen)) {
-            $variants[] = 'C/' . $noParen;
-            $variants[] = 'P/' . $noParen;
+        if (! preg_match('#^[CP]/#i', $noParen)) {
+            $variants[] = 'C/'.$noParen;
+            $variants[] = 'P/'.$noParen;
         }
 
         // If the human-readable name contains parts (e.g. "25D/Neujmin 2"), add tokens
@@ -563,7 +579,7 @@ class UpdateCometPhotometry extends Command
                         $tail[] = $p;
                     }
                 }
-                if (!empty($tail)) {
+                if (! empty($tail)) {
                     $variants[] = implode(' ', $tail);
                     $variants[] = implode('', $tail);
                 }
@@ -572,9 +588,13 @@ class UpdateCometPhotometry extends Command
                 foreach ($parts as $p) {
                     // strip parentheses and non-alnum characters
                     $clean = preg_replace('/[^A-Za-z0-9]/', '', $p);
-                    if ($clean === '') continue;
+                    if ($clean === '') {
+                        continue;
+                    }
                     // skip purely numeric tokens
-                    if (preg_match('/^\d+$/', $clean)) continue;
+                    if (preg_match('/^\d+$/', $clean)) {
+                        continue;
+                    }
                     $variants[] = $clean;
                 }
             }
@@ -591,15 +611,19 @@ class UpdateCometPhotometry extends Command
         }
         foreach ($variants as $v) {
             $v = trim($v);
-            if ($v === '') continue;
-            if (!empty($priority) && in_array($v, $priority, true)) continue;
-            if (!isset($seen[$v])) {
+            if ($v === '') {
+                continue;
+            }
+            if (! empty($priority) && in_array($v, $priority, true)) {
+                continue;
+            }
+            if (! isset($seen[$v])) {
                 $seen[$v] = true;
                 $cands[] = $v;
             }
         }
         // Prepend priority items
-        if (!empty($priority)) {
+        if (! empty($priority)) {
             $cands = array_merge($priority, $cands);
         }
 
@@ -608,9 +632,11 @@ class UpdateCometPhotometry extends Command
         foreach ($cands as $cq) {
             // Use rawurlencode to encode spaces as %20 (matches browser-style encoding)
             $enc = rawurlencode($cq);
-            $url = 'https://ssd-api.jpl.nasa.gov/sbdb.api?des=' . $enc . '&phys-par=1';
+            $url = 'https://ssd-api.jpl.nasa.gov/sbdb.api?des='.$enc.'&phys-par=1';
             try {
-                if ($debug) $this->line("SBDB DES try: {$cq} -> {$url}");
+                if ($debug) {
+                    $this->line("SBDB DES try: {$cq} -> {$url}");
+                }
                 // Retry transient 5xx (502 etc.) a few times with small backoff
                 $res = null;
                 $attempt = 0;
@@ -621,7 +647,9 @@ class UpdateCometPhotometry extends Command
                     try {
                         $res = $client->get($url, ['headers' => ['User-Agent' => 'laravel-astronomy-library-sbdb/1.0']]);
                         if ($res->getStatusCode() !== 200) {
-                            if ($debug) $this->line("SBDB DES {$cq} returned status {$res->getStatusCode()}");
+                            if ($debug) {
+                                $this->line("SBDB DES {$cq} returned status {$res->getStatusCode()}");
+                            }
                             // For 5xx, retry; for 4xx, break and treat as permanent
                             $status = $res->getStatusCode();
                             if ($status >= 500 && $status < 600 && $attempt < $maxAttempts) {
@@ -635,26 +663,34 @@ class UpdateCometPhotometry extends Command
                     } catch (\GuzzleHttp\Exception\RequestException $e) {
                         $resp = $e->getResponse();
                         $code = $resp ? $resp->getStatusCode() : null;
-                        if ($debug) $this->line("SBDB DES {$cq} exception (attempt {$attempt}): " . $e->getMessage());
+                        if ($debug) {
+                            $this->line("SBDB DES {$cq} exception (attempt {$attempt}): ".$e->getMessage());
+                        }
                         if ($code !== null && $code >= 500 && $attempt < $maxAttempts) {
                             usleep(300000);
                             continue;
                         }
                         // Non-retriable or out of attempts
-                        $body = $resp ? (string)$resp->getBody() : null;
+                        $body = $resp ? (string) $resp->getBody() : null;
                         break;
                     } catch (\Exception $e) {
-                        if ($debug) $this->line("SBDB DES {$cq} unexpected exception: " . $e->getMessage());
+                        if ($debug) {
+                            $this->line("SBDB DES {$cq} unexpected exception: ".$e->getMessage());
+                        }
                         break;
                     }
                 }
                 if ($body === null) {
-                    if ($debug) $this->line("SBDB DES {$cq} produced no body after retries");
+                    if ($debug) {
+                        $this->line("SBDB DES {$cq} produced no body after retries");
+                    }
                     continue;
                 }
                 $json = json_decode($body, true);
-                if (!is_array($json)) {
-                    if ($debug) $this->line("SBDB DES {$cq} returned non-JSON response");
+                if (! is_array($json)) {
+                    if ($debug) {
+                        $this->line("SBDB DES {$cq} returned non-JSON response");
+                    }
                     continue;
                 }
 
@@ -665,14 +701,16 @@ class UpdateCometPhotometry extends Command
                 $nFromSBDB = $parsed['n'];
 
                 if ($debug) {
-                    $this->line("SBDB DES {$cq} parsed: H=" . var_export($h, true) . " G=" . var_export($g, true) . " n=" . var_export($nFromSBDB, true));
+                    $this->line("SBDB DES {$cq} parsed: H=".var_export($h, true).' G='.var_export($g, true).' n='.var_export($nFromSBDB, true));
                 }
 
                 if ($h !== null || $nFromSBDB !== null) {
                     // If phys_par didn't supply a slope-like 'n', try orbit.elements
                     if ($nFromSBDB === null && isset($json['orbit']['elements']) && is_array($json['orbit']['elements'])) {
                         foreach ($json['orbit']['elements'] as $el) {
-                            if (!is_array($el)) continue;
+                            if (! is_array($el)) {
+                                continue;
+                            }
                             $ename = $el['name'] ?? ($el['label'] ?? null);
                             if ($ename === 'n' || strtolower($ename) === 'n') {
                                 $nFromSBDB = $el['value'] ?? $el['val'] ?? $nFromSBDB;
@@ -686,11 +724,16 @@ class UpdateCometPhotometry extends Command
                 // If the SBDB response contains an object/orbit but no phys_par,
                 // treat this as a successful lookup (no photometry available).
                 if ((isset($json['object']) || isset($json['orbit'])) && $h === null && $nFromSBDB === null) {
-                    if ($debug) $this->line("SBDB DES {$cq} found object but no photometry");
+                    if ($debug) {
+                        $this->line("SBDB DES {$cq} found object but no photometry");
+                    }
+
                     return ['H' => null, 'n' => null, 'phase' => null, 'source' => 'SBDB', 'query' => $cq];
                 }
             } catch (\Exception $e) {
-                if ($debug) $this->line("SBDB DES {$cq} exception: " . $e->getMessage());
+                if ($debug) {
+                    $this->line("SBDB DES {$cq} exception: ".$e->getMessage());
+                }
                 // continue to next candidate
                 continue;
             }
@@ -700,11 +743,15 @@ class UpdateCometPhotometry extends Command
         foreach ($cands as $cq) {
             // Use rawurlencode for sstr as well
             $enc = rawurlencode($cq);
-            $url = 'https://ssd-api.jpl.nasa.gov/sbdb.api?sstr=' . $enc . '&phys-par=1';
+            $url = 'https://ssd-api.jpl.nasa.gov/sbdb.api?sstr='.$enc.'&phys-par=1';
             try {
-                if ($debug) $this->line("SBDB SSTR try: {$cq} -> {$url}");
+                if ($debug) {
+                    $this->line("SBDB SSTR try: {$cq} -> {$url}");
+                }
                 // Retry loop for sstr as well
-                if ($debug) $this->line("SBDB SSTR try: {$cq} -> {$url}");
+                if ($debug) {
+                    $this->line("SBDB SSTR try: {$cq} -> {$url}");
+                }
                 $res = null;
                 $attempt = 0;
                 $maxAttempts = 3;
@@ -714,7 +761,9 @@ class UpdateCometPhotometry extends Command
                     try {
                         $res = $client->get($url, ['headers' => ['User-Agent' => 'laravel-astronomy-library-sbdb/1.0']]);
                         if ($res->getStatusCode() !== 200) {
-                            if ($debug) $this->line("SBDB SSTR {$cq} returned status {$res->getStatusCode()}");
+                            if ($debug) {
+                                $this->line("SBDB SSTR {$cq} returned status {$res->getStatusCode()}");
+                            }
                             $status = $res->getStatusCode();
                             if ($status >= 500 && $status < 600 && $attempt < $maxAttempts) {
                                 usleep(300000);
@@ -727,25 +776,33 @@ class UpdateCometPhotometry extends Command
                     } catch (\GuzzleHttp\Exception\RequestException $e) {
                         $resp = $e->getResponse();
                         $code = $resp ? $resp->getStatusCode() : null;
-                        if ($debug) $this->line("SBDB SSTR {$cq} exception (attempt {$attempt}): " . $e->getMessage());
+                        if ($debug) {
+                            $this->line("SBDB SSTR {$cq} exception (attempt {$attempt}): ".$e->getMessage());
+                        }
                         if ($code !== null && $code >= 500 && $attempt < $maxAttempts) {
                             usleep(300000);
                             continue;
                         }
-                        $body = $resp ? (string)$resp->getBody() : null;
+                        $body = $resp ? (string) $resp->getBody() : null;
                         break;
                     } catch (\Exception $e) {
-                        if ($debug) $this->line("SBDB SSTR {$cq} unexpected exception: " . $e->getMessage());
+                        if ($debug) {
+                            $this->line("SBDB SSTR {$cq} unexpected exception: ".$e->getMessage());
+                        }
                         break;
                     }
                 }
                 if ($body === null) {
-                    if ($debug) $this->line("SBDB SSTR {$cq} produced no body after retries");
+                    if ($debug) {
+                        $this->line("SBDB SSTR {$cq} produced no body after retries");
+                    }
                     continue;
                 }
                 $json = json_decode($body, true);
-                if (!is_array($json)) {
-                    if ($debug) $this->line("SBDB SSTR {$cq} returned non-JSON response");
+                if (! is_array($json)) {
+                    if ($debug) {
+                        $this->line("SBDB SSTR {$cq} returned non-JSON response");
+                    }
                     continue;
                 }
 
@@ -756,13 +813,15 @@ class UpdateCometPhotometry extends Command
                 $nFromSBDB = $parsed['n'];
 
                 if ($debug) {
-                    $this->line("SBDB SSTR {$cq} parsed: H=" . var_export($h, true) . " G=" . var_export($g, true) . " n=" . var_export($nFromSBDB, true));
+                    $this->line("SBDB SSTR {$cq} parsed: H=".var_export($h, true).' G='.var_export($g, true).' n='.var_export($nFromSBDB, true));
                 }
 
                 if ($h !== null || $nFromSBDB !== null) {
                     if ($nFromSBDB === null && isset($json['orbit']['elements']) && is_array($json['orbit']['elements'])) {
                         foreach ($json['orbit']['elements'] as $el) {
-                            if (!is_array($el)) continue;
+                            if (! is_array($el)) {
+                                continue;
+                            }
                             $ename = $el['name'] ?? ($el['label'] ?? null);
                             if ($ename === 'n' || strtolower($ename) === 'n') {
                                 $nFromSBDB = $el['value'] ?? $el['val'] ?? $nFromSBDB;
@@ -774,11 +833,16 @@ class UpdateCometPhotometry extends Command
                     return ['H' => $h !== null ? floatval($h) : null, 'n' => $nFromSBDB !== null ? floatval($nFromSBDB) : null, 'phase' => $g !== null ? floatval($g) : null, 'source' => 'SBDB', 'query' => $cq];
                 }
                 if ((isset($json['object']) || isset($json['orbit'])) && $h === null && $nFromSBDB === null) {
-                    if ($debug) $this->line("SBDB SSTR {$cq} found object but no photometry");
+                    if ($debug) {
+                        $this->line("SBDB SSTR {$cq} found object but no photometry");
+                    }
+
                     return ['H' => null, 'n' => null, 'phase' => null, 'source' => 'SBDB', 'query' => $cq];
                 }
             } catch (\Exception $e) {
-                if ($debug) $this->line("SBDB SSTR {$cq} exception: " . $e->getMessage());
+                if ($debug) {
+                    $this->line("SBDB SSTR {$cq} exception: ".$e->getMessage());
+                }
                 continue;
             }
         }
@@ -797,14 +861,18 @@ class UpdateCometPhotometry extends Command
             if (isset($data['H']) || isset($data['h']) || isset($data['G']) || isset($data['g'])) {
                 $h = $data['H'] ?? ($data['h'] ?? null);
                 $g = $data['G'] ?? ($data['g'] ?? null);
-                if ($h !== null) return ['H' => $h, 'G' => $g ?? null];
+                if ($h !== null) {
+                    return ['H' => $h, 'G' => $g ?? null];
+                }
             }
 
             // Otherwise recurse into children
             foreach ($data as $k => $v) {
                 if (is_array($v) || is_object($v)) {
                     $found = $this->findHAndG($v);
-                    if ($found !== null) return $found;
+                    if ($found !== null) {
+                        return $found;
+                    }
                 }
             }
         } elseif (is_object($data)) {
@@ -831,29 +899,45 @@ class UpdateCometPhotometry extends Command
 
             // If phys_par is an associative map with keys like H/G
             if (is_array($pp) && array_keys($pp) !== range(0, count($pp) - 1)) {
-                if (isset($pp['H'])) $h = $pp['H'];
-                if (isset($pp['h'])) $h = $pp['h'];
-                if (isset($pp['G'])) $g = $pp['G'];
-                if (isset($pp['g'])) $g = $pp['g'];
+                if (isset($pp['H'])) {
+                    $h = $pp['H'];
+                }
+                if (isset($pp['h'])) {
+                    $h = $pp['h'];
+                }
+                if (isset($pp['G'])) {
+                    $g = $pp['G'];
+                }
+                if (isset($pp['g'])) {
+                    $g = $pp['g'];
+                }
             }
 
             // If phys_par is a numeric array of entries like {name, value, title}
             if (is_array($pp) && isset($pp[0]) && is_array($pp[0])) {
                 foreach ($pp as $entry) {
-                    if (!is_array($entry)) continue;
-                    $ename = isset($entry['name']) ? strtoupper(trim((string)$entry['name'])) : null;
-                    $title = isset($entry['title']) ? strtolower((string)$entry['title']) : '';
+                    if (! is_array($entry)) {
+                        continue;
+                    }
+                    $ename = isset($entry['name']) ? strtoupper(trim((string) $entry['name'])) : null;
+                    $title = isset($entry['title']) ? strtolower((string) $entry['title']) : '';
                     $val = $entry['value'] ?? null;
 
                     if ($ename === 'H' || $ename === 'M1' || stripos($title, 'absolute magnitude') !== false || stripos($title, 'comet total magnitude') !== false) {
-                        if ($h === null && $val !== null) $h = $val;
+                        if ($h === null && $val !== null) {
+                            $h = $val;
+                        }
                     }
                     if ($ename === 'G') {
-                        if ($g === null && $val !== null) $g = $val;
+                        if ($g === null && $val !== null) {
+                            $g = $val;
+                        }
                     }
                     // K1/K2 in SBDB often represent comet slope parameters (map to `n` as a best-effort)
                     if ($ename === 'K1' || $ename === 'K2' || stripos($title, 'slope') !== false) {
-                        if ($n === null && $val !== null) $n = $val;
+                        if ($n === null && $val !== null) {
+                            $n = $val;
+                        }
                     }
                     // Some entries use M2 for nuclear magnitude; prefer M1 for total magnitude
                     if ($ename === 'M2' && $h === null && $val !== null) {
@@ -868,7 +952,9 @@ class UpdateCometPhotometry extends Command
             $found = $this->findHAndG($json);
             if ($found !== null) {
                 $h = $found['H'];
-                if ($g === null) $g = $found['G'];
+                if ($g === null) {
+                    $g = $found['G'];
+                }
             }
         }
 

@@ -1,12 +1,13 @@
 #!/usr/bin/env php
 <?php
+
 // Dry-run utility: connect to the database, enumerate comets, and resolve aerith.net pages.
 // Usage:
 //   export AERITH_VERIFY=false
 //   php scripts/dryrun_update_comet_photometry.php
 // DB can be overridden via env vars: DRY_DB_HOST, DRY_DB_NAME, DRY_DB_USER, DRY_DB_PASS
 
-require __DIR__ . '/../vendor/autoload.php';
+require __DIR__.'/../vendor/autoload.php';
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
@@ -14,7 +15,7 @@ use GuzzleHttp\Exception\RequestException;
 // Optionally, accept an input file (tab/CSV) with id,name lines instead of DB connection.
 $inputFile = getenv('DRY_INPUT_FILE') ?: null;
 if ($inputFile) {
-    if (!is_readable($inputFile)) {
+    if (! is_readable($inputFile)) {
         echo "DRY_INPUT_FILE is set but file not readable: {$inputFile}\n";
         exit(2);
     }
@@ -23,12 +24,14 @@ if ($inputFile) {
     $fh = fopen($inputFile, 'r');
     while (($line = fgets($fh)) !== false) {
         $line = trim($line);
-        if ($line === '') continue;
+        if ($line === '') {
+            continue;
+        }
         // accept tab or comma separated or mysql -N output (id\tname)
         if (strpos($line, "\t") !== false) {
-            list($id, $name) = explode("\t", $line, 2);
+            [$id, $name] = explode("\t", $line, 2);
         } elseif (strpos($line, ',') !== false) {
-            list($id, $name) = str_getcsv($line);
+            [$id, $name] = str_getcsv($line);
         } else {
             // if only name is provided
             $id = null;
@@ -52,7 +55,7 @@ if ($inputFile) {
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
         ]);
     } catch (Exception $e) {
-        echo "Failed to connect to DB: " . $e->getMessage() . "\n";
+        echo 'Failed to connect to DB: '.$e->getMessage()."\n";
         exit(2);
     }
 
@@ -61,7 +64,7 @@ if ($inputFile) {
         $stmt = $pdo->query('SELECT id, name FROM comets_orbital_elements');
         $rows = $stmt->fetchAll();
     } catch (Exception $e) {
-        echo "Failed to query comets_orbital_elements: " . $e->getMessage() . "\n";
+        echo 'Failed to query comets_orbital_elements: '.$e->getMessage()."\n";
         exit(3);
     }
 
@@ -98,31 +101,34 @@ function generateCandidates(string $name): array
     $candidates = [];
     $slug = strtolower(preg_replace('/[^a-z0-9]/', '', $name));
     if ($slug) {
-        $candidates[] = $base . $slug . '.html';
-        $candidates[] = $base . $slug . '/';
+        $candidates[] = $base.$slug.'.html';
+        $candidates[] = $base.$slug.'/';
     }
     if (preg_match('/(\d+)\s*([A-Za-z])/i', $name, $m)) {
         $num = intval($m[1]);
         $type = strtoupper($m[2]);
         $padded = sprintf('%04d%s', $num, $type);
-        $plain = $num . $type;
-        $candidates[] = $base . $padded . '/';
-        $candidates[] = $base . $plain . '/';
-        $candidates[] = $base . $padded . '.html';
-        $candidates[] = $base . $plain . '.html';
-        $candidates[] = $base . $padded . '/index.html';
-        $candidates[] = $base . $padded . '/index-j.html';
+        $plain = $num.$type;
+        $candidates[] = $base.$padded.'/';
+        $candidates[] = $base.$plain.'/';
+        $candidates[] = $base.$padded.'.html';
+        $candidates[] = $base.$plain.'.html';
+        $candidates[] = $base.$padded.'/index.html';
+        $candidates[] = $base.$padded.'/index-j.html';
     }
     $candidates[] = $base;
     // dedupe
     $out = [];
     foreach ($candidates as $c) {
-        if ($c && !in_array($c, $out)) $out[] = $c;
+        if ($c && ! in_array($c, $out)) {
+            $out[] = $c;
+        }
     }
+
     return $out;
 }
 
-echo "Processing " . count($rows) . " comets...\n";
+echo 'Processing '.count($rows)." comets...\n";
 $results = [];
 foreach ($rows as $r) {
     $name = $r['name'] ?? '(unnamed)';
@@ -146,10 +152,10 @@ foreach ($rows as $r) {
                             $years[] = $mm[1];
                         }
                     }
-                    if (!empty($years)) {
+                    if (! empty($years)) {
                         rsort($years, SORT_NUMERIC);
                         foreach ($years as $yr) {
-                            $yearUrl = rtrim($url, '/') . '/' . $yr . '.html';
+                            $yearUrl = rtrim($url, '/').'/'.$yr.'.html';
                             try {
                                 $ry = $client->get($yearUrl, ['headers' => $headers]);
                                 if ($ry->getStatusCode() === 200) {
@@ -160,7 +166,9 @@ foreach ($rows as $r) {
                                 continue;
                             }
                         }
-                        if ($matched) break;
+                        if ($matched) {
+                            break;
+                        }
                     }
                 }
                 $matched = $url;
@@ -169,7 +177,9 @@ foreach ($rows as $r) {
         } catch (RequestException $e) {
             if ($e->hasResponse()) {
                 $code = $e->getResponse()->getStatusCode();
-                if ($code === 404) continue;
+                if ($code === 404) {
+                    continue;
+                }
             }
             continue;
         } catch (Exception $e) {
@@ -184,14 +194,16 @@ foreach ($rows as $r) {
     }
 }
 
-$matchedCount = count(array_filter($results, fn($x) => $x['matched']));
-echo "\nDone. Matched {$matchedCount} of " . count($results) . " comets.\n";
+$matchedCount = count(array_filter($results, fn ($x) => $x['matched']));
+echo "\nDone. Matched {$matchedCount} of ".count($results)." comets.\n";
 
 // Optionally write CSV summary
-$out = __DIR__ . '/dryrun_aerith_matches.csv';
+$out = __DIR__.'/dryrun_aerith_matches.csv';
 $fh = fopen($out, 'w');
 fputcsv($fh, ['id', 'name', 'matched']);
-foreach ($results as $r) fputcsv($fh, [$r['id'], $r['name'], $r['matched']]);
+foreach ($results as $r) {
+    fputcsv($fh, [$r['id'], $r['name'], $r['matched']]);
+}
 fclose($fh);
 echo "Summary written to: {$out}\n";
 
