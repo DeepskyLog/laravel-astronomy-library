@@ -30,10 +30,13 @@ function doQuery($command, $site, $start, $stop, $ephem = null)
         'CSV_FORMAT' => 'YES'
     ];
 
-    // Allow client to request a particular JPL ephemeris name (e.g. DE440).
-    if ($ephem !== null && trim($ephem) !== '') {
-        $post['EPHEM'] = trim($ephem);
-    }
+    // The optional ephemeris argument is accepted for backwards compatibility
+    // but is not sent to Horizons: the API has no parameter to select the JPL
+    // ephemeris, and passing one makes the whole request fail with
+    // "HTTP code 400 - one or more query parameter was not recognized".
+    // Horizons serves its own current ephemeris (DE441 for the major bodies);
+    // the 'target_name' field of the output reports which source was used.
+    unset($ephem);
     $ch = curl_init('https://ssd.jpl.nasa.gov/api/horizons.api');
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_POST, true);
@@ -78,11 +81,59 @@ function doQuery($command, $site, $start, $stop, $ephem = null)
     return [$resp, $err];
 }
 
+/**
+ * Does this designation refer to a comet or an interstellar object?
+ *
+ * Horizons resolves a bare designation against the major-body table first. A
+ * command of '12P' therefore returns Styx (905), a moon of Pluto, instead of
+ * comet 12P/Pons-Brooks, and it does so with a perfectly valid data block, so
+ * there is nothing to notice further down. Those objects have to be requested
+ * with the small-body syntax 'DES=<designation>; CAP;' instead, where CAP also
+ * selects the apparition closest to the requested date.
+ */
+function isSmallBodyDesignation($des)
+{
+    $des = trim($des);
+
+    // Numbered periodic comets and interstellar objects: 1P, 2P, 12P, 73P-C,
+    // 12P/Pons-Brooks, 1I, 2I/Borisov.
+    if (preg_match('#^\d+[PICDX](\b|[/-])#i', $des)) {
+        return true;
+    }
+
+    // Provisional designations: C/1998 H1, P/2010 A2, D/1993 F2, A/2017 U1.
+    if (preg_match('#^[CPDXAI]/#i', $des)) {
+        return true;
+    }
+
+    return false;
+}
+
 $site = "'{$lon},{$lat},{$alt_km}'";
 $command = "'{$des}'";
 // Track which command produced the final successful response for debugging.
 $used_command = $command;
-list($resp, $err) = doQuery($command, $site, $start, $stop, $ephem);
+$resp = false;
+$err = null;
+
+// Ask for comets by their small-body designation, otherwise Horizons silently
+// answers for a major body that happens to carry the same name.
+if (isSmallBodyDesignation($des)) {
+    $sbCommand = "'DES={$des}; CAP;'";
+    list($sbResp, $sbErr) = doQuery($sbCommand, $site, $start, $stop, $ephem);
+    if ($sbResp !== false && !empty($sbResp)
+        && preg_match('/\$\$SOE([\s\S]*?)\$\$EOE/', $sbResp)
+    ) {
+        $resp = $sbResp;
+        $err = $sbErr;
+        $used_command = $sbCommand;
+    }
+}
+
+if ($resp === false) {
+    list($resp, $err) = doQuery($command, $site, $start, $stop, $ephem);
+}
+
 if ($resp === false || empty($resp)) {
     echo json_encode(['error' => 'horizons empty', 'curl' => $err]);
     exit(1);
@@ -277,7 +328,15 @@ function dmsToDeg($s)
 }
 $raH = hmsToHours($raStr);
 $decD = dmsToDeg($decStr);
-$out = ['ra_hours' => $raH, 'dec_deg' => $decD, 'raw_ra' => $raStr, 'raw_dec' => $decStr, 'used_command' => ($used_command ?? $command)];
+// Report the body Horizons actually answered for, so that a designation that
+// resolves to the wrong object is visible in the output instead of silently
+// producing plausible coordinates.
+$targetName = null;
+if (preg_match('/Target body name:\s*(.+)$/m', $resp, $mname)) {
+    $targetName = trim(preg_replace('/\s+/', ' ', $mname[1]));
+}
+
+$out = ['ra_hours' => $raH, 'dec_deg' => $decD, 'raw_ra' => $raStr, 'raw_dec' => $decStr, 'used_command' => ($used_command ?? $command), 'target_name' => $targetName];
 // Save structured JSON output for inspection
 @file_put_contents(__DIR__ . '/horizons_resp.json', json_encode($out));
 echo json_encode($out);

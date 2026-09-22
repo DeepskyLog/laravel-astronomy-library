@@ -72,7 +72,12 @@ class Elliptic extends Target
         // Basic canonical normalization for angles and inclination:
         // - wrap angles into [0,360)
         // - if inclination is negative, make it positive and rotate node/omega by 180deg
-        // - if inclination > 90deg, convert to complementary i' = 180 - i and rotate node/omega by 180deg
+        //
+        // Inclinations above 90 degrees are retrograde orbits and are left as
+        // they are: the formulae of chapter 33 take the inclination through
+        // cos(i) and are valid over the full 0 - 180 degree range. Replacing i
+        // by 180 - i mirrors the orbit in the ecliptic plane and turns a
+        // retrograde orbit (comet Halley, i = 162 degrees) into a prograde one.
         $this->_i = $i;
         $omega_norm = fmod($omega + 360.0, 360.0);
         if ($omega_norm < 0) $omega_norm += 360.0;
@@ -81,12 +86,6 @@ class Elliptic extends Target
 
         if ($this->_i < 0.0) {
             $this->_i = -$this->_i;
-            $omega_norm = fmod($omega_norm + 180.0, 360.0);
-            $node_norm = fmod($node_norm + 180.0, 360.0);
-        }
-
-        if ($this->_i > 90.0) {
-            $this->_i = 180.0 - $this->_i;
             $omega_norm = fmod($omega_norm + 180.0, 360.0);
             $node_norm = fmod($node_norm + 180.0, 360.0);
         }
@@ -145,8 +144,8 @@ class Elliptic extends Target
         $b = sqrt($G ** 2 + $Q ** 2);
         $c = sqrt($H ** 2 + $R ** 2);
 
-        $diff_in_date = $this->_perihelion_date->diffInSeconds($date) / 3600.0 / 24.0;
-        $M = -$diff_in_date * $this->_n;
+        $diff_in_date = $this->_perihelion_date->diffInSeconds($date, false) / 3600.0 / 24.0;
+        $M = $diff_in_date * $this->_n;
 
         $E = $this->eccentricAnomaly($this->_e, $M, 0.000001);
 
@@ -291,8 +290,8 @@ class Elliptic extends Target
         $b = sqrt($G ** 2 + $Q ** 2);
         $c = sqrt($H ** 2 + $R ** 2);
 
-        $diff_in_date = $this->_perihelion_date->diffInSeconds($date) / 3600.0 / 24.0;
-        $M = -$diff_in_date * $this->_n;
+        $diff_in_date = $this->_perihelion_date->diffInSeconds($date, false) / 3600.0 / 24.0;
+        $M = $diff_in_date * $this->_n;
 
         $E = $this->eccentricAnomaly($this->_e, $M, 0.000001);
 
@@ -316,8 +315,8 @@ class Elliptic extends Target
         $jd = Time::getJd($date);
         $newDate = Time::fromJd($jd - $tau);
 
-        $diff_in_date = $this->_perihelion_date->diffInSeconds($newDate) / 3600.0 / 24.0;
-        $M = -$diff_in_date * $this->_n;
+        $diff_in_date = $this->_perihelion_date->diffInSeconds($newDate, false) / 3600.0 / 24.0;
+        $M = $diff_in_date * $this->_n;
 
         $E = $this->eccentricAnomaly($this->_e, $M, 0.000001);
 
@@ -342,21 +341,15 @@ class Elliptic extends Target
 
         $equa_coords = new EquatorialCoordinates($ra, $dec);
 
-        // Calculate corrections for parallax
-        $pi = 8.794 / $delta;
-
-        $siderial_time = Time::apparentSiderialTime($date, new GeographicalCoordinates(0.0, 0.0));
-
-        $hour_angle = (new \deepskylog\AstronomyLibrary\Coordinates\Coordinate($equa_coords->getHourAngle($siderial_time) + $geo_coords->getLongitude()->getCoordinate() * 15.0, 0, 360))->getCoordinate();
-
-        $earthsGlobe = $geo_coords->earthsGlobe($height);
-
-        $deltara = rad2deg(atan(-$earthsGlobe[1] * sin(deg2rad($pi / 3600.0)) * sin(deg2rad($hour_angle)) / (cos(deg2rad($equa_coords->getDeclination()->getCoordinate())) - $earthsGlobe[1] * sin(deg2rad($pi / 3600.0)) * sin(deg2rad($hour_angle)))));
-        $dec = rad2deg(atan((sin(deg2rad($equa_coords->getDeclination()->getCoordinate())) - $earthsGlobe[0] * sin(deg2rad($pi / 3600.0))) * cos(deg2rad($deltara / 3600.0))
-            / (cos(deg2rad($equa_coords->getDeclination()->getCoordinate())) - $earthsGlobe[1] * sin(deg2rad($pi / 3600.0)) * cos(deg2rad($height)))));
-
-        $equa_coords->setRA($ra + $deltara);
-        $equa_coords->setDeclination($dec);
+        // Calculate corrections for parallax.
+        // The equatorial horizontal parallax in arcseconds, converted to degrees.
+        $equa_coords = $this->_correctForParallax(
+            $equa_coords,
+            (8.794 / $delta) / 3600.0,
+            $date,
+            $geo_coords,
+            $height
+        );
 
         return $equa_coords;
     }

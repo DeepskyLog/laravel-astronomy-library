@@ -57,21 +57,26 @@ class Time
             $month = $month + 12;
         }
 
-        if ($date < Carbon::create(1582, 10, 4, 0, 0, 0, 'UTC')) {
+        // The Julian calendar was in use up to and including 1582 October 4.
+        // The Gregorian calendar starts at 1582 October 15; the ten days in
+        // between were skipped and never existed.
+        $endOfJulianCalendar = Carbon::create(1582, 10, 5, 0, 0, 0, 'UTC');
+        $startOfGregorianCalendar = Carbon::create(1582, 10, 15, 0, 0, 0, 'UTC');
+
+        if ($date >= $endOfJulianCalendar && $date < $startOfGregorianCalendar) {
+            throw new InvalidDateException(
+                'Date does not exist',
+                $date
+            );
+        }
+
+        if ($date < $endOfJulianCalendar) {
             $b = 0;
         } else {
             $a = (int) ($year / 100);
             $b = 2 - $a + (int) ($a / 4);
         }
 
-        if ($date > Carbon::create(1582, 10, 4, 0, 0, 0, 'UTC')
-            && $date < Carbon::create(1582, 10, 15, 0, 0, 0, 'UTC')
-        ) {
-            throw new InvalidDateException(
-                'Date does not exist',
-                $date
-            );
-        }
         if ($date < Carbon::create(-4712, 1, 1, 12, 0, 0, 'UTC')) {
             throw new InvalidDateException(
                 'Date does not exist',

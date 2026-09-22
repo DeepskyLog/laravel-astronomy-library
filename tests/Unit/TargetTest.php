@@ -573,8 +573,19 @@ class TargetTest extends BaseTestCase
         $encke->calculateEquatorialCoordinates($date, $geo_coords);
         $coordinates = $encke->getEquatorialCoordinates();
 
-        $this->assertEqualsWithDelta(14.137346221139, $coordinates->getRA()->getCoordinate(), 0.000001);
-        $this->assertEqualsWithDelta(-18.679746243818, $coordinates->getDeclination()->getCoordinate(), 0.000001);
+        // Cross-checked against JPL Horizons (DES=2P;CAP;, geocentric astrometric
+        // J2000), which gives RA 10h33m46.04s = 10.562789 h and Dec +19d15'27.3"
+        // = +19.257583 deg for this date. The remaining difference (about 37
+        // arcsec of RA and 4 arcmin of declination) is the error of the two-body
+        // solution of chapter 33 with osculating elements.
+        $this->assertEqualsWithDelta(10.562106034676, $coordinates->getRA()->getCoordinate(), 0.000001);
+        $this->assertEqualsWithDelta(19.188986216308, $coordinates->getDeclination()->getCoordinate(), 0.000001);
+
+        // Guard against a regression of the sign of the mean anomaly: before the
+        // fix this returned 14.137 h / -18.680 deg, roughly 3.6 hours of right
+        // ascension and 38 degrees of declination away from the true position.
+        $this->assertEqualsWithDelta(10.562789, $coordinates->getRA()->getCoordinate(), 0.02);
+        $this->assertEqualsWithDelta(19.257583, $coordinates->getDeclination()->getCoordinate(), 0.1);
     }
 
     /**
@@ -591,8 +602,12 @@ class TargetTest extends BaseTestCase
         $stonehouse->calculateEquatorialCoordinates($date, $geo_coords);
         $coordinates = $stonehouse->getEquatorialCoordinates();
 
-        $this->assertEqualsWithDelta(12.5221625, $coordinates->getRA()->getCoordinate(), 0.00001);
-        $this->assertEqualsWithDelta(50.7643669, $coordinates->getDeclination()->getCoordinate(), 0.00001);
+        // Cross-checked against JPL Horizons (DES=C/1998 H1;CAP;, geocentric
+        // astrometric J2000), which gives RA 12h31m21.73s = 12.522703 h and Dec
+        // +50d45'09.2" = +50.752556 deg. The library stays within 33 arcsec of
+        // right ascension and 38 arcsec of declination of that.
+        $this->assertEqualsWithDelta(12.523304102096, $coordinates->getRA()->getCoordinate(), 0.00001);
+        $this->assertEqualsWithDelta(50.763203653952, $coordinates->getDeclination()->getCoordinate(), 0.00001);
     }
 
     /**
@@ -752,6 +767,37 @@ class TargetTest extends BaseTestCase
     }
 
     /**
+     * Test that a retrograde orbit keeps its inclination.
+     *
+     * Replacing an inclination above 90 degrees by 180 - i mirrors the orbit in
+     * the ecliptic plane and turns a retrograde orbit into a prograde one. The
+     * formulae of chapter 33 use cos(i) and are valid over the full range, so
+     * the inclination has to be stored unchanged.
+     */
+    public function testRetrogradeInclinationIsKept()
+    {
+        $halley = new Elliptic();
+        $peridate = Carbon::create(1986, 2, 9, 11, 0, 50, 'UTC');
+        $halley->setOrbitalElements(17.9400782, 0.96727426, 162.26, 111.84644, 58.42, $peridate);
+
+        $geo_coords = new GeographicalCoordinates(0, 0);
+        $halley->calculateEquatorialCoordinates(Carbon::create(1986, 2, 9, 0, 0, 0, 'UTC'), $geo_coords);
+
+        // A mirrored (prograde) Halley puts the comet on the other side of the
+        // ecliptic. Build the flipped orbit explicitly and check the two do not
+        // agree, so the normalisation cannot come back unnoticed.
+        $mirrored = new Elliptic();
+        $mirrored->setOrbitalElements(17.9400782, 0.96727426, 180.0 - 162.26, 111.84644 + 180.0, 58.42 + 180.0, $peridate->copy());
+        $mirrored->calculateEquatorialCoordinates(Carbon::create(1986, 2, 9, 0, 0, 0, 'UTC'), $geo_coords);
+
+        $this->assertNotEqualsWithDelta(
+            $mirrored->getEquatorialCoordinates()->getDeclination()->getCoordinate(),
+            $halley->getEquatorialCoordinates()->getDeclination()->getCoordinate(),
+            0.1
+        );
+    }
+
+    /**
      * Test the passage through the nodes.
      */
     public function testPassageThroughNodes()
@@ -761,23 +807,26 @@ class TargetTest extends BaseTestCase
         $peridate = Carbon::create(1986, 2, 9, 11, 0, 50, 'UTC');
         $halley->setOrbitalElements(17.9400782, 0.96727426, 162.0, 111.84644, 0.0, $peridate);
 
-        // Ascending node
+        // Ascending node. Halley crosses the ecliptic from south to north on
+        // 1985 November 9: JPL Horizons gives a heliocentric ecliptic
+        // z of -0.0066 AU on November 7 and +0.0059 AU on November 11.
         $node = $halley->ascendingNode();
-
-        $this->assertEquals(1986, $node->year);
-        $this->assertEquals(3, $node->month);
-        $this->assertEquals(10, $node->day);
-        $this->assertEquals(8, $node->hour);
-        $this->assertEquals(51, $node->minute);
-
-        // Decending node
-        $node = $halley->descendingNode();
 
         $this->assertEquals(1985, $node->year);
         $this->assertEquals(11, $node->month);
         $this->assertEquals(9, $node->day);
         $this->assertEquals(3, $node->hour);
         $this->assertEquals(49, $node->minute);
+
+        // Descending node. Halley crosses from north to south on 1986 March 10:
+        // Horizons gives z = +0.0156 AU on March 8 and -0.0109 AU on March 12.
+        $node = $halley->descendingNode();
+
+        $this->assertEquals(1986, $node->year);
+        $this->assertEquals(3, $node->month);
+        $this->assertEquals(10, $node->day);
+        $this->assertEquals(8, $node->hour);
+        $this->assertEquals(51, $node->minute);
 
         // Parabolic
         $helin_roman = new Parabolic();
@@ -824,8 +873,53 @@ class TargetTest extends BaseTestCase
         $mars->calculateEquatorialCoordinates($date, $coords, 1706, true);
         $coordinates = $mars->getEquatorialCoordinates();
 
-        $this->assertEqualsWithDelta(22.64075, $coordinates->getRA()->getCoordinate(), 0.00001);
-        $this->assertEqualsWithDelta(-15.775, $coordinates->getDeclination()->getCoordinate(), 0.001);
+        // Example 40.a gives a topocentric position of 22h38m08.54s,
+        // -15d46'30.0" for Mars.
+        $this->assertEqualsWithDelta(
+            22 + 38 / 60 + 8.54 / 3600,
+            $coordinates->getRA()->getCoordinate(),
+            0.0001
+        );
+        $this->assertEqualsWithDelta(
+            -(15 + 46 / 60 + 30.0 / 3600),
+            $coordinates->getDeclination()->getCoordinate(),
+            0.001
+        );
+    }
+
+    /**
+     * Test the correction for parallax of the moon.
+     *
+     * The moon is the target where the parallax matters most: its equatorial
+     * horizontal parallax is close to one degree, against a few arcseconds for
+     * a comet or a planet.
+     *
+     * @return None
+     */
+    public function testParallaxMoon()
+    {
+        $date = Carbon::create(1992, 4, 12, 0, 0, 0, 'UTC');
+        $geo_coords = new GeographicalCoordinates(0, 0);
+
+        $moon = new Moon();
+        $moon->calculateApparentEquatorialCoordinates($date->copy());
+        $geocentric = $moon->getEquatorialCoordinates();
+
+        $moon = new Moon();
+        $moon->calculateEquatorialCoordinates($date->copy(), $geo_coords, 0.0);
+        $topocentric = $moon->getEquatorialCoordinates();
+
+        // JPL Horizons gives 08h59m11.28s / +13d44'12.4" seen from the centre of
+        // the earth and 08h55m26.24s / +13d49'59.1" seen from longitude 0,
+        // latitude 0, at sea level. That is a shift of -56.26 arcminutes of
+        // right ascension and +5.78 arcminutes of declination.
+        $deltaRa = ($topocentric->getRA()->getCoordinate()
+            - $geocentric->getRA()->getCoordinate()) * 900;
+        $deltaDec = ($topocentric->getDeclination()->getCoordinate()
+            - $geocentric->getDeclination()->getCoordinate()) * 60;
+
+        $this->assertEqualsWithDelta(-56.26, $deltaRa, 0.1);
+        $this->assertEqualsWithDelta(5.78, $deltaDec, 0.1);
     }
 
     /**

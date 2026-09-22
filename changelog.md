@@ -2,6 +2,34 @@
 
 All notable changes to `laravel-astronomy-library` will be documented in this file.
 
+## Version 6.8.0
+
+Fixed:
+
+- Elliptic orbits: the sign of the mean anomaly was inverted in `src/deepskylog/AstronomyLibrary/Targets/Elliptic.php`, so every position calculated for a comet or an asteroid on an elliptic orbit was wrong. Chapter 33 of Astronomical Algorithms needs `M = n(t - T)`, the code used `M = -n(t - T)`. For comet Encke on 1990 October 6 the calculated position was 3.6 hours of right ascension and 38 degrees of declination away from the real position; it now agrees with JPL Horizons to 37 arcseconds of right ascension and 4 arcminutes of declination, the remaining difference being the accuracy of a two-body solution with osculating elements. `Parabolic` and `NearParabolic` already used the correct sign and are unaffected.
+- Retrograde orbits: `Elliptic::setOrbitalElements()` replaced an inclination above 90 degrees by `180 - i` and turned the argument of perihelion and the longitude of the ascending node by 180 degrees. That mirrors the orbit in the plane of the ecliptic and makes a retrograde orbit prograde, so comet Halley (i = 162 degrees) was stored as a prograde orbit with i = 18 degrees. The inclination is now kept as it is given: the formulae of chapter 33 use `cos(i)` and are valid over the whole range of 0 to 180 degrees. Because of this, `ascendingNode()` and `descendingNode()` no longer return each other's result for a retrograde orbit.
+- Julian day at the Gregorian calendar reform: `Time::getJd()` treated 1582 October 4 as a Gregorian date and returned a julian day 10 days too small for midnight on that day, and it threw an `InvalidDateException` for every later time on that day, although the date did exist. The Julian calendar now runs to the end of 1582 October 4 and the julian day is continuous over the reform. The dates from 1582 October 5 to 14, which never existed, still throw.
+- Correction for parallax (chapter 40): the calculation was repeated in `Targets/Elliptic.php`, `Targets/Parabolic.php`, `Targets/Planet.php` and `Targets/Moon.php`, and every copy had the same four errors. The denominator used `sin(H)` instead of `cos(H)`, a correction in degrees was divided by 3600 as if it were in arcseconds, the height of the observer in meters was given to a cosine instead of the hour angle, and a correction in degrees was added to a right ascension in hours. For the moon the equatorial horizontal parallax was in addition used 3600 times too small, so the correction was in practice not applied at all. Example 40.a of Astronomical Algorithms is now reproduced exactly, and the parallax of the moon agrees with JPL Horizons to 0.03 arcminutes.
+- JPL Horizons queries in `scripts/horizons_radec.php` and `Targets/Planet.php` sent an `EPHEM` parameter. The Horizons API does not know that parameter and refuses the whole request with "HTTP code 400 - one or more query parameter was not recognized", so the query always failed and the code fell back silently to a cached answer or to the internal calculation. The parameter is no longer sent. Horizons serves DE441 for the major bodies and the ephemeris cannot be chosen per request.
+- Comet designations in `scripts/horizons_radec.php`: Horizons looks a bare designation up in the table of major bodies first, so a query for `12P` answered for Styx (905), a moon of Pluto, together with a completely valid block of data. Comets and interstellar objects are now asked for with the small-body syntax `DES=<designation>; CAP;`.
+
+Changed:
+
+- The correction for parallax is now in one place, `Target::_correctForParallax()`, and takes the equatorial horizontal parallax in degrees.
+- `scripts/horizons_radec.php` reports the body Horizons answered for in a `target_name` field, so a designation that is resolved to the wrong object is visible in the output instead of giving plausible coordinates.
+- `Elliptic` gives `false` to `Carbon::diffInSeconds()` explicitly, so that the signed difference is used on Carbon 2 as well as on Carbon 3.
+- `tests/Unit/PlanetHorizonsDE440Test.php` is renamed to `tests/Unit/PlanetHorizonsTest.php`, because the test compares against the ephemeris that Horizons serves, which cannot be chosen.
+- `phpunit.xml` is migrated to the schema of PHPUnit 11.
+- `readme.md` mentions php 8.0 as the minimum version, as `composer.json` requires.
+
+Removed:
+
+- The debug output of `scripts/horizons_radec.php` is no longer under version control. `scripts/horizons_raw.txt`, `scripts/horizons_block.txt` and `scripts/horizons_resp.json` are rewritten on every run and are ignored from now on, so running the tests no longer changes files in the working tree. `scripts/horizons_resp_capture.json` was not used anywhere and is deleted. The fixtures `scripts/horizons_resp_Mars.json` and `scripts/horizons_resp_Jupiter.json` are kept, they are read by `tests/Unit/PrintPlanetCoordsTest.php`.
+
+Notes:
+
+- This release changes calculated positions. Positions of comets and asteroids on elliptic orbits change completely, topocentric positions of planets and comets change by up to about 4.5 arcminutes, and topocentric positions of the moon by up to about 1 degree. Results that were stored with an earlier version have to be calculated again.
+
 ## Version 6.7.7
 
 Added:

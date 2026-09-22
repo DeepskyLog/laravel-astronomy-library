@@ -14,7 +14,7 @@ The laravel-astronomy-library is part of [DeepskyLog](https://www.deepskylog.org
 
 ## Installation
 
-AstronomyLibrary can be installed via composer.  laravel-astronomy-library needs at least php 7.4 to run.
+AstronomyLibrary can be installed via composer.  laravel-astronomy-library needs at least php 8.0 to run.
 
 ``` bash
 composer require deepskylog/laravel-astronomy-library

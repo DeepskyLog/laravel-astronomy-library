@@ -2545,4 +2545,66 @@ class Target
     {
         // no-op; subclasses (e.g. Sun, Moon, Planet) provide a real implementation
     }
+
+    /**
+     * Converts geocentric equatorial coordinates to topocentric coordinates.
+     * Chapter 40 of Astronomical Algorithms.
+     *
+     * @param  EquatorialCoordinates  $equa_coords  The geocentric coordinates
+     * @param  float  $parallax  The equatorial horizontal parallax, in degrees
+     * @param  Carbon  $date  The date
+     * @param  GeographicalCoordinates  $geo_coords  The location of the observer
+     * @param  float  $height  The height of the observer, in meters
+     * @return EquatorialCoordinates The topocentric coordinates
+     */
+    protected function _correctForParallax(
+        EquatorialCoordinates $equa_coords,
+        float $parallax,
+        Carbon $date,
+        GeographicalCoordinates $geo_coords,
+        float $height
+    ): EquatorialCoordinates {
+        $siderial_time = Time::apparentSiderialTime(
+            $date,
+            new GeographicalCoordinates(0.0, 0.0)
+        );
+
+        // The geocentric local hour angle, in degrees.
+        $hour_angle = (new Coordinate(
+            $equa_coords->getHourAngle($siderial_time)
+                + $geo_coords->getLongitude()->getCoordinate() * 15.0,
+            0,
+            360
+        ))->getCoordinate();
+
+        // rhoSinPhi and rhoCosPhi for the observer.
+        [$rhoSinPhi, $rhoCosPhi] = $geo_coords->earthsGlobe($height);
+
+        $ra = $equa_coords->getRA()->getCoordinate();
+        $declination = $equa_coords->getDeclination()->getCoordinate();
+
+        $sinPi = sin(deg2rad($parallax));
+        $sinDec = sin(deg2rad($declination));
+        $cosDec = cos(deg2rad($declination));
+        $sinH = sin(deg2rad($hour_angle));
+        $cosH = cos(deg2rad($hour_angle));
+
+        // Formula 40.2. The same denominator is used for both corrections.
+        $denominator = $cosDec - $rhoCosPhi * $sinPi * $cosH;
+
+        $deltaRa = rad2deg(atan2(-$rhoCosPhi * $sinPi * $sinH, $denominator));
+
+        $newDeclination = rad2deg(
+            atan(
+                ($sinDec - $rhoSinPhi * $sinPi) * cos(deg2rad($deltaRa))
+                    / $denominator
+            )
+        );
+
+        // The right ascension is kept in hours, the correction is in degrees.
+        $equa_coords->setRA($ra + $deltaRa / 15.0);
+        $equa_coords->setDeclination($newDeclination);
+
+        return $equa_coords;
+    }
 }

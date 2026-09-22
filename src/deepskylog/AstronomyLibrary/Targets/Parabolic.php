@@ -265,21 +265,15 @@ class Parabolic extends Target
 
         $equa_coords = new EquatorialCoordinates($ra, $dec);
 
-        // Calculate corrections for parallax
-        $pi = 8.794 / $delta;
-
-        $siderial_time = Time::apparentSiderialTime($date, new GeographicalCoordinates(0.0, 0.0));
-
-        $hour_angle = (new \deepskylog\AstronomyLibrary\Coordinates\Coordinate($equa_coords->getHourAngle($siderial_time) + $geo_coords->getLongitude()->getCoordinate() * 15.0, 0, 360))->getCoordinate();
-
-        $earthsGlobe = $geo_coords->earthsGlobe($height);
-
-        $deltara = rad2deg(atan(-$earthsGlobe[1] * sin(deg2rad($pi / 3600.0)) * sin(deg2rad($hour_angle)) / (cos(deg2rad($equa_coords->getDeclination()->getCoordinate())) - $earthsGlobe[1] * sin(deg2rad($pi / 3600.0)) * sin(deg2rad($hour_angle)))));
-        $dec = rad2deg(atan((sin(deg2rad($equa_coords->getDeclination()->getCoordinate())) - $earthsGlobe[0] * sin(deg2rad($pi / 3600.0))) * cos(deg2rad($deltara / 3600.0))
-                                / (cos(deg2rad($equa_coords->getDeclination()->getCoordinate())) - $earthsGlobe[1] * sin(deg2rad($pi / 3600.0)) * cos(deg2rad($height)))));
-
-        $equa_coords->setRA($ra + $deltara);
-        $equa_coords->setDeclination($dec);
+        // Calculate corrections for parallax.
+        // The equatorial horizontal parallax in arcseconds, converted to degrees.
+        $equa_coords = $this->_correctForParallax(
+            $equa_coords,
+            (8.794 / $delta) / 3600.0,
+            $date,
+            $geo_coords,
+            $height
+        );
 
         return $equa_coords;
     }

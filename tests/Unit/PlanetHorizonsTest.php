@@ -7,9 +7,9 @@ use deepskylog\AstronomyLibrary\Coordinates\GeographicalCoordinates;
 use deepskylog\AstronomyLibrary\Targets\Mars;
 use Carbon\Carbon;
 
-final class PlanetHorizonsDE440Test extends TestCase
+final class PlanetHorizonsTest extends TestCase
 {
-    public function testPlanetUsesHorizonsHelperWithDE440(): void
+    public function testPlanetMatchesHorizons(): void
     {
         $script = __DIR__ . '/../../scripts/horizons_radec.php';
         $dt = '2025-11-18 16:08';
@@ -17,7 +17,10 @@ final class PlanetHorizonsDE440Test extends TestCase
         $lat = '49.3447';
         $alt = '130';
 
-        // First: call the helper directly with EPHEM=DE440 to get authoritative RA/Dec
+        // First: call the helper directly to get authoritative RA/Dec. The
+        // ephemeris argument is accepted but ignored: Horizons has no API
+        // parameter to select the JPL ephemeris and serves DE441 for the major
+        // bodies.
         $scriptPath = realpath($script);
         if (! $scriptPath || ! file_exists($scriptPath)) {
             $this->markTestSkipped('Horizons helper script not found');

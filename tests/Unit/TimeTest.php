@@ -298,6 +298,61 @@ class TimeTest extends BaseTestCase
     }
 
     /**
+     * Test the boundary between the Julian and the Gregorian calendar.
+     *
+     * The Julian calendar was in use up to and including 1582 October 4, the
+     * Gregorian calendar starts at 1582 October 15. The julian day has to run
+     * on without a gap over that boundary.
+     *
+     * @return None
+     */
+    public function testGregorianJulianBoundary()
+    {
+        // Last day of the Julian calendar.
+        $this->assertEquals(
+            2299159.5,
+            Time::getJd(Carbon::create(1582, 10, 4, 0, 0, 0, 'UTC'))
+        );
+
+        // 1582 October 4 existed all day long, up to midnight.
+        $this->assertEqualsWithDelta(
+            2299160.0,
+            Time::getJd(Carbon::create(1582, 10, 4, 12, 0, 0, 'UTC')),
+            0.0000001
+        );
+
+        // First day of the Gregorian calendar, one day after October 4.
+        $this->assertEquals(
+            2299160.5,
+            Time::getJd(Carbon::create(1582, 10, 15, 0, 0, 0, 'UTC'))
+        );
+    }
+
+    /**
+     * Test that the first skipped day of 1582 does not exist.
+     *
+     * @return None
+     */
+    public function testFirstSkippedDayDoesNotExist()
+    {
+        $date = Carbon::create(1582, 10, 5, 0, 0, 0, 'UTC');
+        $this->expectException(\Carbon\Exceptions\InvalidDateException::class);
+        Time::getJd($date);
+    }
+
+    /**
+     * Test that the last skipped day of 1582 does not exist.
+     *
+     * @return None
+     */
+    public function testLastSkippedDayDoesNotExist()
+    {
+        $date = Carbon::create(1582, 10, 14, 23, 59, 59, 'UTC');
+        $this->expectException(\Carbon\Exceptions\InvalidDateException::class);
+        Time::getJd($date);
+    }
+
+    /**
      * Test exceptions for wrong dates.
      *
      * @return None

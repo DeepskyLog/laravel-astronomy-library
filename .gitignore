@@ -3,3 +3,9 @@
 .phpunit.result.cache
 composer.lock
 .idea/
+.phpunit.cache
+
+# Debug output written by scripts/horizons_radec.php on every run
+scripts/horizons_raw.txt
+scripts/horizons_block.txt
+scripts/horizons_resp.json

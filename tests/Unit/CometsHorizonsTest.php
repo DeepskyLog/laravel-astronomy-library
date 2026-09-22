@@ -1,5 +1,6 @@
 <?php
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -23,9 +24,7 @@ class CometsHorizonsTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider cometsProvider
-     */
+    #[DataProvider('cometsProvider')]
     public function testHorizonsHelperReturnsRaDec(mixed $des, string $datetime, float $lon, float $lat, float $height)
     {
         $script = realpath(__DIR__ . '/../../scripts/horizons_radec.php');
@@ -60,7 +59,7 @@ class CometsHorizonsTest extends TestCase
         if ($ret !== 0 || ! is_array($json) || ! isset($json['ra_hours'])) {
             $this->markTestSkipped('Horizons helper did not return usable data for any candidate: ' . json_encode($candidates) . ' (last output: ' . implode("\n", (array)$out) . ')');
         }
-        $this->assertIsArray($json, 'Invalid JSON returned by helper for ' . $des);
+        $this->assertIsArray($json, 'Invalid JSON returned by helper for ' . ($used ?? json_encode($des)));
         $this->assertArrayHasKey('ra_hours', $json);
         $this->assertArrayHasKey('dec_deg', $json);
 
