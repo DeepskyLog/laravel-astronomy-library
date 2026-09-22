@@ -1,16 +1,16 @@
 <?php
 
-use PHPUnit\Framework\TestCase;
 use Carbon\Carbon;
-use deepskylog\AstronomyLibrary\Targets\Elliptic;
-use deepskylog\AstronomyLibrary\Coordinates\GeographicalCoordinates;
 use deepskylog\AstronomyLibrary\Coordinates\EquatorialCoordinates;
+use deepskylog\AstronomyLibrary\Coordinates\GeographicalCoordinates;
+use deepskylog\AstronomyLibrary\Targets\Elliptic;
+use PHPUnit\Framework\TestCase;
 
 class EllipticHorizonsIntegrationTest extends TestCase
 {
     public function testEllipticUsesHorizonsHelper()
     {
-        $script = realpath(__DIR__ . '/../../scripts/horizons_radec.php');
+        $script = realpath(__DIR__.'/../../scripts/horizons_radec.php');
         if (! $script || ! file_exists($script)) {
             $this->markTestSkipped('Horizons helper script not found');
         }
@@ -22,15 +22,15 @@ class EllipticHorizonsIntegrationTest extends TestCase
         $height = 130;
 
         // Call helper directly to obtain authoritative RA/Dec
-        $cmd = escapeshellcmd(PHP_BINARY) . ' ' . escapeshellarg($script) . ' '
-            . escapeshellarg($des) . ' ' . escapeshellarg($datetime) . ' '
-            . escapeshellarg((string)$lon) . ' ' . escapeshellarg((string)$lat) . ' ' . escapeshellarg((string)$height);
+        $cmd = escapeshellcmd(PHP_BINARY).' '.escapeshellarg($script).' '
+            .escapeshellarg($des).' '.escapeshellarg($datetime).' '
+            .escapeshellarg((string) $lon).' '.escapeshellarg((string) $lat).' '.escapeshellarg((string) $height);
 
         $out = null;
         $ret = null;
         exec($cmd, $out, $ret);
         if ($ret !== 0) {
-            $this->markTestSkipped('Horizons helper failed to produce JSON: ' . implode("\n", $out));
+            $this->markTestSkipped('Horizons helper failed to produce JSON: '.implode("\n", $out));
         }
 
         $helperJson = @json_decode(implode("\n", $out), true);
@@ -57,6 +57,6 @@ class EllipticHorizonsIntegrationTest extends TestCase
         $sep = $got->angularSeparation($expected)->getCoordinate();
 
         // Assert small separation (<= 0.02 deg ~72 arcsec)
-        $this->assertLessThanOrEqual(0.02, $sep, 'Elliptic Horizons coordinates differ from helper by ' . $sep . ' deg');
+        $this->assertLessThanOrEqual(0.02, $sep, 'Elliptic Horizons coordinates differ from helper by '.$sep.' deg');
     }
 }
