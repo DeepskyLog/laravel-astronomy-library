@@ -2,6 +2,26 @@
 
 All notable changes to `laravel-astronomy-library` will be documented in this file.
 
+## Version 6.8.2
+
+Fixed:
+
+- `astronomy:updateOrbitalElements` truncated `comets_orbital_elements` on every run, which removed the photometry (`H`, `n`, `phase_coeff`, `n_pre`, `n_post`) stored by `astronomy:updateCometPhotometry` every Monday. The comets are now upserted on their name, so the photometry is kept, and comets that are no longer in the file of JPL are removed.
+- `astronomy:updateOrbitalElements` emptied the tables before the download, so a failed download left empty or half-filled tables. The files are now downloaded completely first, checked against their `Content-Length`, and the tables are changed in one transaction each. A failure leaves the old orbital elements in place.
+- `astronomy:updateOrbitalElements` failed on SQLite, because the truncate of a table without an auto-increment column tried to clear `sqlite_sequence`.
+- `astronomy:updateCometPhotometry` did not find the aerith.net page of most comets. The name slug removed the capitals before lowercasing (12P/Pons-Brooks became `12onsrooks`), and C/1992 B1 became `1992B/`, so the pages of non-periodic comets were never found. The command now reads the index pages of aerith.net (`index-periodic.html` and `index-code.html`), which give the page of every comet: 1770 comets get their photometry from aerith.net.
+- `astronomy:updateCometPhotometry` used the first m1 formula of a page, which is the oldest part of the light curve (for 12P/Pons-Brooks the one of 2022). It now uses the last line of the list, the most recent one, and no longer the notes below the list like "Gray curve is: m1 = ...". A light curve "H = 17.7  G = 0.15" is stored with K = 5.
+- `astronomy:updateCometPhotometry` lost the sign of K: "m1 = 8.5 + 5 log d - 5.0 log r" was read as K = 5.0.
+- `astronomy:updateCometPhotometry` asked SBDB for parts of the name like `des=C`, `des=SOHO` or `des=Bradfield`, which can match an asteroid with the same name, and not for the designation itself, like C/1992 B1. SBDB is now asked for M1 and K1 of all comets in one query, matched on the full name.
+- Fragments of a comet, like 205P/Giacobini-C, got the photometry of the main comet from aerith.net. They now only get the photometry of SBDB.
+
+Changed:
+
+- `astronomy:updateOrbitalElements` is faster: the inserts run in one transaction instead of committing every batch, with batches of 2000 rows through the query builder. For the about 900 000 asteroids on SQLite the database part went from 12.6 to 5.2 seconds; on MySQL, where every commit waits for the disk, the gain is larger. The download from JPL, about 25 seconds, did not change.
+- `astronomy:updateCometPhotometry` is faster: a run for all 4077 comets takes about 2 minutes instead of about 3 hours. It used to try up to 30 urls on aerith.net and SBDB per comet, one after the other. It now makes three requests for all comets (the SBDB query and the two index pages of aerith.net), and only fetches the page of the comets that are on aerith.net, 4 at a time. The new option `--concurrency=` changes the number of simultaneous requests.
+- `astronomy:updateCometPhotometry --target=` uses aerith.net as well, with SBDB as fallback, like a run for all comets. It used to ask SBDB only.
+- When the most recent m1 formula of aerith.net is outside the plausible range (for C/1995 O1 (Hale-Bopp) m1 = -14.5 + 5 log d + 20 log r, far from the sun), the photometry of SBDB is used.
+
 ## Version 6.8.1
 
 Fixed:
