@@ -19,6 +19,7 @@ use Carbon\Carbon;
 use deepskylog\AstronomyLibrary\Coordinates\Coordinate;
 use deepskylog\AstronomyLibrary\Coordinates\EquatorialCoordinates;
 use deepskylog\AstronomyLibrary\Coordinates\GeographicalCoordinates;
+use deepskylog\AstronomyLibrary\Coordinates\RectangularCoordinates;
 use deepskylog\AstronomyLibrary\Time;
 use RuntimeException;
 
@@ -1217,6 +1218,8 @@ class Target
         GeographicalCoordinates $geo_coords,
         Carbon $date
     ): string {
+        // The graph walks through the night by changing the date, work on a copy
+        $date = $date->copy();
         if (! $this->_altitudeChart) {
             $image = imagecreatetruecolor(1000, 400);
 
@@ -2552,6 +2555,50 @@ class Target
     protected function calculateEquatorialCoordinates(Carbon $date, ...$args): void
     {
         // no-op; subclasses (e.g. Sun, Moon, Planet) provide a real implementation
+    }
+
+    /**
+     * Geometric rectangular coordinates of the Sun, referred to the mean
+     * equator and equinox of the orbital elements.
+     * Chapters 26 and 33 of Astronomical Algorithms.
+     *
+     * The heliocentric position of a comet or an asteroid is calculated in the
+     * frame of its orbital elements, J2000 for the elements that JPL and the
+     * MPC publish. The Sun has to be referred to that same equinox before both
+     * vectors are added: the coordinates of the Sun for the equinox of the date
+     * are turned by the precession since J2000, which moves an object close to
+     * the earth by up to a quarter of a degree.
+     *
+     * @param  Carbon  $date  The date
+     * @param  float  $equinox  The equinox of the orbital elements, as a julian day
+     * @return RectangularCoordinates The geometric coordinates of the Sun, in AU
+     */
+    protected function _sunRectangularCoordinates(Carbon $date, float $equinox = 2451545.0): RectangularCoordinates
+    {
+        $xyz = (new Sun())->calculateGeometricCoordinatesJ2000($date);
+
+        if (abs($equinox - 2451545.0) < 1e-6) {
+            return $xyz;
+        }
+
+        // Precess the direction of the Sun from J2000 to the equinox of the elements.
+        $X = $xyz->getX()->getCoordinate();
+        $Y = $xyz->getY()->getCoordinate();
+        $Z = $xyz->getZ()->getCoordinate();
+        $R = sqrt($X ** 2 + $Y ** 2 + $Z ** 2);
+
+        $ra = fmod(rad2deg(atan2($Y, $X)) + 360.0, 360.0) / 15.0;
+        $precessed = (new EquatorialCoordinates($ra, rad2deg(asin($Z / $R))))
+            ->precessionHighAccuracy(Time::fromJd($equinox));
+
+        $alpha = deg2rad($precessed->getRA()->getCoordinate() * 15.0);
+        $delta = deg2rad($precessed->getDeclination()->getCoordinate());
+
+        return new RectangularCoordinates(
+            $R * cos($delta) * cos($alpha),
+            $R * cos($delta) * sin($alpha),
+            $R * sin($delta)
+        );
     }
 
     /**

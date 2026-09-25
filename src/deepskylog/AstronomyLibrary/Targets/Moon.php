@@ -295,10 +295,10 @@ class Moon extends Target
             $this->_calculateApparentEquatorialCoordinates($date)
         );
         $this->setEquatorialCoordinatesTomorrow(
-            $this->_calculateApparentEquatorialCoordinates($date->addDay())
+            $this->_calculateApparentEquatorialCoordinates($date->copy()->addDay())
         );
         $this->setEquatorialCoordinatesYesterday(
-            $this->_calculateApparentEquatorialCoordinates($date->subDays(2))
+            $this->_calculateApparentEquatorialCoordinates($date->copy()->subDay())
         );
     }
 
@@ -329,10 +329,10 @@ class Moon extends Target
             $this->_calculateEquatorialCoordinates($date, $geo_coords, $height)
         );
         $this->setEquatorialCoordinatesTomorrow(
-            $this->_calculateEquatorialCoordinates($date->addDay(), $geo_coords, $height)
+            $this->_calculateEquatorialCoordinates($date->copy()->addDay(), $geo_coords, $height)
         );
         $this->setEquatorialCoordinatesYesterday(
-            $this->_calculateEquatorialCoordinates($date->subDays(2), $geo_coords, $height)
+            $this->_calculateEquatorialCoordinates($date->copy()->subDay(), $geo_coords, $height)
         );
     }
 

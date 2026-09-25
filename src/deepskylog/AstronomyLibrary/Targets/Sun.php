@@ -70,10 +70,10 @@ class Sun extends Target
             $this->_calculateEquatorialCoordinates($date, $obliquity)
         );
         $this->setEquatorialCoordinatesTomorrow(
-            $this->_calculateEquatorialCoordinates($date->addDay(), $obliquity)
+            $this->_calculateEquatorialCoordinates($date->copy()->addDay(), $obliquity)
         );
         $this->setEquatorialCoordinatesYesterday(
-            $this->_calculateEquatorialCoordinates($date->subDays(2), $obliquity)
+            $this->_calculateEquatorialCoordinates($date->copy()->subDay(), $obliquity)
         );
     }
 
@@ -147,10 +147,10 @@ class Sun extends Target
             $this->_calculateEquatorialCoordinatesHighAccuracy($date, $nutation)
         );
         $this->setEquatorialCoordinatesTomorrow(
-            $this->_calculateEquatorialCoordinatesHighAccuracy($date->addDay(), $nutation)
+            $this->_calculateEquatorialCoordinatesHighAccuracy($date->copy()->addDay(), $nutation)
         );
         $this->setEquatorialCoordinatesYesterday(
-            $this->_calculateEquatorialCoordinatesHighAccuracy($date->subDays(2), $nutation)
+            $this->_calculateEquatorialCoordinatesHighAccuracy($date->copy()->subDay(), $nutation)
         );
     }
 

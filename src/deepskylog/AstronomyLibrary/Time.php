@@ -43,8 +43,8 @@ class Time
      */
     public static function getJd(Carbon $date): float
     {
-        // Get the time in UTC
-        $date->setTimezone('UTC');
+        // Get the time in UTC, without changing the timezone of the caller's date
+        $date = $date->copy()->setTimezone('UTC');
 
         $day = (($date->second / 60 + $date->minute) / 60 + $date->hour) / 24
             + $date->day;
@@ -155,7 +155,7 @@ class Time
      */
     public static function dynamicalTime(Carbon $date): Carbon
     {
-        return $date->addSeconds(self::deltaT($date));
+        return $date->copy()->addSeconds(self::deltaT($date));
     }
 
     /**

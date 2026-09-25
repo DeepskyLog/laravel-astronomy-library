@@ -23,6 +23,7 @@ use deepskylog\AstronomyLibrary\Targets\Jupiter;
 use deepskylog\AstronomyLibrary\Targets\Mars;
 use deepskylog\AstronomyLibrary\Targets\Mercury;
 use deepskylog\AstronomyLibrary\Targets\Moon;
+use deepskylog\AstronomyLibrary\Targets\NearParabolic;
 use deepskylog\AstronomyLibrary\Targets\Neptune;
 use deepskylog\AstronomyLibrary\Targets\Parabolic;
 use deepskylog\AstronomyLibrary\Targets\Planet;
@@ -572,19 +573,22 @@ class TargetTest extends BaseTestCase
         $encke->calculateEquatorialCoordinates($date, $geo_coords);
         $coordinates = $encke->getEquatorialCoordinates();
 
-        // Cross-checked against JPL Horizons (DES=2P;CAP;, geocentric astrometric
-        // J2000), which gives RA 10h33m46.04s = 10.562789 h and Dec +19d15'27.3"
-        // = +19.257583 deg for this date. The remaining difference (about 37
-        // arcsec of RA and 4 arcmin of declination) is the error of the two-body
-        // solution of chapter 33 with osculating elements.
-        $this->assertEqualsWithDelta(10.562106034676, $coordinates->getRA()->getCoordinate(), 0.000001);
-        $this->assertEqualsWithDelta(19.188986216308, $coordinates->getDeclination()->getCoordinate(), 0.000001);
+        // JPL Horizons propagating these same elements (COMMAND=';', ECLIP=J2000,
+        // geocentric astrometric) gives RA 10.570689 h and Dec +19.157710 deg,
+        // 1.7 arcsec from the library. Meeus finds 158.558965 deg = 10.570598 h
+        // and +19.158496 deg in Example 33.a.
+        $this->assertEqualsWithDelta(10.570722433439, $coordinates->getRA()->getCoordinate(), 0.000001);
+        $this->assertEqualsWithDelta(19.157677526139, $coordinates->getDeclination()->getCoordinate(), 0.000001);
+        $this->assertEqualsWithDelta(10.570689, $coordinates->getRA()->getCoordinate(), 0.0001);
+        $this->assertEqualsWithDelta(19.157710, $coordinates->getDeclination()->getCoordinate(), 0.001);
 
-        // Guard against a regression of the sign of the mean anomaly: before the
+        // Guard against a regression of the sign of the mean anomaly: before that
         // fix this returned 14.137 h / -18.680 deg, roughly 3.6 hours of right
         // ascension and 38 degrees of declination away from the true position.
-        $this->assertEqualsWithDelta(10.562789, $coordinates->getRA()->getCoordinate(), 0.02);
-        $this->assertEqualsWithDelta(19.257583, $coordinates->getDeclination()->getCoordinate(), 0.1);
+        // Guard as well against adding the Sun for the equinox of the date to
+        // the J2000 position of the comet, which gave 10.562106 h / +19.188986 deg.
+        $this->assertEqualsWithDelta(10.570689, $coordinates->getRA()->getCoordinate(), 0.001);
+        $this->assertEqualsWithDelta(19.157710, $coordinates->getDeclination()->getCoordinate(), 0.01);
     }
 
     /**
@@ -601,12 +605,12 @@ class TargetTest extends BaseTestCase
         $stonehouse->calculateEquatorialCoordinates($date, $geo_coords);
         $coordinates = $stonehouse->getEquatorialCoordinates();
 
-        // Cross-checked against JPL Horizons (DES=C/1998 H1;CAP;, geocentric
-        // astrometric J2000), which gives RA 12h31m21.73s = 12.522703 h and Dec
-        // +50d45'09.2" = +50.752556 deg. The library stays within 33 arcsec of
-        // right ascension and 38 arcsec of declination of that.
-        $this->assertEqualsWithDelta(12.523304102096, $coordinates->getRA()->getCoordinate(), 0.00001);
-        $this->assertEqualsWithDelta(50.763203653952, $coordinates->getDeclination()->getCoordinate(), 0.00001);
+        // JPL Horizons propagating these same elements (COMMAND=';', ECLIP=J2000,
+        // geocentric astrometric) gives RA 12.523821 h and Dec +50.752680 deg.
+        // The library stays within 4 arcsec of right ascension and 16 arcsec of
+        // declination of that; Parabolic does not correct for light time.
+        $this->assertEqualsWithDelta(12.523722966142, $coordinates->getRA()->getCoordinate(), 0.00001);
+        $this->assertEqualsWithDelta(50.756976892099, $coordinates->getDeclination()->getCoordinate(), 0.00001);
     }
 
     /**
@@ -763,6 +767,73 @@ class TargetTest extends BaseTestCase
         $this->assertEquals($aphelion->month, 10);
         $this->assertEquals($aphelion->day, 24);
         $this->assertEquals($aphelion->hour, 22);
+    }
+
+    /**
+     * Test a comet close to the earth, where the frame of the Sun matters most.
+     *
+     * The orbital elements are referred to J2000, so the Sun has to be referred
+     * to J2000 as well. Adding the Sun for the equinox of the date put comet
+     * C/2025 A6 (Lemmon), 0.6 AU from the earth, 36 arcminutes away from its
+     * position on 2025 October 21.
+     */
+    public function testEquatorialCoordinatesOfCometCloseToEarth()
+    {
+        $lemmon = new Elliptic();
+        $q = 0.52990413;
+        $e = 0.99553621;
+        $peridate = Carbon::create(2025, 11, 8, 12, 56, 43, 'UTC');
+        $lemmon->setOrbitalElements($q / (1 - $e), $e, 143.66371, 132.96884, 108.09799, $peridate);
+
+        $lemmon->calculateEquatorialCoordinates(Carbon::create(2025, 10, 21, 18, 0, 0, 'UTC'), new GeographicalCoordinates(0, 0));
+        $coordinates = $lemmon->getEquatorialCoordinates();
+
+        // JPL Horizons propagating these same elements (COMMAND=';', ECLIP=J2000,
+        // geocentric astrometric) gives RA 14.501186 h and Dec +28.582650 deg.
+        // The difference of 16 arcsec is the parallax for an observer at
+        // longitude 0 and latitude 0.
+        $this->assertEqualsWithDelta(14.501186, $coordinates->getRA()->getCoordinate(), 0.0005);
+        $this->assertEqualsWithDelta(28.582650, $coordinates->getDeclination()->getCoordinate(), 0.005);
+    }
+
+    /**
+     * Test that calculating the coordinates leaves the date of the caller alone.
+     *
+     * The coordinates for tomorrow and yesterday used to be calculated with
+     * $date->addDay() and $date->subDays(2), which moved the Carbon instance of
+     * the caller one day back, and Time::getJd() changed its timezone to UTC.
+     */
+    public function testCalculationsDoNotChangeTheDate()
+    {
+        $geo_coords = new GeographicalCoordinates(4.70, 50.88);
+        $peridate = Carbon::create(1990, 10, 28, 13, 4, 50, 'UTC');
+
+        $encke = new Elliptic();
+        $encke->setOrbitalElements(2.2091404, 0.8502196, 11.94524, 186.23352, 334.75006, $peridate);
+        $parabolic = new Parabolic();
+        $parabolic->setOrbitalElements(1.487469, 104.69219, 1.32431, 222.10887, $peridate);
+        $nearParabolic = new NearParabolic();
+        $nearParabolic->setOrbitalElements(0.52990413, 0.99553621, 143.66371, 132.96884, 108.09799, $peridate);
+
+        $targets = [
+            [new Sun(), []],
+            [new Moon(), [$geo_coords, 30.0]],
+            [new Mars(), [$geo_coords, 30.0]],
+            [$encke, [$geo_coords, 2451545.0, 30.0]],
+            [$parabolic, [$geo_coords, 30.0]],
+            [$nearParabolic, []],
+        ];
+        foreach ($targets as [$target, $args]) {
+            $date = Carbon::create(2026, 9, 25, 22, 0, 0, 'Europe/Brussels');
+            $target->calculateEquatorialCoordinates($date, ...$args);
+            $this->assertEquals('2026-09-25 22:00:00', $date->format('Y-m-d H:i:s'), get_class($target));
+            $this->assertEquals('Europe/Brussels', $date->timezone->getName(), get_class($target));
+        }
+
+        $date = Carbon::create(2026, 9, 25, 22, 0, 0, 'Europe/Brussels');
+        Time::getJd($date);
+        Time::dynamicalTime($date);
+        $this->assertEquals('2026-09-25 22:00:00 Europe/Brussels', $date->format('Y-m-d H:i:s e'));
     }
 
     /**

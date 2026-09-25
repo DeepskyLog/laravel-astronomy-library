@@ -251,9 +251,8 @@ class Elliptic extends Target
             try {
                 $h = $this->_horizonsEquatorialCoordinates($date, $geo_coords, $height);
                 $this->setEquatorialCoordinatesToday($h);
-                $this->setEquatorialCoordinatesTomorrow($this->_horizonsEquatorialCoordinates($date->addDay(), $geo_coords, $height));
-                $this->setEquatorialCoordinatesYesterday($this->_horizonsEquatorialCoordinates($date->subDays(2), $geo_coords, $height));
-
+                $this->setEquatorialCoordinatesTomorrow($this->_horizonsEquatorialCoordinates($date->copy()->addDay(), $geo_coords, $height));
+                $this->setEquatorialCoordinatesYesterday($this->_horizonsEquatorialCoordinates($date->copy()->subDay(), $geo_coords, $height));
                 return;
             } catch (\Throwable $e) {
                 // fallback to internal calculation on failure; log error for debugging
@@ -265,10 +264,10 @@ class Elliptic extends Target
             $this->_calculateEquatorialCoordinates($date, $geo_coords, $epoch, $height)
         );
         $this->setEquatorialCoordinatesTomorrow(
-            $this->_calculateEquatorialCoordinates($date->addDay(), $geo_coords, $epoch, $height)
+            $this->_calculateEquatorialCoordinates($date->copy()->addDay(), $geo_coords, $epoch, $height)
         );
         $this->setEquatorialCoordinatesYesterday(
-            $this->_calculateEquatorialCoordinates($date->subDays(2), $geo_coords, $epoch, $height)
+            $this->_calculateEquatorialCoordinates($date->copy()->subDay(), $geo_coords, $epoch, $height)
         );
     }
 
@@ -306,8 +305,7 @@ class Elliptic extends Target
         $y = $r * $b * sin(deg2rad($B + $this->_omega + $v));
         $z = $r * $c * sin(deg2rad($C + $this->_omega + $v));
 
-        $sun = new Sun();
-        $XYZ = $sun->calculateGeometricCoordinates($date);
+        $XYZ = $this->_sunRectangularCoordinates($date, $epoch);
 
         $ksi = $XYZ->getX()->getCoordinate() + $x;
         $eta = $XYZ->getY()->getCoordinate() + $y;
@@ -331,8 +329,7 @@ class Elliptic extends Target
         $y = $r * $b * sin(deg2rad($B + $this->_omega + $v));
         $z = $r * $c * sin(deg2rad($C + $this->_omega + $v));
 
-        $sun = new Sun();
-        $XYZ = $sun->calculateGeometricCoordinates($newDate);
+        // The comet is taken at t - tau, but the Sun (and so the observer) stays at t.
 
         $ksi = $XYZ->getX()->getCoordinate() + $x;
         $eta = $XYZ->getY()->getCoordinate() + $y;

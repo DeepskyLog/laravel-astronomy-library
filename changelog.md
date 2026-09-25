@@ -2,6 +2,20 @@
 
 All notable changes to `laravel-astronomy-library` will be documented in this file.
 
+## Version 6.8.1
+
+Fixed:
+
+- Comets and asteroids: `Elliptic`, `Parabolic` and `NearParabolic` added the geometric position of the Sun for the equinox of the date to the heliocentric position of the object, which is calculated in the J2000 frame of the orbital elements. The two vectors differ by the precession since J2000, so the result was wrong by up to 40 arcminutes for an object close to the earth (C/2025 A6 (Lemmon) on 2025 October 21) and by several arcminutes for most comets. The Sun is now referred to the equinox of the elements through the new `Target::_sunRectangularCoordinates()`: J2000 by default, or precessed to the `$epoch` given to `Elliptic::calculateEquatorialCoordinates()`. JPL Horizons propagating the same elements now agrees within a few arcseconds for Meeus' example 33.a (Encke), and within 1 arcminute for the comets tested between 2024 and 2026.
+- Light time in `Elliptic`: the position of the object is taken at t - tau, but the Sun is now kept at t, as in chapter 33 of Astronomical Algorithms. It used to be recalculated for t - tau as well.
+- `calculateEquatorialCoordinates()` and `calculateApparentEquatorialCoordinates()` of all targets changed the `Carbon` instance of the caller. The coordinates for tomorrow and yesterday were calculated with `$date->addDay()` and `$date->subDays(2)`, so the date of the caller was one day earlier after every call. They now work on a copy. `Time::getJd()` no longer changes the timezone of the date it gets to UTC, `Time::dynamicalTime()` no longer adds delta t to the date it gets, and `Target::altitudeGraph()` no longer moves the date through the night.
+- The migrations for `comets_orbital_elements` and `asteroids_orbital_elements` used `$table->float('q', 12, 8)`. Since Laravel 11 the second argument is the precision in bits, so the columns were single precision floats with about 7 significant digits: a time of perihelion like 20240421.13116 was stored as 20240422, and the epoch was an integer, so the `.5` of the julian day was lost. The orbital elements and the epoch are now `double` columns. Existing installations have to change the column types themselves, the migration only creates a missing table.
+
+Notes:
+
+- This release changes calculated positions of comets and asteroids. Results that were stored with an earlier version have to be calculated again.
+- The positions of comets and asteroids are astrometric positions for J2000, the positions of the planets are apparent positions for the equinox of the date. The two differ by about 20 arcminutes in 2025. `Parabolic` and `NearParabolic` do not correct for light time, and `NearParabolic` does not correct for parallax either.
+
 ## Version 6.8.0
 
 Fixed:

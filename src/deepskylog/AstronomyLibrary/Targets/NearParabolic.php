@@ -169,8 +169,7 @@ class NearParabolic extends Target
         $y = $r * $b * sin(deg2rad($B + $this->_omega + $v));
         $z = $r * $c * sin(deg2rad($C + $this->_omega + $v));
 
-        $sun = new Sun();
-        $XYZ = $sun->calculateGeometricCoordinates($date);
+        $XYZ = $this->_sunRectangularCoordinates($date);
 
         $xObj = $XYZ->getX()->getCoordinate() + $x;
         $yObj = $XYZ->getY()->getCoordinate() + $y;
@@ -235,10 +234,10 @@ class NearParabolic extends Target
             $this->_calculateEquatorialCoordinates($date)
         );
         $this->setEquatorialCoordinatesTomorrow(
-            $this->_calculateEquatorialCoordinates($date->addDay())
+            $this->_calculateEquatorialCoordinates($date->copy()->addDay())
         );
         $this->setEquatorialCoordinatesYesterday(
-            $this->_calculateEquatorialCoordinates($date->subDays(2))
+            $this->_calculateEquatorialCoordinates($date->copy()->subDay())
         );
     }
 
@@ -309,8 +308,7 @@ class NearParabolic extends Target
         $y = $r * $b * sin(deg2rad($B + $this->_omega + $v));
         $z = $r * $c * sin(deg2rad($C + $this->_omega + $v));
 
-        $sun = new Sun();
-        $XYZ = $sun->calculateGeometricCoordinates($date);
+        $XYZ = $this->_sunRectangularCoordinates($date);
 
         $ksi = $XYZ->getX()->getCoordinate() + $x;
         $eta = $XYZ->getY()->getCoordinate() + $y;

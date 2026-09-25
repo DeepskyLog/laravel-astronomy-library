@@ -71,10 +71,10 @@ abstract class Planet extends Target
                 $this->_horizonsEquatorialCoordinates($date, $geo, 0.0, (string) $VSOP87)
             );
             $this->setEquatorialCoordinatesTomorrow(
-                $this->_horizonsEquatorialCoordinates($date->addDay(), $geo, 0.0, (string) $VSOP87)
+                $this->_horizonsEquatorialCoordinates($date->copy()->addDay(), $geo, 0.0, (string) $VSOP87)
             );
             $this->setEquatorialCoordinatesYesterday(
-                $this->_horizonsEquatorialCoordinates($date->subDays(2), $geo, 0.0, (string) $VSOP87)
+                $this->_horizonsEquatorialCoordinates($date->copy()->subDay(), $geo, 0.0, (string) $VSOP87)
             );
 
             return;
@@ -85,10 +85,10 @@ abstract class Planet extends Target
             $this->_calculateApparentEquatorialCoordinates($date)
         );
         $this->setEquatorialCoordinatesTomorrow(
-            $this->_calculateApparentEquatorialCoordinates($date->addDay())
+            $this->_calculateApparentEquatorialCoordinates($date->copy()->addDay())
         );
         $this->setEquatorialCoordinatesYesterday(
-            $this->_calculateApparentEquatorialCoordinates($date->subDays(2))
+            $this->_calculateApparentEquatorialCoordinates($date->copy()->subDay())
         );
     }
 
@@ -128,10 +128,10 @@ abstract class Planet extends Target
                 $this->_horizonsEquatorialCoordinates($date, $geo_coords, $height, (string) $VSOP87)
             );
             $this->setEquatorialCoordinatesTomorrow(
-                $this->_horizonsEquatorialCoordinates($date->addDay(), $geo_coords, $height, (string) $VSOP87)
+                $this->_horizonsEquatorialCoordinates($date->copy()->addDay(), $geo_coords, $height, (string) $VSOP87)
             );
             $this->setEquatorialCoordinatesYesterday(
-                $this->_horizonsEquatorialCoordinates($date->subDays(2), $geo_coords, $height, (string) $VSOP87)
+                $this->_horizonsEquatorialCoordinates($date->copy()->subDay(), $geo_coords, $height, (string) $VSOP87)
             );
 
             return;
@@ -141,10 +141,10 @@ abstract class Planet extends Target
             $this->_calculateEquatorialCoordinates($date, $geo_coords, $height)
         );
         $this->setEquatorialCoordinatesTomorrow(
-            $this->_calculateEquatorialCoordinates($date->addDay(), $geo_coords, $height)
+            $this->_calculateEquatorialCoordinates($date->copy()->addDay(), $geo_coords, $height)
         );
         $this->setEquatorialCoordinatesYesterday(
-            $this->_calculateEquatorialCoordinates($date->subDays(2), $geo_coords, $height)
+            $this->_calculateEquatorialCoordinates($date->copy()->subDay(), $geo_coords, $height)
         );
     }
 

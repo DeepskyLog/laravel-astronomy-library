@@ -17,13 +17,13 @@ class CreateAsteroidsOrbitalElementsTable extends Migration
                 function (Blueprint $table) {
                     $table->integer('number');
                     $table->string('name');
-                    $table->integer('epoch')->signed();
-                    $table->float('a', 12, 8);
-                    $table->float('e', 12, 8);
-                    $table->float('i', 10, 5);
-                    $table->float('w', 10, 5);
-                    $table->float('node', 10, 5);
-                    $table->float('M', 15, 7);
+                    $table->double('epoch');
+                    $table->double('a');
+                    $table->double('e');
+                    $table->double('i');
+                    $table->double('w');
+                    $table->double('node');
+                    $table->double('M');
                     $table->float('H', 5, 2);
                     $table->float('G', 5, 2);
                     $table->string('ref');

@@ -135,8 +135,7 @@ class Parabolic extends Target
         $z = $r * $c * sin(deg2rad($C + $this->_omega + $v));
 
         // Sun geometric coordinates (heliocentric origin used in library)
-        $sun = new Sun();
-        $XYZ = $sun->calculateGeometricCoordinates($date);
+        $XYZ = $this->_sunRectangularCoordinates($date);
 
         // Object heliocentric Cartesian (approx): add to Sun cartesian to obtain ecliptic coords
         $xObj = $XYZ->getX()->getCoordinate() + $x;
@@ -215,10 +214,10 @@ class Parabolic extends Target
             $this->_calculateEquatorialCoordinates($date, $geo_coords, $height)
         );
         $this->setEquatorialCoordinatesTomorrow(
-            $this->_calculateEquatorialCoordinates($date->addDay(), $geo_coords, $height)
+            $this->_calculateEquatorialCoordinates($date->copy()->addDay(), $geo_coords, $height)
         );
         $this->setEquatorialCoordinatesYesterday(
-            $this->_calculateEquatorialCoordinates($date->subDays(2), $geo_coords, $height)
+            $this->_calculateEquatorialCoordinates($date->copy()->subDay(), $geo_coords, $height)
         );
     }
 
@@ -254,8 +253,7 @@ class Parabolic extends Target
         $y = $r * $b * sin(deg2rad($B + $this->_omega + $v));
         $z = $r * $c * sin(deg2rad($C + $this->_omega + $v));
 
-        $sun = new Sun();
-        $XYZ = $sun->calculateGeometricCoordinates($date);
+        $XYZ = $this->_sunRectangularCoordinates($date);
 
         $ksi = $XYZ->getX()->getCoordinate() + $x;
         $eta = $XYZ->getY()->getCoordinate() + $y;
