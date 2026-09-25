@@ -198,7 +198,7 @@ $sqm = Magnitude::bortleToNelm($bortle, $fstOffset);
 
 ### Magnitude examples
 
-The following short examples show how to compute the visual magnitude for an asteroid (IAU H–G system) and a comet (empirical H + 5 log10(delta) + n log10(r) model with optional phase term).
+The following short examples show how to compute the visual magnitude for an asteroid (IAU H–G system) and a comet (total magnitude H + 5 log10(delta) + K log10(r), with an optional phase term). `setCometParams()` is available on `Elliptic`, `Parabolic` and `NearParabolic`; an `Elliptic` object with comet parameters uses the comet formula, otherwise the H–G system.
 
 ```php
 // Asteroid (elliptic orbit) — IAU H-G
@@ -221,7 +221,7 @@ echo "Asteroid magnitude: {$m}\n";
 ```
 
 ```php
-// Comet (parabolic orbit) — simple H + 5 log10(delta) + n log10(r) model
+// Comet (parabolic orbit) — total magnitude H + 5 log10(delta) + K log10(r)
 use deepskylog\\AstronomyLibrary\\Targets\\Parabolic;
 use Carbon\\Carbon;
 
@@ -232,9 +232,10 @@ $comet = new Parabolic();
 $peridate = Carbon::create(1998, 4, 14, 10, 27, 33, 'UTC');
 $comet->setOrbitalElements(1.487469, 104.69219, 1.32431, 222.10887, $peridate);
 
-// Set comet photometric parameters: H (m at 1 AU), n (power-law index)
-// Optional: third argument is a linear phase coefficient (mag/deg), and you can provide n_pre / n_post
-$comet->setCometParams(6.5, 4.0, 0.02, 3.5, 4.5);
+// Set comet photometric parameters: H (M1, the magnitude at 1 AU from the Sun and the Earth)
+// and K (K1, the coefficient of log10(r), 10 when unknown; K = 2.5 n for an activity exponent n).
+// Optional: a linear phase coefficient (mag/deg), and K before / after the perihelion.
+$comet->setCometParams(6.5, 10.0, 0.02, 8.75, 11.25);
 
 // Compute magnitude for a given date
 $m = $comet->magnitude($date);

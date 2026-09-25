@@ -79,11 +79,9 @@ class UpdateCometPhotometry extends Command
             if (is_array($sb)) {
                 if ($sb['H'] !== null || $sb['n'] !== null || $sb['phase'] !== null) {
                     $this->info("Updating {$single->name} from SBDB: H={$sb['H']} n={$sb['n']} phase={$sb['phase']}");
-                    $single->H = $sb['H'] !== null ? floatval($sb['H']) : null;
-                    $single->n = $sb['n'] !== null ? floatval($sb['n']) : null;
-                    $single->phase_coeff = $sb['phase'] !== null ? floatval($sb['phase']) : null;
-                    $single->save();
-                    $this->info("Saved photometry for {$single->name}");
+                    if ($this->savePhotometry($single, $sb['H'], $sb['n'], $sb['phase'])) {
+                        $this->info("Saved photometry for {$single->name}");
+                    }
                 } else {
                     $this->line("SBDB lookup found object but no photometry for {$single->name}.");
                 }
@@ -297,10 +295,7 @@ class UpdateCometPhotometry extends Command
                 $sb = $this->sbdbFallback($comet->designation ?? null, $name, $client);
                 if (is_array($sb)) {
                     $this->info("Found photometry for {$name} via SBDB: H={$sb['H']} n={$sb['n']} phase={$sb['phase']}");
-                    $comet->H = $sb['H'] !== null ? floatval($sb['H']) : null;
-                    $comet->n = $sb['n'] !== null ? floatval($sb['n']) : null;
-                    $comet->phase_coeff = $sb['phase'] !== null ? floatval($sb['phase']) : null;
-                    $comet->save();
+                    $this->savePhotometry($comet, $sb['H'], $sb['n'], $sb['phase']);
                     continue;
                 }
 
@@ -308,10 +303,6 @@ class UpdateCometPhotometry extends Command
             }
 
             // Parse the found HTML for photometry
-            $doc = new DOMDocument();
-            @$doc->loadHTML($html);
-            $xpath = new DOMXPath($doc);
-
             // Prefer an explicit "Green curve" m1 formula when available
             // Example: "Green curve is:  m1 = 6.8 + 5 log d + 9.0 log r"
             $foundH = null;
@@ -331,30 +322,13 @@ class UpdateCometPhotometry extends Command
                     $foundN = floatval($gm2[2]);
                 }
 
-                // If neither formula matched, fall back to scanning text nodes for H/n/phase
-                if ($foundH === null && $foundN === null) {
-                    $nodes = $xpath->query('//text()');
-                    foreach ($nodes as $n) {
-                        $text = trim($n->nodeValue);
-                        if (preg_match('/H\s*=\s*([0-9]+\.?[0-9]*)/i', $text, $m)) {
-                            $foundH = floatval($m[1]);
-                        }
-                        if (preg_match('/n\s*=\s*([0-9]+\.?[0-9]*)/i', $text, $m)) {
-                            $foundN = floatval($m[1]);
-                        }
-                        if (preg_match('/phase.*?([0-9]+\.?[0-9]*)/i', $text, $m)) {
-                            $foundPhase = floatval($m[1]);
-                        }
-                    }
-                }
+                // Only the m1 formula is used: loose "n = ..." or "phase ..." matches
+                // in the text picked up unrelated numbers such as julian days.
             }
 
             if ($foundH !== null || $foundN !== null || $foundPhase !== null) {
                 $this->info("Found photometry for {$name} at {$usedUrl}: H={$foundH} n={$foundN} phase={$foundPhase}");
-                $comet->H = $foundH;
-                $comet->n = $foundN;
-                $comet->phase_coeff = $foundPhase;
-                $comet->save();
+                $this->savePhotometry($comet, $foundH, $foundN, $foundPhase);
             } else {
                 $this->line("No photometry found for {$name} at {$usedUrl}");
 
@@ -363,50 +337,51 @@ class UpdateCometPhotometry extends Command
                 $sb = $this->sbdbFallback($comet->designation ?? null, $name, $client);
                 if (is_array($sb)) {
                     $this->info("Found photometry for {$name} via SBDB: H={$sb['H']} n={$sb['n']} phase={$sb['phase']}");
-                    $comet->H = $sb['H'] !== null ? floatval($sb['H']) : null;
-                    $comet->n = $sb['n'] !== null ? floatval($sb['n']) : null;
-                    $comet->phase_coeff = $sb['phase'] !== null ? floatval($sb['phase']) : null;
-                    $comet->save();
+                    $this->savePhotometry($comet, $sb['H'], $sb['n'], $sb['phase']);
                 } else {
-                    // No SBDB result; try extracting H and G from the aerith "Magnitudes" graph
-                    // Example appearances: "H = 9.0 and G = 0.15", "H = 9.0, G = 0.15", or "H = 9.0  G = 0.15"
-                    if ($foundH === null) {
-                        $plain = trim(strip_tags($html));
-
-                        // Try a combined H...G pattern first on stripped text
-                        if (preg_match('/H\s*=\s*([+-]?\d+(?:\.\d+)?)[,\s;:\)]*\s*(?:and\s*)?G\s*=\s*([+-]?\d+(?:\.\d+)?)/i', $plain, $hg)) {
-                            $hval = floatval($hg[1]);
-                            $gval = floatval($hg[2]);
-                            $this->info("Punting H/G for {$name} from aerith magnitudes: H={$hval} G={$gval}");
-                            $comet->H = $hval;
-                            $comet->phase_coeff = $gval;
-                            $comet->save();
-                        } else {
-                            // Try to find H and G separately (handles cases where markup separates them)
-                            $hval = null;
-                            $gval = null;
-                            if (preg_match('/\bH\s*=\s*([+-]?\d+(?:\.\d+)?)/i', $plain, $mH)) {
-                                $hval = floatval($mH[1]);
-                            }
-                            if (preg_match('/\bG\s*=\s*([+-]?\d+(?:\.\d+)?)/i', $plain, $mG)) {
-                                $gval = floatval($mG[1]);
-                            }
-
-                            if ($hval !== null) {
-                                $this->info("Punting H for {$name} from aerith magnitudes: H={$hval}".($gval !== null ? " G={$gval}" : ''));
-                                $comet->H = $hval;
-                                if ($gval !== null) {
-                                    $comet->phase_coeff = $gval;
-                                }
-                                $comet->save();
-                            }
-                        }
+                    // No SBDB result; try the H of an asteroid-like light curve on
+                    // aerith.net: "H = 9.0 and G = 0.15". G is the slope parameter of
+                    // the H-G system, not a phase coefficient in magnitudes per degree.
+                    // Without the phase term the H-G system is H + 5 log(r delta), so
+                    // K = 5.
+                    if ($foundH === null && preg_match('/\bH\s*=\s*([+-]?\d+(?:\.\d+)?)/i', trim(strip_tags($html)), $mH)) {
+                        $this->info("Using H of the aerith magnitudes for {$name}: H={$mH[1]}");
+                        $this->savePhotometry($comet, floatval($mH[1]), 5.0, null);
                     }
                 }
             }
         }
 
         $this->info('Finished updating comet photometry.');
+    }
+
+    /**
+     * Store the photometry of a comet, for m = H + 5 log(delta) + n log(r) + phase_coeff * alpha.
+     *
+     * Values outside a plausible range are not stored: they come from parsing
+     * something else, like the mean motion in degrees per day or a julian day
+     * that ended up in `n` before.
+     *
+     * @return bool Whether an absolute magnitude was stored
+     */
+    private function savePhotometry(CometsOrbitalElements $comet, $H, $K, $phase): bool
+    {
+        $H = is_numeric($H) && $H >= -10.0 && $H <= 30.0 ? floatval($H) : null;
+        $K = is_numeric($K) && $K >= 1.0 && $K <= 60.0 ? floatval($K) : null;
+        $phase = is_numeric($phase) && $phase >= 0.0 && $phase <= 0.1 ? floatval($phase) : null;
+
+        if ($H === null) {
+            $this->line("No usable photometry for {$comet->name}");
+
+            return false;
+        }
+
+        $comet->H = $H;
+        $comet->n = $K;
+        $comet->phase_coeff = $phase;
+        $comet->save();
+
+        return true;
     }
 
     /**
@@ -705,21 +680,8 @@ class UpdateCometPhotometry extends Command
                 }
 
                 if ($h !== null || $nFromSBDB !== null) {
-                    // If phys_par didn't supply a slope-like 'n', try orbit.elements
-                    if ($nFromSBDB === null && isset($json['orbit']['elements']) && is_array($json['orbit']['elements'])) {
-                        foreach ($json['orbit']['elements'] as $el) {
-                            if (! is_array($el)) {
-                                continue;
-                            }
-                            $ename = $el['name'] ?? ($el['label'] ?? null);
-                            if ($ename === 'n' || strtolower($ename) === 'n') {
-                                $nFromSBDB = $el['value'] ?? $el['val'] ?? $nFromSBDB;
-                                break;
-                            }
-                        }
-                    }
 
-                    return ['H' => $h !== null ? floatval($h) : null, 'n' => $nFromSBDB !== null ? floatval($nFromSBDB) : null, 'phase' => $g !== null ? floatval($g) : null, 'source' => 'SBDB', 'query' => $cq];
+                    return ['H' => $h !== null ? floatval($h) : null, 'n' => $nFromSBDB !== null ? floatval($nFromSBDB) : null, 'phase' => null, 'source' => 'SBDB', 'query' => $cq];
                 }
                 // If the SBDB response contains an object/orbit but no phys_par,
                 // treat this as a successful lookup (no photometry available).
@@ -817,20 +779,8 @@ class UpdateCometPhotometry extends Command
                 }
 
                 if ($h !== null || $nFromSBDB !== null) {
-                    if ($nFromSBDB === null && isset($json['orbit']['elements']) && is_array($json['orbit']['elements'])) {
-                        foreach ($json['orbit']['elements'] as $el) {
-                            if (! is_array($el)) {
-                                continue;
-                            }
-                            $ename = $el['name'] ?? ($el['label'] ?? null);
-                            if ($ename === 'n' || strtolower($ename) === 'n') {
-                                $nFromSBDB = $el['value'] ?? $el['val'] ?? $nFromSBDB;
-                                break;
-                            }
-                        }
-                    }
 
-                    return ['H' => $h !== null ? floatval($h) : null, 'n' => $nFromSBDB !== null ? floatval($nFromSBDB) : null, 'phase' => $g !== null ? floatval($g) : null, 'source' => 'SBDB', 'query' => $cq];
+                    return ['H' => $h !== null ? floatval($h) : null, 'n' => $nFromSBDB !== null ? floatval($nFromSBDB) : null, 'phase' => null, 'source' => 'SBDB', 'query' => $cq];
                 }
                 if ((isset($json['object']) || isset($json['orbit'])) && $h === null && $nFromSBDB === null) {
                     if ($debug) {
@@ -933,15 +883,10 @@ class UpdateCometPhotometry extends Command
                             $g = $val;
                         }
                     }
-                    // K1/K2 in SBDB often represent comet slope parameters (map to `n` as a best-effort)
-                    if ($ename === 'K1' || $ename === 'K2' || stripos($title, 'slope') !== false) {
-                        if ($n === null && $val !== null) {
-                            $n = $val;
-                        }
-                    }
-                    // Some entries use M2 for nuclear magnitude; prefer M1 for total magnitude
-                    if ($ename === 'M2' && $h === null && $val !== null) {
-                        $h = $val;
+                    // K1 is the coefficient of log r of the total magnitude M1. M2 and
+                    // K2 describe the nucleus and are not used.
+                    if ($ename === 'K1' && $n === null && $val !== null) {
+                        $n = $val;
                     }
                 }
             }
@@ -956,6 +901,12 @@ class UpdateCometPhotometry extends Command
                     $g = $found['G'];
                 }
             }
+        }
+
+        // An H without K1 belongs to an inactive, asteroid-like object: the H-G
+        // system without its phase term is H + 5 log(r delta), so K = 5.
+        if ($h !== null && $n === null) {
+            $n = 5.0;
         }
 
         return ['H' => $h !== null ? $h : null, 'G' => $g !== null ? $g : null, 'n' => $n !== null ? $n : null];

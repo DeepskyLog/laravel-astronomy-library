@@ -34,6 +34,8 @@ use deepskylog\AstronomyLibrary\Time;
  */
 class Elliptic extends Target
 {
+    use CometPhotometry;
+
     private float $_a;
     private float $_e;
     private float $_i;
@@ -43,9 +45,9 @@ class Elliptic extends Target
     private Carbon $_perihelion_date;
     private bool $_useHorizons = false;
     private string $_horizonsDesignation = '';
-    // Photometric parameters (optional)
+    // Photometric parameters of an asteroid (IAU H-G system); comets use CometPhotometry
     private ?float $_H = null; // Absolute magnitude H
-    private ?float $_G = null; // Slope parameter G (IAU H-G)
+    private ?float $_G = null; // Slope parameter G
 
     /**
      * The constructor.
@@ -110,101 +112,36 @@ class Elliptic extends Target
     }
 
     /**
-     * Calculate the magnitude for an elliptic object (asteroid).
-     * Uses the H-G system when H/G are available; otherwise falls back
-     * to stored magnitude or faint sentinel.
+     * The magnitude of the object.
+     *
+     * A comet, with parameters given by setCometParams(), uses the total
+     * magnitude m = H + 5 log(delta) + K log(r). An asteroid, with H and G
+     * given by setHG(), uses the IAU H-G system (Bowell et al. 1989), as JPL
+     * Horizons does for its APmag.
+     *
+     * @param  Carbon  $date  The date
+     * @return float The magnitude, 99.9 when no photometric parameters are known
      */
     public function magnitude(Carbon $date): float
     {
-        // If explicit stored magnitude provided, prefer that
         if ($this->getMagnitude() !== null) {
             return $this->getMagnitude();
         }
-
+        if ($this->hasCometParams()) {
+            return $this->_cometMagnitude($date);
+        }
         if ($this->_H === null) {
-            // No photometric parameters available
             return 99.9;
         }
 
-        // Compute heliocentric position (r) and geocentric distance (delta)
-        $nutation = Time::nutation(2451545.0);
+        [$r, $delta, $alpha] = $this->_photometricGeometry($date);
 
-        $sine = sin(deg2rad($nutation[2]));
-        $cose = cos(deg2rad($nutation[2]));
-
-        $F = cos(deg2rad($this->_longitude_ascending_node));
-        $G = sin(deg2rad($this->_longitude_ascending_node)) * $cose;
-        $H = sin(deg2rad($this->_longitude_ascending_node)) * $sine;
-
-        $P = -sin(deg2rad($this->_longitude_ascending_node)) * cos(deg2rad($this->_i));
-        $Q = cos(deg2rad($this->_longitude_ascending_node)) * cos(deg2rad($this->_i)) * $cose - sin(deg2rad($this->_i)) * $sine;
-        $R = cos(deg2rad($this->_longitude_ascending_node)) * cos(deg2rad($this->_i)) * $sine + sin(deg2rad($this->_i)) * $cose;
-
-        $A = rad2deg(atan2($F, $P));
-        $B = rad2deg(atan2($G, $Q));
-        $C = rad2deg(atan2($H, $R));
-
-        $a = sqrt($F ** 2 + $P ** 2);
-        $b = sqrt($G ** 2 + $Q ** 2);
-        $c = sqrt($H ** 2 + $R ** 2);
-
-        $diff_in_date = $this->_perihelion_date->diffInSeconds($date, false) / 3600.0 / 24.0;
-        $M = $diff_in_date * $this->_n;
-
-        $E = $this->eccentricAnomaly($this->_e, $M, 0.000001);
-
-        $v = rad2deg(2 * atan(sqrt((1 + $this->_e) / (1 - $this->_e)) * tan(deg2rad($E / 2))));
-        $r = $this->_a * (1 - $this->_e * cos(deg2rad($E)));
-        $x = $r * $a * sin(deg2rad($A + $this->_omega + $v));
-        $y = $r * $b * sin(deg2rad($B + $this->_omega + $v));
-        $z = $r * $c * sin(deg2rad($C + $this->_omega + $v));
-
-        // Earth heliocentric coordinates
-        $earth = new Earth();
-        $helio_coords_earth = $earth->calculateHeliocentricCoordinates($date);
-        $R0 = $helio_coords_earth[2];
-
-        // Convert Earth's spherical heliocentric (L,B,R0) into Cartesian
-        $L0 = deg2rad($helio_coords_earth[0]);
-        $B0 = deg2rad($helio_coords_earth[1]);
-        $xE = $R0 * cos($B0) * cos($L0);
-        $yE = $R0 * cos($B0) * sin($L0);
-        $zE = $R0 * sin($B0);
-
-        // Object heliocentric Cartesian (already in ecliptic-based frame from orbital transform)
-        $xObj = $x;
-        $yObj = $y;
-        $zObj = $z;
-
-        // Geocentric vector = object heliocentric - earth heliocentric
-        $dx = $xObj - $xE;
-        $dy = $yObj - $yE;
-        $dz = $zObj - $zE;
-        $delta = sqrt($dx ** 2 + $dy ** 2 + $dz ** 2);
-
-        // Phase angle (Sun-target-Earth). Compute angle between object->Sun and object->Earth
-        // Vector from object to Sun is - (object heliocentric)
-        $vxSun = -$xObj;
-        $vySun = -$yObj;
-        $vzSun = -$zObj;
-        $dot = $vxSun * ($xE - $xObj) + $vySun * ($yE - $yObj) + $vzSun * ($zE - $zObj);
-        $mag1 = sqrt($vxSun ** 2 + $vySun ** 2 + $vzSun ** 2);
-        $mag2 = sqrt(($xE - $xObj) ** 2 + ($yE - $yObj) ** 2 + ($zE - $zObj) ** 2);
-        $alpha = 0.0;
-        if ($mag1 > 0 && $mag2 > 0) {
-            $alpha = rad2deg(acos(max(-1.0, min(1.0, $dot / ($mag1 * $mag2)))));
-        }
-
-        // H-G system phase functions (Bowell et al.)
+        // H-G system phase functions
         $phi1 = exp(-3.33 * pow(tan(deg2rad($alpha) / 2.0), 0.63));
         $phi2 = exp(-1.87 * pow(tan(deg2rad($alpha) / 2.0), 1.22));
-
-        $H = $this->_H;
         $G = $this->_G ?? 0.15;
 
-        $V = $H - 2.5 * log10((1 - $G) * $phi1 + $G * $phi2) + 5 * log10($r * $delta);
-
-        return floatval($V);
+        return $this->_H - 2.5 * log10((1 - $G) * $phi1 + $G * $phi2) + 5 * log10($r * $delta);
     }
 
     /**
@@ -273,6 +210,56 @@ class Elliptic extends Target
 
     public function _calculateEquatorialCoordinates(Carbon $date, GeographicalCoordinates $geo_coords, float $epoch, float $height): EquatorialCoordinates
     {
+        $XYZ = $this->_sunRectangularCoordinates($date, $epoch);
+
+        [$x, $y, $z] = $this->_heliocentricRectangularCoordinates($date, $epoch);
+        $ksi = $XYZ->getX()->getCoordinate() + $x;
+        $eta = $XYZ->getY()->getCoordinate() + $y;
+        $zeta = $XYZ->getZ()->getCoordinate() + $z;
+
+        $delta = sqrt($ksi ** 2 + $eta ** 2 + $zeta ** 2);
+        $tau = 0.0057755183 * $delta;
+
+        // Do the calculations again for t - tau: the object is taken at t - tau,
+        // but the Sun (and so the observer) stays at t.
+        $newDate = Time::fromJd(Time::getJd($date) - $tau);
+
+        [$x, $y, $z] = $this->_heliocentricRectangularCoordinates($newDate, $epoch);
+        $ksi = $XYZ->getX()->getCoordinate() + $x;
+        $eta = $XYZ->getY()->getCoordinate() + $y;
+        $zeta = $XYZ->getZ()->getCoordinate() + $z;
+
+        $delta = sqrt($ksi ** 2 + $eta ** 2 + $zeta ** 2);
+
+        $ra = rad2deg(atan2($eta, $ksi)) / 15.0;
+        $dec = rad2deg(asin($zeta / $delta));
+
+        $equa_coords = new EquatorialCoordinates($ra, $dec);
+
+        // Calculate corrections for parallax.
+        // The equatorial horizontal parallax in arcseconds, converted to degrees.
+        $equa_coords = $this->_correctForParallax(
+            $equa_coords,
+            (8.794 / $delta) / 3600.0,
+            $date,
+            $geo_coords,
+            $height
+        );
+
+        return $equa_coords;
+    }
+
+    /**
+     * The heliocentric rectangular coordinates, in AU, referred to the mean
+     * equator and equinox of the orbital elements.
+     * Chapter 33 of Astronomical Algorithms.
+     *
+     * @param  Carbon  $date  The date
+     * @param  float  $epoch  The equinox of the orbital elements, as a julian day
+     * @return array [x, y, z]
+     */
+    protected function _heliocentricRectangularCoordinates(Carbon $date, float $epoch = 2451545.0): array
+    {
         $nutation = Time::nutation($epoch);
 
         $sine = sin(deg2rad($nutation[2]));
@@ -301,59 +288,12 @@ class Elliptic extends Target
 
         $v = rad2deg(2 * atan(sqrt((1 + $this->_e) / (1 - $this->_e)) * tan(deg2rad($E / 2))));  // Formula 30.1
         $r = $this->_a * (1 - $this->_e * cos(deg2rad($E)));  // Formula 30.2
-        $x = $r * $a * sin(deg2rad($A + $this->_omega + $v));
-        $y = $r * $b * sin(deg2rad($B + $this->_omega + $v));
-        $z = $r * $c * sin(deg2rad($C + $this->_omega + $v));
 
-        $XYZ = $this->_sunRectangularCoordinates($date, $epoch);
-
-        $ksi = $XYZ->getX()->getCoordinate() + $x;
-        $eta = $XYZ->getY()->getCoordinate() + $y;
-        $zeta = $XYZ->getZ()->getCoordinate() + $z;
-
-        $delta = sqrt($ksi ** 2 + $eta ** 2 + $zeta ** 2);
-        $tau = 0.0057755183 * $delta;
-
-        // Do the calculations again for t - $tau
-        $jd = Time::getJd($date);
-        $newDate = Time::fromJd($jd - $tau);
-
-        $diff_in_date = $this->_perihelion_date->diffInSeconds($newDate, false) / 3600.0 / 24.0;
-        $M = $diff_in_date * $this->_n;
-
-        $E = $this->eccentricAnomaly($this->_e, $M, 0.000001);
-
-        $v = rad2deg(2 * atan(sqrt((1 + $this->_e) / (1 - $this->_e)) * tan(deg2rad($E / 2))));  // Formula 30.1
-        $r = $this->_a * (1 - $this->_e * cos(deg2rad($E)));  // Formula 30.2
-        $x = $r * $a * sin(deg2rad($A + $this->_omega + $v));
-        $y = $r * $b * sin(deg2rad($B + $this->_omega + $v));
-        $z = $r * $c * sin(deg2rad($C + $this->_omega + $v));
-
-        // The comet is taken at t - tau, but the Sun (and so the observer) stays at t.
-
-        $ksi = $XYZ->getX()->getCoordinate() + $x;
-        $eta = $XYZ->getY()->getCoordinate() + $y;
-        $zeta = $XYZ->getZ()->getCoordinate() + $z;
-
-        $delta = sqrt($ksi ** 2 + $eta ** 2 + $zeta ** 2);
-        $tau = 0.0057755183 * $delta;
-
-        $ra = rad2deg(atan2($eta, $ksi)) / 15.0;
-        $dec = rad2deg(asin($zeta / $delta));
-
-        $equa_coords = new EquatorialCoordinates($ra, $dec);
-
-        // Calculate corrections for parallax.
-        // The equatorial horizontal parallax in arcseconds, converted to degrees.
-        $equa_coords = $this->_correctForParallax(
-            $equa_coords,
-            (8.794 / $delta) / 3600.0,
-            $date,
-            $geo_coords,
-            $height
-        );
-
-        return $equa_coords;
+        return [
+            $r * $a * sin(deg2rad($A + $this->_omega + $v)),
+            $r * $b * sin(deg2rad($B + $this->_omega + $v)),
+            $r * $c * sin(deg2rad($C + $this->_omega + $v)),
+        ];
     }
 
     /**

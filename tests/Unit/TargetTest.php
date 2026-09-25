@@ -797,6 +797,101 @@ class TargetTest extends BaseTestCase
     }
 
     /**
+     * Test the total magnitude of comets against JPL Horizons.
+     *
+     * The elements are the osculating elements of Horizons for the date
+     * (heliocentric, ecliptic J2000), the photometric parameters JPL's M1 and
+     * K1. Horizons gives T-mag = M1 + 5 log(delta) + K1 log(r), for C/2023 A3
+     * the value is that formula with the distances of Horizons, because
+     * Horizons rounds its T-mag to a whole magnitude there. Before 6.8.1
+     * Elliptic used the H-G system of asteroids for comets, and Parabolic and
+     * NearParabolic used a wrong distance to the earth: 12P was 2.3 magnitudes
+     * too faint, C/2023 A3 2.4 and C/2025 A6 (Lemmon) 4.3 magnitudes.
+     */
+    public function testCometMagnitudes()
+    {
+        $comets = [
+            // e, q, i, node, w, time of perihelion (JD), date, M1, K1, magnitude of Horizons
+            '12P' => [0.9546110184438342, 0.780788135653347, 74.19156435379394, 255.8558161536839, 198.988728245405, 2460421.624383379, '2024-04-21 22:00', 5.0, 15.0, 4.416],
+            'C/2023 A3' => [1.000069777706182, 0.3914157854608206, 139.1105091484924, 21.55946950650229, 308.4882152737364, 2460581.241747817, '2024-10-14 18:00', 8.9, 5.5, 6.079],
+            'C/2025 A6' => [0.9955494323904098, 0.5298973916194352, 143.6637063311405, 108.0979235648542, 132.9705427073495, 2460988.039742467, '2025-10-21 18:00', 10.4, 8.75, 7.759],
+            '2P' => [0.846933169228188, 0.3395969863162251, 11.3364955889955, 334.0187423534334, 187.2882986117874, 2460240.028295104, '2023-10-22 22:00', 15.7, 4.5, 14.088],
+        ];
+
+        foreach ($comets as $name => [$e, $q, $i, $node, $w, $tp, $date, $H, $K, $expected]) {
+            $date = Carbon::parse($date, 'UTC');
+            $perihelion = Time::fromJd($tp);
+
+            $targets = [];
+            if ($e < 1) {
+                $elliptic = new Elliptic();
+                $elliptic->setOrbitalElements($q / (1 - $e), $e, $i, $w, $node, $perihelion->copy());
+                $targets[] = $elliptic;
+            }
+            $nearParabolic = new NearParabolic();
+            $nearParabolic->setOrbitalElements($q, $e, $i, $w, $node, $perihelion->copy());
+            $targets[] = $nearParabolic;
+            if ($e >= 1) {
+                $parabolic = new Parabolic();
+                $parabolic->setOrbitalElements($q, $i, $w, $node, $perihelion->copy());
+                $targets[] = $parabolic;
+            }
+
+            foreach ($targets as $target) {
+                $this->assertEquals(99.9, $target->magnitude($date->copy()), $name.' '.get_class($target).' without photometry');
+                $target->setCometParams($H, $K);
+                $this->assertEqualsWithDelta($expected, $target->magnitude($date->copy()), 0.005, $name.' '.get_class($target));
+            }
+        }
+    }
+
+    /**
+     * Test the magnitude of comets with different K before and after the perihelion.
+     */
+    public function testAsymmetricCometMagnitude()
+    {
+        $perihelion = Carbon::create(2024, 4, 21, 14, 59, 6, 'UTC');
+        $comet = new Elliptic();
+        $comet->setOrbitalElements(0.780788135653347 / (1 - 0.9546110184438342), 0.9546110184438342, 74.19156435379394, 198.988728245405, 255.8558161536839, $perihelion);
+        $before = Carbon::create(2024, 3, 21, 0, 0, 0, 'UTC');
+        $after = Carbon::create(2024, 5, 21, 0, 0, 0, 'UTC');
+
+        $comet->setCometParams(5.0, 15.0);
+        $symmetricBefore = $comet->magnitude($before);
+        $symmetricAfter = $comet->magnitude($after);
+
+        // r is below 1 AU on both dates, so a larger K makes the comet brighter
+        $comet->setCometParams(5.0, 15.0, null, 20.0, 10.0);
+        $this->assertLessThan($symmetricBefore, $comet->magnitude($before));
+        $this->assertGreaterThan($symmetricAfter, $comet->magnitude($after));
+    }
+
+    /**
+     * Test the magnitude of asteroids (IAU H-G system) against JPL Horizons.
+     *
+     * The elements are the osculating elements of Horizons for the date, H and
+     * G those of JPL. Horizons computes its APmag with the H-G system as well.
+     * The phase angle of Eros is 60 degrees on 2026 March 1, which tests the
+     * phase functions.
+     */
+    public function testAsteroidMagnitudes()
+    {
+        $asteroids = [
+            // e, q, i, node, w, time of perihelion (JD), date, H, G, APmag of Horizons
+            'Ceres' => [0.07975990122180275, 2.545362908333336, 10.58742001256453, 80.24897812591227, 73.19608893024726, 2461599.443143175, '2026-09-25 22:00', 3.34, 0.12, 8.721],
+            'Eros' => [0.2229016426862817, 1.133217767664045, 10.82864874348861, 304.2683640027604, 178.9171429572238, 2461088.814294151, '2026-03-01 00:00', 10.4, 0.46, 10.830],
+        ];
+
+        foreach ($asteroids as $name => [$e, $q, $i, $node, $w, $tp, $date, $H, $G, $expected]) {
+            $asteroid = new Elliptic();
+            $asteroid->setOrbitalElements($q / (1 - $e), $e, $i, $w, $node, Time::fromJd($tp));
+            $asteroid->setHG($H, $G);
+
+            $this->assertEqualsWithDelta($expected, $asteroid->magnitude(Carbon::parse($date, 'UTC')), 0.005, $name);
+        }
+    }
+
+    /**
      * Test that calculating the coordinates leaves the date of the caller alone.
      *
      * The coordinates for tomorrow and yesterday used to be calculated with
