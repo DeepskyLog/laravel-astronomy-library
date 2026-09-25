@@ -253,6 +253,7 @@ class Elliptic extends Target
                 $this->setEquatorialCoordinatesToday($h);
                 $this->setEquatorialCoordinatesTomorrow($this->_horizonsEquatorialCoordinates($date->copy()->addDay(), $geo_coords, $height));
                 $this->setEquatorialCoordinatesYesterday($this->_horizonsEquatorialCoordinates($date->copy()->subDay(), $geo_coords, $height));
+
                 return;
             } catch (\Throwable $e) {
                 // fallback to internal calculation on failure; log error for debugging
