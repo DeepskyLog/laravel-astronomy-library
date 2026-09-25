@@ -680,7 +680,6 @@ class UpdateCometPhotometry extends Command
                 }
 
                 if ($h !== null || $nFromSBDB !== null) {
-
                     return ['H' => $h !== null ? floatval($h) : null, 'n' => $nFromSBDB !== null ? floatval($nFromSBDB) : null, 'phase' => null, 'source' => 'SBDB', 'query' => $cq];
                 }
                 // If the SBDB response contains an object/orbit but no phys_par,
@@ -779,7 +778,6 @@ class UpdateCometPhotometry extends Command
                 }
 
                 if ($h !== null || $nFromSBDB !== null) {
-
                     return ['H' => $h !== null ? floatval($h) : null, 'n' => $nFromSBDB !== null ? floatval($nFromSBDB) : null, 'phase' => null, 'source' => 'SBDB', 'query' => $cq];
                 }
                 if ((isset($json['object']) || isset($json['orbit'])) && $h === null && $nFromSBDB === null) {
