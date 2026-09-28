@@ -2,6 +2,27 @@
 
 All notable changes to `laravel-astronomy-library` will be documented in this file.
 
+## Version 6.8.3
+
+Fixed:
+
+- Positions of periodic comets: `astronomy:updateOrbitalElements` used only the elements of JPL, which are those of its last orbit solution. For many periodic comets the epoch of that solution is years old (2017 for 10P/Tempel 2, 2014 for 161P/Hartley-IRAS in 2026), and a two-body orbit propagated that long misses the perturbations by the planets: 10P was 3.6 degrees and 161P 9 degrees away from its position. The command now also reads `AllCometEls.txt` and `CometEls.txt` of the Minor Planet Center, which give the elements for a recent standard epoch and the current epoch, and the perihelion of the current apparition. They replace the elements of JPL for the comets they contain; lines of the Minor Planet Center without an epoch, older elements for the perihelion, are only used for comets that JPL does not have. Comets that are only at the Minor Planet Center are added. For the 144 comets of DeepskyLog the error against JPL Horizons went from a median of 3.2 arcminutes (90 % within 67 arcminutes, at most 22 degrees) to a median of 0.06 arcminutes (90 % within 1.1 arcminutes); what remains are comets that broke up. When the files of the Minor Planet Center cannot be downloaded, the elements of JPL are kept.
+- Magnitudes of comets: `astronomy:updateCometPhotometry` stored only the last line of the light curve of aerith.net, which describes the most recent period, and that line was used for every date. aerith.net gives the light curve in parts, each valid for a range of days around the perihelion. For C/2025 A6 (Lemmon) on 2025 October 21 the last line gave magnitude -1.1, the part for that date 4.1; Lemmon was about magnitude 4. The command now stores all parts, with the range of days and the shift of `log r(t + 10)`, in the new `light_curve` column, and the new `setCometLightCurve()` of `CometPhotometry` uses the part for the date, with the distance to the Sun of the shifted date. Against 1607 visual estimates of DeepskyLog observers the median difference is 0.45 magnitudes (90 % within 1.2), against 1.07 (90 % within 4.5) with only the last line and 3.2 with M1 and K1 of JPL. `H` and `n` keep the values of the last part.
+- An open range on aerith.net, like `[14, ]` followed by `[175, ]`, runs to the start of the next part.
+- The ranges that `astronomy:updateCometPhotometry` accepts now allow the fits of aerith.net for a single period: H from -20 to 35, K from -20 to 60 (K = 0 for a standstill, a negative K for a comet that fades while it approaches the Sun).
+- aerith.net is read over http: the certificate of its https site is self-signed and expired in 2021. With https the command only worked with `AERITH_VERIFY=false`, which it read with `env()`, and that returns null once the configuration of the application is cached; then no page of aerith.net was read and SBDB was used for all comets.
+
+Added:
+
+- The migration `add_light_curve_to_comets_orbital_elements_table` for the `light_curve` column, and the cast of `light_curve` to an array in `CometsOrbitalElements`. Existing installations have to publish and run it.
+- `UpdateOrbitalElements::parseMpcComet()`, `UpdateOrbitalElements::designation()` and `UpdateCometPhotometry::parseAerithPhotometry()` are public static methods, with tests in `tests/Unit/CometImportTest.php`.
+
+Changed:
+
+- `maatwebsite/excel` was required with `*`, so a new installation got whatever version Composer picked, and on Laravel 12 or 13 that is now 4.x, which was never tested. It is now `^3.1|^4.0`; both versions import `deltat.csv` and `conlines.csv` correctly.
+- The minimum PHP version is 8.2 (was 8.0). `laravel/laravel` ^8.0 is removed from `require-dev`, as `laravel/framework` ^8.0 was already not allowed.
+- Removed `.travis.yml` and the Travis badge in the readme. It tested on PHP 7.4, which cannot install this package.
+
 ## Version 6.8.2
 
 Fixed:

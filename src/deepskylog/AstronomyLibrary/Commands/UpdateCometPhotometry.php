@@ -18,7 +18,11 @@ class UpdateCometPhotometry extends Command
 
     protected $description = 'Fetch comet photometry (H, K) from Seiichi Yoshida (aerith.net), with JPL SBDB as fallback.';
 
-    private const AERITH_CATALOG = 'https://www.aerith.net/comet/catalog/';
+    /**
+     * aerith.net over http: the certificate of its https site is self-signed
+     * and expired in 2021, so https only works without verification.
+     */
+    private const AERITH_CATALOG = 'http://www.aerith.net/comet/catalog/';
 
     /**
      * The aerith.net pages with all comets, by the number of the periodic
@@ -125,15 +129,15 @@ class UpdateCometPhotometry extends Command
     private function storePhotometry(CometsOrbitalElements $comet, ?array $found, ?array $sbdb): string
     {
         if ($found !== null) {
-            $this->info("Found photometry for {$comet->name} at {$found['url']}: H={$found['H']} K={$found['K']}");
-            if ($this->savePhotometry($comet, $found['H'], $found['K'], null)) {
+            $this->info("Found photometry for {$comet->name} at {$found['url']}: H={$found['H']} K={$found['K']}, ".count($found['light_curve']).' part(s)');
+            if ($this->savePhotometry($comet, $found['H'], $found['K'], null, $found['light_curve'])) {
                 return 'aerith';
             }
         }
 
         if ($sbdb !== null && $sbdb['H'] !== null) {
             $this->info("Found photometry for {$comet->name} via SBDB: H={$sbdb['H']} K={$sbdb['K']}");
-            if ($this->savePhotometry($comet, $sbdb['H'], $sbdb['K'], null)) {
+            if ($this->savePhotometry($comet, $sbdb['H'], $sbdb['K'], null, [])) {
                 return 'SBDB';
             }
         }
@@ -150,13 +154,22 @@ class UpdateCometPhotometry extends Command
      * something else, like the mean motion in degrees per day or a julian day
      * that ended up in `n` before.
      *
+     * The light curve of aerith.net, all its parts with the range of days
+     * around the perihelion in which they are valid, is stored in
+     * `light_curve`; H and n are those of its most recent part.
+     *
+     * @param  array  $lightCurve  The parts, see parseAerithPhotometry()
      * @return bool Whether an absolute magnitude was stored
      */
-    private function savePhotometry(CometsOrbitalElements $comet, $H, $K, $phase): bool
+    private function savePhotometry(CometsOrbitalElements $comet, $H, $K, $phase, array $lightCurve = []): bool
     {
-        $H = is_numeric($H) && $H >= -10.0 && $H <= 30.0 ? floatval($H) : null;
-        $K = is_numeric($K) && $K >= 1.0 && $K <= 60.0 ? floatval($K) : null;
+        $H = self::plausibleH($H);
+        $K = self::plausibleK($K);
         $phase = is_numeric($phase) && $phase >= 0.0 && $phase <= 0.1 ? floatval($phase) : null;
+        $lightCurve = array_values(array_filter(
+            $lightCurve,
+            fn ($part) => self::plausibleH($part['H'] ?? null) !== null && self::plausibleK($part['K'] ?? null) !== null
+        ));
 
         if ($H === null) {
             $this->line("No usable photometry for {$comet->name}");
@@ -167,9 +180,25 @@ class UpdateCometPhotometry extends Command
         $comet->H = $H;
         $comet->n = $K;
         $comet->phase_coeff = $phase;
+        $comet->light_curve = empty($lightCurve) ? null : $lightCurve;
         $comet->save();
 
         return true;
+    }
+
+    /**
+     * The ranges allow the fits of aerith.net for a single period, like
+     * H = -17 and K = 35 for a comet far from the Sun, K = 0 for a standstill
+     * or K = -5 for a comet that fades while it approaches the Sun.
+     */
+    private static function plausibleH($H): ?float
+    {
+        return is_numeric($H) && $H >= -20.0 && $H <= 35.0 ? floatval($H) : null;
+    }
+
+    private static function plausibleK($K): ?float
+    {
+        return is_numeric($K) && $K >= -20.0 && $K <= 60.0 ? floatval($K) : null;
     }
 
     /**
@@ -347,39 +376,67 @@ class UpdateCometPhotometry extends Command
     }
 
     /**
-     * The most recent photometry on the page of an apparition.
+     * The light curve on the page of an apparition.
      *
      * aerith.net lists the light curve in chronological order, one line per
-     * period, so the last line is the most recent one:
+     * period, with the range of days from the perihelion in which it is valid:
      *
      *   m1 = 5.0 + 5 log d + 13.5 log r          [-840,-276]  (2022 Jan.  2 - 2023 July 20)
      *   m1 = 4.3 + 5 log d + 11.0 log r(t + 10)  [  14,    ]  (2024 May   5 - 2024 Oct. 13)
-     *   H = 12.5  G = 0.15
+     *   H = 12.5  G = 0.15                       [ 405,    ]  (2027 Sept.11 -             )
      *
-     * An asteroid-like light curve "H = 12.5  G = 0.15" is stored with K = 5,
-     * the H-G system without its phase term. The notes below the list, like
+     * "log r(t + 10)" uses the distance to the Sun of 10 days later. An
+     * asteroid-like line "H = 12.5  G = 0.15" is stored with K = 5, the H-G
+     * system without its phase term. The notes below the list, like
      * "* Gray curve is:  m1 = ...", are alternative curves and not used.
      *
-     * @return array|null ['H', 'K']
+     * @return array|null ['H', 'K', 'light_curve']: H and K of the most recent
+     *                    part, and all parts as ['from', 'to', 'H', 'K', 'shift']
      */
-    private function parseAerithPhotometry(string $html): ?array
+    public static function parseAerithPhotometry(string $html): ?array
     {
+        $number = '[+-]?\d+(?:\.\d*)?';
         $pattern = '/^[ \t]*(?:'
-            .'m1\s*=\s*(?<H>[+-]?\d+(?:\.\d*)?)\s*\+\s*5(?:\.0*)?\s*log\s*d\s*(?<sign>[+-])\s*(?<K>\d+(?:\.\d*)?)\s*log\s*r'
-            .'|H\s*=\s*(?<Hg>[+-]?\d+(?:\.\d*)?)\s+G\s*=\s*[+-]?\d'
-            .')/m';
+            .'m1\s*=\s*(?<H>'.$number.')\s*\+\s*5(?:\.0*)?\s*log\s*d\s*(?<sign>[+-])\s*(?<K>\d+(?:\.\d*)?)\s*log\s*r'
+            .'(?:\s*\(\s*t\s*(?<shiftSign>[+-])\s*(?<shift>\d+(?:\.\d*)?)\s*\))?'
+            .'|H\s*=\s*(?<Hg>'.$number.')\s+G\s*=\s*[+-]?\d[\d.]*'
+            .')[ \t]*(?:\[\s*(?<from>[+-]?\d+)?\s*,\s*(?<to>[+-]?\d+)?\s*\])?/m';
 
         if (! preg_match_all($pattern, $html, $matches, PREG_SET_ORDER | PREG_UNMATCHED_AS_NULL)) {
             return null;
         }
 
-        $last = end($matches);
-        if ($last['H'] !== null) {
-            $K = floatval($last['K']);
-
-            return ['H' => floatval($last['H']), 'K' => $last['sign'] === '-' ? -$K : $K];
+        $parts = [];
+        foreach ($matches as $m) {
+            if ($m['H'] !== null) {
+                $K = floatval($m['K']);
+                $shift = $m['shift'] !== null ? floatval($m['shift']) * ($m['shiftSign'] === '-' ? -1 : 1) : 0.0;
+                $part = ['H' => floatval($m['H']), 'K' => $m['sign'] === '-' ? -$K : $K, 'shift' => $shift];
+            } else {
+                $part = ['H' => floatval($m['Hg']), 'K' => 5.0, 'shift' => 0.0];
+            }
+            $parts[] = [
+                'from' => ($m['from'] ?? '') !== '' ? floatval($m['from']) : null,
+                'to' => ($m['to'] ?? '') !== '' ? floatval($m['to']) : null,
+            ] + $part;
         }
 
-        return ['H' => floatval($last['Hg']), 'K' => 5.0];
+        // An open end runs to the start of the next part: "[14, ]" followed by
+        // "[175, ]" means from 14 to 175 days after the perihelion.
+        foreach ($parts as $i => $part) {
+            if ($part['to'] !== null) {
+                continue;
+            }
+            foreach (array_slice($parts, $i + 1) as $next) {
+                if ($next['from'] !== null && ($part['from'] === null || $next['from'] > $part['from'])) {
+                    $parts[$i]['to'] = $next['from'];
+                    break;
+                }
+            }
+        }
+
+        $last = end($parts);
+
+        return ['H' => $last['H'], 'K' => $last['K'], 'light_curve' => $parts];
     }
 }

@@ -6,7 +6,6 @@
 
 [![Latest Version on Packagist][ico-version]][link-packagist]
 [![Total Downloads][ico-downloads]][link-downloads]
-[![Build Status][ico-travis]][link-travis]
 [![StyleCI][ico-styleci]][link-styleci]
 
 Take a look at [contributing.md](contributing.md) if you are interesting in helping out.
@@ -14,7 +13,7 @@ The laravel-astronomy-library is part of [DeepskyLog](https://www.deepskylog.org
 
 ## Installation
 
-AstronomyLibrary can be installed via composer.  laravel-astronomy-library needs at least php 8.0 to run.
+AstronomyLibrary can be installed via composer.  laravel-astronomy-library needs at least php 8.2 and Laravel 9 or newer to run.
 
 ``` bash
 composer require deepskylog/laravel-astronomy-library
@@ -236,6 +235,14 @@ $comet->setOrbitalElements(1.487469, 104.69219, 1.32431, 222.10887, $peridate);
 // and K (K1, the coefficient of log10(r), 10 when unknown; K = 2.5 n for an activity exponent n).
 // Optional: a linear phase coefficient (mag/deg), and K before / after the perihelion.
 $comet->setCometParams(6.5, 10.0, 0.02, 8.75, 11.25);
+
+// Or a light curve in parts, as aerith.net publishes it: each part is valid for a range
+// of days around the perihelion (null for an open end), and 'shift' uses the distance
+// to the Sun of that many days later ("log r(t + 10)"). It takes precedence over setCometParams().
+$comet->setCometLightCurve([
+    ['from' => -100, 'to' => 14, 'H' => 4.6, 'K' => 9.5, 'shift' => 0],
+    ['from' => 14, 'to' => null, 'H' => 4.3, 'K' => 11.0, 'shift' => 10],
+]);
 
 // Compute magnitude for a given date
 $m = $comet->magnitude($date);
@@ -740,12 +747,10 @@ GPLv3. Please see the [license file](LICENSE) for more information.
 
 [ico-version]: https://img.shields.io/packagist/v/deepskylog/laravel-astronomy-library.svg?style=flat-square
 [ico-downloads]: https://img.shields.io/packagist/dt/deepskylog/laravel-astronomy-library.svg?style=flat-square
-[ico-travis]: https://img.shields.io/travis/deepskylog/laravel-astronomy-library/master.svg?style=flat-square
 [ico-styleci]: https://styleci.io/repos/255550499/shield
 
 [link-packagist]: https://packagist.org/packages/deepskylog/laravel-astronomy-library
 [link-downloads]: https://packagist.org/packages/deepskylog/laravel-astronomy-library
-[link-travis]: https://travis-ci.org/deepskylog/laravel-astronomy-library
 [link-styleci]: https://styleci.io/repos/255550499
 [link-author]: https://github.com/DeepskyLog
 [link-contributors]: https://github.com/DeepskyLog/laravel-astronomy-library/graphs/contributors

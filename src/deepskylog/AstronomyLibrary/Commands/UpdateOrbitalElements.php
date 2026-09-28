@@ -3,7 +3,9 @@
 namespace deepskylog\AstronomyLibrary\Commands;
 
 use deepskylog\AstronomyLibrary\Models\AsteroidsOrbitalElements;
+use Carbon\Carbon;
 use deepskylog\AstronomyLibrary\Models\CometsOrbitalElements;
+use deepskylog\AstronomyLibrary\Time;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use RuntimeException;
@@ -15,6 +17,16 @@ class UpdateOrbitalElements extends Command
      * this stays below the 32766 bound parameters of SQLite.
      */
     private const BATCH_SIZE = 2000;
+
+    /**
+     * The orbital elements of the comets of the Minor Planet Center: all
+     * comets, most for a recent standard epoch, and then the comets that can
+     * be observed now, for the current epoch.
+     */
+    private const MPC_COMETS = [
+        'https://www.minorplanetcenter.net/iau/MPCORB/AllCometEls.txt',
+        'https://www.minorplanetcenter.net/iau/MPCORB/CometEls.txt',
+    ];
 
     /**
      * The name and signature of the console command.
@@ -60,9 +72,19 @@ class UpdateOrbitalElements extends Command
     /**
      * Updates the orbital elements of the comets.
      *
+     * The elements of JPL are used, replaced by those of the Minor Planet
+     * Center for the comets in its file. JPL gives the elements of its last
+     * orbit solution, whose epoch can be many years old for a periodic comet
+     * (2017 for 10P/Tempel 2 in 2026): a two-body orbit propagated that long
+     * misses the perturbations by the planets, and puts such a comet degrees
+     * away from its position. The Minor Planet Center gives osculating
+     * elements for a current epoch and the perihelion of the current
+     * apparition, which keeps the positions within an arcminute or so.
+     *
      * The comets are upserted on their name instead of truncating the table,
      * so the photometry stored by astronomy:updateCometPhotometry is kept.
-     * Comets that are no longer in the file of JPL are removed.
+     * Comets that are no longer in the files of JPL and the Minor Planet
+     * Center are removed.
      */
     private function updateComets(): void
     {
@@ -106,6 +128,8 @@ class UpdateOrbitalElements extends Command
             throw new RuntimeException('No comet orbital elements found in the download.');
         }
 
+        $comets = $this->mergeMpcComets($comets);
+
         DB::transaction(function () use ($comets) {
             $table = (new CometsOrbitalElements)->getTable();
 
@@ -119,6 +143,139 @@ class UpdateOrbitalElements extends Command
                 DB::table($table)->upsert($chunk, ['name'], $columns);
             }
         });
+    }
+
+    /**
+     * Replaces the elements of JPL by those of the Minor Planet Center.
+     *
+     * The comets are matched on their designation. A comet that is only in
+     * the files of the Minor Planet Center is added under its name there.
+     * Lines without an epoch hold older elements for the perihelion, with
+     * fewer decimals: for those the elements of JPL are kept when JPL has the
+     * comet. When a file cannot be downloaded, the elements of the other
+     * files are kept.
+     *
+     * @param  array  $comets  The comets of JPL, by name
+     * @return array The comets, by name
+     */
+    private function mergeMpcComets(array $comets): array
+    {
+        $jpl = [];
+        foreach (array_keys($comets) as $name) {
+            $key = self::designation($name);
+            if ($key !== null) {
+                $jpl[$key] = $name;
+            }
+        }
+
+        $mpc = [];
+        foreach (self::MPC_COMETS as $url) {
+            try {
+                $handle = $this->download($url, 'comet (Minor Planet Center)');
+            } catch (RuntimeException $e) {
+                $this->warn($e->getMessage());
+
+                continue;
+            }
+            while (($line = fgets($handle)) !== false) {
+                $row = self::parseMpcComet(rtrim($line, "\r\n"));
+                $key = $row !== null ? self::designation($row['name']) : null;
+                if ($row === null || $key === null) {
+                    continue;
+                }
+                if (! $row['has_epoch'] && isset($jpl[$key])) {
+                    continue;
+                }
+                // The later file, with the current epoch, replaces the earlier one
+                $mpc[$key] = $row;
+            }
+            fclose($handle);
+        }
+
+        $replaced = 0;
+        $added = 0;
+        foreach ($mpc as $key => $row) {
+            unset($row['has_epoch']);
+            if (isset($jpl[$key])) {
+                $row['name'] = $jpl[$key];
+                $replaced++;
+            } else {
+                $added++;
+            }
+            $comets[$row['name']] = $row;
+        }
+
+        $this->info("Orbital elements of {$replaced} comets from the Minor Planet Center, {$added} comets added.");
+
+        return $comets;
+    }
+
+    /**
+     * Parses a line of CometEls.txt or AllCometEls.txt of the Minor Planet Center.
+     *
+     *   0010P         2026 08  2.1166  1.417741  0.537437  195.4699  117.7969   12.0271  20260924  13.1  4.0  10P/Tempel    MPC xxxxx
+     *
+     * See https://www.minorplanetcenter.net/iau/info/CometOrbitFormat.html
+     *
+     * @return array|null The row for the table, or null for an empty line
+     */
+    public static function parseMpcComet(string $line): ?array
+    {
+        $name = trim(substr($line, 102, 56));
+        if ($name === '' || strlen($line) < 90) {
+            return null;
+        }
+
+        $year = intval(substr($line, 14, 4));
+        $month = intval(substr($line, 19, 2));
+        $day = floatval(substr($line, 22, 7));
+
+        // Some fragments have no epoch: their elements are for the perihelion
+        $epoch = trim(substr($line, 81, 8));
+        $epochJd = strlen($epoch) === 8
+            ? Time::getJd(Carbon::create(intval(substr($epoch, 0, 4)), intval(substr($epoch, 4, 2)), intval(substr($epoch, 6, 2)), 0, 0, 0, 'UTC'))
+            : Time::getJd(Carbon::create($year, $month, 1, 0, 0, 0, 'UTC')->addSeconds((int) round(($day - 1) * 86400)));
+
+        return [
+            'name' => $name,
+            'epoch' => $epochJd,
+            'q' => floatval(substr($line, 30, 9)),
+            'e' => floatval(substr($line, 41, 8)),
+            'w' => floatval(substr($line, 51, 8)),
+            'node' => floatval(substr($line, 61, 8)),
+            'i' => floatval(substr($line, 71, 8)),
+            // YYYYMMDD.dddd, as in the file of JPL
+            'Tp' => $year * 10000 + $month * 100 + $day,
+            'ref' => str_starts_with($ref = trim(substr($line, 159)), 'MPC') ? $ref : trim('MPC '.$ref),
+            // Whether the elements are for a standard epoch or for the perihelion
+            'has_epoch' => strlen($epoch) === 8,
+        ];
+    }
+
+    /**
+     * The designation of a comet, the same for JPL and the Minor Planet Center.
+     *
+     * '10P/Tempel 2' (JPL) and '10P/Tempel' (MPC) give '10P',
+     * '73P/Schwassmann-Wachmann 3-B' (JPL) and '73P-B/Schwassmann-Wachmann'
+     * (MPC) give '73P-B', 'C/2025 A6 (Lemmon)' gives 'C/2025 A6'.
+     */
+    public static function designation(string $name): ?string
+    {
+        $name = trim($name);
+        if (preg_match('#^(\d+[PDI])(-[A-Z]{1,2})?(?:/|$)#', $name, $m)) {
+            if (! empty($m[2])) {
+                return $m[1].$m[2];
+            }
+            // JPL writes the fragment at the end: '73P/Schwassmann-Wachmann 3-B',
+            // '101P/Chernykh-B'. Only capitals, so '67P/Churyumov-Gerasimenko'
+            // is not a fragment.
+            return preg_match('#-([A-Z]{1,2})$#', $name, $f) ? $m[1].'-'.$f[1] : $m[1];
+        }
+        if (preg_match('#^([PCDXAI]/-?\d{1,4} [A-Z]{1,2}\d*(?:-[A-Z]{1,2})?)(?:\s|$)#', $name, $m)) {
+            return $m[1];
+        }
+
+        return null;
     }
 
     /**

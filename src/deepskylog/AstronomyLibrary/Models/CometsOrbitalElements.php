@@ -31,5 +31,11 @@ class CometsOrbitalElements extends Model
         'phase_coeff',
         'n_pre',
         'n_post',
+        // The light curve of aerith.net in parts, see astronomy:updateCometPhotometry
+        'light_curve',
+    ];
+
+    protected $casts = [
+        'light_curve' => 'array',
     ];
 }

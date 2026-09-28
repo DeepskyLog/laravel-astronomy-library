@@ -37,6 +37,7 @@ trait CometPhotometry
     private ?float $_cometPhaseCoeff = null;
     private ?float $_cometKPre = null;
     private ?float $_cometKPost = null;
+    private array $_cometLightCurve = [];
 
     /**
      * Sets the photometric parameters of the comet for the total magnitude
@@ -62,11 +63,67 @@ trait CometPhotometry
     }
 
     /**
+     * Sets a light curve in parts, each valid for a range of days around the
+     * perihelion, as aerith.net publishes them:
+     *
+     *   m1 = 7.0 + 5 log d + 10.0 log r          [-85,  0]
+     *   m1 = 4.3 + 5 log d + 11.0 log r(t + 10)  [  0, 52]
+     *
+     * The second line uses the distance to the Sun of 10 days later. For a
+     * date outside all ranges the nearest part is used. A light curve takes
+     * precedence over setCometParams().
+     *
+     * @param  array  $segments  Each ['from' => ?float, 'to' => ?float, 'H' => float,
+     *                           'K' => float, 'shift' => float]: days from the
+     *                           perihelion (null for an open end), the absolute
+     *                           magnitude, the coefficient of log r and the
+     *                           shift in days of r
+     */
+    public function setCometLightCurve(array $segments): void
+    {
+        $this->_cometLightCurve = [];
+        foreach ($segments as $segment) {
+            if (! isset($segment['H'], $segment['K']) || ! is_numeric($segment['H']) || ! is_numeric($segment['K'])) {
+                continue;
+            }
+            $this->_cometLightCurve[] = [
+                'from' => is_numeric($segment['from'] ?? null) ? (float) $segment['from'] : null,
+                'to' => is_numeric($segment['to'] ?? null) ? (float) $segment['to'] : null,
+                'H' => (float) $segment['H'],
+                'K' => (float) $segment['K'],
+                'shift' => is_numeric($segment['shift'] ?? null) ? (float) $segment['shift'] : 0.0,
+            ];
+        }
+    }
+
+    /**
      * Are the photometric parameters of a comet known?
      */
     public function hasCometParams(): bool
     {
-        return $this->_cometH !== null;
+        return $this->_cometH !== null || ! empty($this->_cometLightCurve);
+    }
+
+    /**
+     * The part of the light curve for a number of days from the perihelion:
+     * the part whose range contains it, else the part with the nearest range.
+     */
+    protected function _lightCurveSegment(float $days): array
+    {
+        $best = null;
+        $bestDistance = INF;
+        foreach ($this->_cometLightCurve as $segment) {
+            $from = $segment['from'] ?? -INF;
+            $to = $segment['to'] ?? INF;
+            $distance = $days < $from ? $from - $days : ($days > $to ? $days - $to : 0.0);
+            // On a shared boundary, the later part starts
+            if ($distance < $bestDistance || ($distance == 0.0 && $bestDistance == 0.0)) {
+                $best = $segment;
+                $bestDistance = $distance;
+            }
+        }
+
+        return $best;
     }
 
     /**
@@ -114,6 +171,16 @@ trait CometPhotometry
     protected function _cometMagnitude(Carbon $date): float
     {
         [$r, $delta, $alpha] = $this->_photometricGeometry($date);
+
+        if (! empty($this->_cometLightCurve)) {
+            $days = $this->_perihelion_date->diffInSeconds($date, false) / 86400.0;
+            $segment = $this->_lightCurveSegment($days);
+            if ($segment['shift'] != 0.0) {
+                [$r] = $this->_photometricGeometry($date->copy()->addSeconds((int) round($segment['shift'] * 86400)));
+            }
+
+            return $segment['H'] + 5 * log10($delta) + $segment['K'] * log10($r);
+        }
 
         $K = $this->_cometK;
         if ($date < $this->_perihelion_date && $this->_cometKPre !== null) {

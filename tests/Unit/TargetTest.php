@@ -867,6 +867,46 @@ class TargetTest extends BaseTestCase
     }
 
     /**
+     * Test a light curve in parts, as aerith.net publishes it for 12P.
+     *
+     * The expected values use the distances of JPL Horizons:
+     * 2024 March 1 is in [-100, 14]: 4.6 + 5 log(1.690081) + 9.5 log(1.211017) = 6.529;
+     * 2024 May 21 is in [14, 175] with log r(t + 10), so r of May 31:
+     * 4.3 + 5 log(1.557525) + 11 log(1.071307) = 5.591.
+     */
+    public function testCometLightCurve()
+    {
+        $comet = new Elliptic();
+        $comet->setOrbitalElements(0.780788135653347 / (1 - 0.9546110184438342), 0.9546110184438342, 74.19156435379394, 198.988728245405, 255.8558161536839, Time::fromJd(2460421.624383379));
+        $comet->setCometLightCurve([
+            ['from' => null, 'to' => -100, 'H' => 8.5, 'K' => -5.0, 'shift' => 0],
+            ['from' => -100, 'to' => 14, 'H' => 4.6, 'K' => 9.5, 'shift' => 0],
+            ['from' => 14, 'to' => 175, 'H' => 4.3, 'K' => 11.0, 'shift' => 10],
+        ]);
+
+        $this->assertTrue($comet->hasCometParams());
+        $this->assertEqualsWithDelta(6.529, $comet->magnitude(Carbon::create(2024, 3, 1, 0, 0, 0, 'UTC')), 0.01);
+        $this->assertEqualsWithDelta(5.591, $comet->magnitude(Carbon::create(2024, 5, 21, 0, 0, 0, 'UTC')), 0.01);
+
+        // Outside all ranges the nearest part is used: after the last one, and in the
+        // gap between -200 and -100 days (2024 January 1 is 111 days before the perihelion)
+        $late = Carbon::create(2025, 3, 1, 0, 0, 0, 'UTC');
+        $reference = new Elliptic();
+        $reference->setOrbitalElements(0.780788135653347 / (1 - 0.9546110184438342), 0.9546110184438342, 74.19156435379394, 198.988728245405, 255.8558161536839, Time::fromJd(2460421.624383379));
+        $reference->setCometParams(4.6, 9.5);
+        $comet->setCometLightCurve([
+            ['from' => -300, 'to' => -200, 'H' => 9.0, 'K' => 0.0],
+            ['from' => -100, 'to' => 14, 'H' => 4.6, 'K' => 9.5],
+        ]);
+        $this->assertEqualsWithDelta($reference->magnitude($late), $comet->magnitude($late), 0.0001);
+        $this->assertEqualsWithDelta($reference->magnitude(Carbon::create(2024, 1, 1, 0, 0, 0, 'UTC')), $comet->magnitude(Carbon::create(2024, 1, 1, 0, 0, 0, 'UTC')), 0.0001);
+
+        // The light curve takes precedence over setCometParams()
+        $comet->setCometParams(20.0, 10.0);
+        $this->assertEqualsWithDelta(6.529, $comet->magnitude(Carbon::create(2024, 3, 1, 0, 0, 0, 'UTC')), 0.01);
+    }
+
+    /**
      * Test the magnitude of asteroids (IAU H-G system) against JPL Horizons.
      *
      * The elements are the osculating elements of Horizons for the date, H and

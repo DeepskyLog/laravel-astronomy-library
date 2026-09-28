@@ -27,7 +27,7 @@ composer install
 ```
 
 There is no build step, linter invocation, or artisan app in this repo itself — StyleCI (`.styleci.yml`, laravel
-preset) runs on pushes, and Travis (`.travis.yml`) runs `vendor/bin/phpunit`.
+preset) runs on pushes. There is no CI test run; run `vendor/bin/phpunit` locally.
 
 ## Test architecture
 
