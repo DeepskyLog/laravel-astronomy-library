@@ -956,7 +956,7 @@ class TargetTest extends BaseTestCase
             [new Mars(), [$geo_coords, 30.0]],
             [$encke, [$geo_coords, 2451545.0, 30.0]],
             [$parabolic, [$geo_coords, 30.0]],
-            [$nearParabolic, []],
+            [$nearParabolic, [$geo_coords, 30.0]],
         ];
         foreach ($targets as [$target, $args]) {
             $date = Carbon::create(2026, 9, 25, 22, 0, 0, 'Europe/Brussels');
@@ -1355,5 +1355,33 @@ class TargetTest extends BaseTestCase
         $moon->calculateDiameter($date);
 
         $this->assertEqualsWithDelta(1806.5, $moon->getDiameter()[0], 0.1);
+    }
+
+    /**
+     * Test that a near-parabolic orbit is topocentric, as the elliptic and
+     * parabolic orbits are: with e = 1 it gives the position of the parabola.
+     */
+    public function testNearParabolicIsTopocentric()
+    {
+        $geo_coords = new GeographicalCoordinates(4.70, 50.88);
+        $peridate = Carbon::create(2026, 9, 1, 0, 0, 0, 'UTC');
+        $date = Carbon::create(2026, 9, 25, 22, 0, 0, 'UTC');
+
+        $parabolic = new Parabolic();
+        $parabolic->setOrbitalElements(0.3, 104.69219, 1.32431, 222.10887, $peridate);
+        $parabolic->calculateEquatorialCoordinates($date->copy(), $geo_coords, 30.0);
+
+        $nearParabolic = new NearParabolic();
+        $nearParabolic->setOrbitalElements(0.3, 1.0, 104.69219, 1.32431, 222.10887, $peridate);
+        $nearParabolic->calculateEquatorialCoordinates($date->copy(), $geo_coords, 30.0);
+
+        $expected = $parabolic->getEquatorialCoordinatesToday();
+        $actual = $nearParabolic->getEquatorialCoordinatesToday();
+        $this->assertEqualsWithDelta($expected->getRA()->getCoordinate(), $actual->getRA()->getCoordinate(), 1e-6);
+        $this->assertEqualsWithDelta($expected->getDeclination()->getCoordinate(), $actual->getDeclination()->getCoordinate(), 1e-6);
+
+        // Without a location, the position is geocentric: the parallax moves it
+        $geocentric = $nearParabolic->_calculateEquatorialCoordinates($date->copy());
+        $this->assertNotEqualsWithDelta($actual->getDeclination()->getCoordinate(), $geocentric->getDeclination()->getCoordinate(), 1e-6);
     }
 }

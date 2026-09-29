@@ -2,6 +2,12 @@
 
 All notable changes to `laravel-astronomy-library` will be documented in this file.
 
+## Version 6.8.4
+
+Fixed:
+
+- Positions of comets in a near-parabolic orbit: `NearParabolic::calculateEquatorialCoordinates()` ignored the location of the observer and gave geocentric coordinates, while `Elliptic` and `Parabolic` correct for the parallax. It now takes the same arguments as `Parabolic`, `calculateEquatorialCoordinates($date, $geo_coords, $height)`, and gives topocentric coordinates. With e = 1 the position is the same as that of `Parabolic`. Without a location, the coordinates are calculated for longitude 0 and latitude 0, as for `Elliptic` and `Parabolic`. `_calculateEquatorialCoordinates($date)` without a location still gives geocentric coordinates.
+
 ## Version 6.8.3
 
 Fixed:

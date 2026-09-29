@@ -17,6 +17,7 @@ namespace deepskylog\AstronomyLibrary\Targets;
 
 use Carbon\Carbon;
 use deepskylog\AstronomyLibrary\Coordinates\EquatorialCoordinates;
+use deepskylog\AstronomyLibrary\Coordinates\GeographicalCoordinates;
 
 /**
  * The target class describing an object moving in a near-parabolic orbit.
@@ -96,19 +97,28 @@ class NearParabolic extends Target
      */
     public function calculateEquatorialCoordinates(Carbon $date, ...$args): void
     {
-        // No extra args expected; keep behavior but accept variadic for signature compatibility
+        // Expected args: [GeographicalCoordinates $geo_coords, float $height = 0.0]
+        $geo_coords = $args[0] ?? null;
+        $height = $args[1] ?? 0.0;
+
+        if (! $geo_coords instanceof GeographicalCoordinates) {
+            $geo_coords = new GeographicalCoordinates(0.0, 0.0);
+        }
+
+        $height = floatval($height);
+
         $this->setEquatorialCoordinatesToday(
-            $this->_calculateEquatorialCoordinates($date)
+            $this->_calculateEquatorialCoordinates($date, $geo_coords, $height)
         );
         $this->setEquatorialCoordinatesTomorrow(
-            $this->_calculateEquatorialCoordinates($date->copy()->addDay())
+            $this->_calculateEquatorialCoordinates($date->copy()->addDay(), $geo_coords, $height)
         );
         $this->setEquatorialCoordinatesYesterday(
-            $this->_calculateEquatorialCoordinates($date->copy()->subDay())
+            $this->_calculateEquatorialCoordinates($date->copy()->subDay(), $geo_coords, $height)
         );
     }
 
-    public function _calculateEquatorialCoordinates(Carbon $date): EquatorialCoordinates
+    public function _calculateEquatorialCoordinates(Carbon $date, ?GeographicalCoordinates $geo_coords = null, float $height = 0.0): EquatorialCoordinates
     {
         [$x, $y, $z] = $this->_heliocentricRectangularCoordinates($date);
 
@@ -124,7 +134,22 @@ class NearParabolic extends Target
         $ra = rad2deg(atan2($eta, $ksi)) / 15.0;
         $dec = rad2deg(asin($zeta / $delta));
 
-        return new EquatorialCoordinates($ra, $dec);
+        $equa_coords = new EquatorialCoordinates($ra, $dec);
+
+        // Without a location the coordinates stay geocentric
+        if ($geo_coords === null) {
+            return $equa_coords;
+        }
+
+        // Calculate corrections for parallax, as for elliptic and parabolic orbits.
+        // The equatorial horizontal parallax in arcseconds, converted to degrees.
+        return $this->_correctForParallax(
+            $equa_coords,
+            (8.794 / $delta) / 3600.0,
+            $date,
+            $geo_coords,
+            $height
+        );
     }
 
     /**
