@@ -159,8 +159,64 @@ class Time
     }
 
     /**
+     * The delta_t table, read once per process: year => delta t in seconds,
+     * or false when the table cannot be read.
+     *
+     * @var array<int, float>|false|null
+     */
+    private static array|false|null $deltaTTable = null;
+
+    /**
+     * The first year after the delta_t table (the year after the first row).
+     */
+    private static ?int $deltaTTableEnd = null;
+
+    /**
+     * Forget the delta_t table read by deltaT(), after it was changed.
+     */
+    public static function flushDeltaTTable(): void
+    {
+        self::$deltaTTable = null;
+        self::$deltaTTableEnd = null;
+    }
+
+    /**
+     * Reads the delta_t table in one query, the first time it is needed.
+     *
+     * @return array<int, float>|false year => delta t, or false without a table
+     */
+    private static function deltaTTable(): array|false
+    {
+        if (self::$deltaTTable === null) {
+            try {
+                $rows = DeltaT::query()->toBase()->get(['year', 'deltat']);
+                if ($rows->isEmpty()) {
+                    self::$deltaTTable = false;
+                } else {
+                    // The table runs from the most recent year down, so its
+                    // first row gives the end of the table.
+                    self::$deltaTTableEnd = (int) $rows->first()->year + 1;
+                    self::$deltaTTable = [];
+                    foreach ($rows as $row) {
+                        self::$deltaTTable[(int) $row->year] = (float) $row->deltat;
+                    }
+                }
+            } catch (\Throwable $e) {
+                // Eloquent/DB may not be available in CLI contexts; fall back
+                // to polynomial approximations below.
+                self::$deltaTTable = false;
+            }
+        }
+
+        return self::$deltaTTable;
+    }
+
+    /**
      * Calculates delta t for the given date.
      * Chapter 10 in Astronomical Algorithms.
+     *
+     * The delta_t table is read once per process; call flushDeltaTTable()
+     * after changing it.
      *
      * @param  Carbon  $date  The date
      * @return float delta t in seconds
@@ -169,21 +225,10 @@ class Time
     {
         $y = $date->year + ($date->month - 0.5) / 12;
 
-        try {
-            $databaseDate = Carbon::create(
-                DeltaT::first()['year'] + 1,
-                1,
-                1,
-                0,
-                0,
-                0,
-                'UTC'
-            );
-            $databaseAvailable = true;
-        } catch (\Throwable $e) {
-            // Eloquent/DB may not be available in CLI contexts; fall back
-            // to polynomial approximations below.
-            $databaseAvailable = false;
+        $table = self::deltaTTable();
+        $databaseAvailable = $table !== false;
+        if ($databaseAvailable) {
+            $databaseDate = Carbon::create(self::$deltaTTableEnd, 1, 1, 0, 0, 0, 'UTC');
         }
 
         if ($date < Carbon::create(-500, 1, 1, 12, 12, 12, 'UTC')) {
@@ -214,10 +259,8 @@ class Time
             $deltaT = (int) (
                 120 - 0.9808 * $t - 0.01532 * ($t ** 2) + ($t ** 3) / 7129
             );
-        } elseif ($databaseAvailable && $date < $databaseDate) {
-            $databaseEntry = DeltaT::where('year', '=', $date->year)->first();
-
-            return $databaseEntry['deltat'];
+        } elseif ($databaseAvailable && $date < $databaseDate && isset($table[$date->year])) {
+            return $table[$date->year];
         } elseif ($date < Carbon::create(2050, 1, 1, 12, 12, 12, 'UTC')) {
             $t = $y - 2000;
 

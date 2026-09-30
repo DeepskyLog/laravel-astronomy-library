@@ -2,6 +2,12 @@
 
 All notable changes to `laravel-astronomy-library` will be documented in this file.
 
+## Version 6.8.5
+
+Fixed:
+
+- `Time::deltaT()` queried the `delta_t` table twice on every call (`DeltaT::first()` for the end of the table and the row of the year), and it is called for every position: an object page of DeepskyLog ran 171 to 379 of these queries. The table is now read once per process, in one query; `Time::flushDeltaTTable()` forgets it, and `astronomy:updateDeltaT` calls it after the import. A year missing from the table now falls back to the polynomial approximations instead of failing.
+
 ## Version 6.8.4
 
 Fixed:

@@ -4,6 +4,7 @@ namespace deepskylog\AstronomyLibrary\Commands;
 
 use deepskylog\AstronomyLibrary\Imports\DeltaTImport;
 use deepskylog\AstronomyLibrary\Models\DeltaT;
+use deepskylog\AstronomyLibrary\Time;
 use Illuminate\Console\Command;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -50,5 +51,7 @@ class UpdateDeltaTTable extends Command
 
         // Import the file in the database.
         Excel::import(new DeltaTImport(), '/tmp/deltat.csv');
+
+        Time::flushDeltaTTable();
     }
 }
