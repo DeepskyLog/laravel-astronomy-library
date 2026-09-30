@@ -2,8 +2,8 @@
 
 namespace deepskylog\AstronomyLibrary\Commands;
 
-use deepskylog\AstronomyLibrary\Models\AsteroidsOrbitalElements;
 use Carbon\Carbon;
+use deepskylog\AstronomyLibrary\Models\AsteroidsOrbitalElements;
 use deepskylog\AstronomyLibrary\Models\CometsOrbitalElements;
 use deepskylog\AstronomyLibrary\Time;
 use Illuminate\Console\Command;
@@ -266,6 +266,7 @@ class UpdateOrbitalElements extends Command
             if (! empty($m[2])) {
                 return $m[1].$m[2];
             }
+
             // JPL writes the fragment at the end: '73P/Schwassmann-Wachmann 3-B',
             // '101P/Chernykh-B'. Only capitals, so '67P/Churyumov-Gerasimenko'
             // is not a fragment.
