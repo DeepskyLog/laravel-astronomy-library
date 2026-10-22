@@ -2,6 +2,12 @@
 
 All notable changes to `laravel-astronomy-library` will be documented in this file.
 
+## Version 6.8.6
+
+Fixed:
+
+- `Magnitude::nelmToSqm()` returned NAN for a NELM (plus the offset of the observer) above 7.93: the argument of the logarithm becomes negative there. It now returns 22, the upper limit that the SQM already reaches from a NELM of about 6.6 on.
+
 ## Version 6.8.5
 
 Fixed:

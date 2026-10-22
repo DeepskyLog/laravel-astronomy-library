@@ -66,6 +66,9 @@ class MagnitudeTest extends BaseTestCase
         $this->assertEqualsWithDelta(20.80, Magnitude::nelmToSqm(6.0), 0.01);
         $this->assertEqualsWithDelta(21.15, Magnitude::nelmToSqm(6.2), 0.01);
         $this->assertEqualsWithDelta(21.53, Magnitude::nelmToSqm(6.4), 0.01);
+        $this->assertEquals(22.0, Magnitude::nelmToSqm(7.93));
+        $this->assertEquals(22.0, Magnitude::nelmToSqm(8.0));
+        $this->assertEquals(22.0, Magnitude::nelmToSqm(7.8, 0.5));
         $this->assertEqualsWithDelta(21.73, Magnitude::nelmToSqm(6.5), 0.01);
         $this->assertEqualsWithDelta(21.94, Magnitude::nelmToSqm(6.6), 0.01);
     }

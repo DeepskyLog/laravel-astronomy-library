@@ -51,8 +51,15 @@ class Magnitude
                 'No Naked Eye Limiting Magnitude < 0 possible.'
             );
         }
-        $sqm = 21.58
-            - 5 * log10(pow(10, 1.586 - ($nelm + $fstOffset) / 5.0) - 1.0);
+        $x = pow(10, 1.586 - ($nelm + $fstOffset) / 5.0) - 1.0;
+
+        // From a NELM of 7.93 on, the logarithm is undefined; the SQM is already
+        // capped at 22 from a NELM of about 6.6 on.
+        if ($x <= 0) {
+            return 22.0;
+        }
+
+        $sqm = 21.58 - 5 * log10($x);
 
         if ($sqm > 22.0) {
             return 22.0;
