@@ -150,10 +150,6 @@ class UpdateCometPhotometry extends Command
     /**
      * Store the photometry of a comet, for m = H + 5 log(delta) + n log(r) + phase_coeff * alpha.
      *
-     * Values outside a plausible range are not stored: they come from parsing
-     * something else, like the mean motion in degrees per day or a julian day
-     * that ended up in `n` before.
-     *
      * The light curve of aerith.net, all its parts with the range of days
      * around the perihelion in which they are valid, is stored in
      * `light_curve`; H and n are those of its most recent part.
@@ -163,33 +159,61 @@ class UpdateCometPhotometry extends Command
      */
     private function savePhotometry(CometsOrbitalElements $comet, $H, $K, $phase, array $lightCurve = []): bool
     {
-        $H = self::plausibleH($H);
-        $K = self::plausibleK($K);
-        $phase = is_numeric($phase) && $phase >= 0.0 && $phase <= 0.1 ? floatval($phase) : null;
-        $lightCurve = array_values(array_filter(
-            $lightCurve,
-            fn ($part) => self::plausibleH($part['H'] ?? null) !== null && self::plausibleK($part['K'] ?? null) !== null
-        ));
-
-        if ($H === null) {
+        $photometry = self::usablePhotometry($H, $K, $lightCurve);
+        if ($photometry === null) {
             $this->line("No usable photometry for {$comet->name}");
 
             return false;
         }
 
-        $comet->H = $H;
-        $comet->n = $K;
-        $comet->phase_coeff = $phase;
-        $comet->light_curve = empty($lightCurve) ? null : $lightCurve;
+        $comet->H = $photometry['H'];
+        $comet->n = $photometry['K'];
+        $comet->phase_coeff = is_numeric($phase) && $phase >= 0.0 && $phase <= 0.1 ? floatval($phase) : null;
+        $comet->light_curve = $photometry['light_curve'];
         $comet->save();
 
         return true;
     }
 
     /**
+     * The photometry that can be stored: H and K, which only mean something
+     * together, and the parts of the light curve with a plausible H and K.
+     * When there is a light curve, H and K are those of its most recent
+     * usable part. Values outside a plausible range come from parsing
+     * something else, like a julian day that ended up in `n` before.
+     *
+     * Null when there is no plausible pair of H and K: an H without its K
+     * would be used with a default K, which gives absurd magnitudes for the
+     * steep curves of aerith.net (m1 = -14.5 + 5 log d + 100 log r).
+     *
+     * @param  array  $lightCurve  The parts, see parseAerithPhotometry()
+     * @return array|null ['H', 'K', 'light_curve' (null when empty)]
+     */
+    public static function usablePhotometry($H, $K, array $lightCurve = []): ?array
+    {
+        $lightCurve = array_values(array_filter(
+            $lightCurve,
+            fn ($part) => self::plausibleH($part['H'] ?? null) !== null && self::plausibleK($part['K'] ?? null) !== null
+        ));
+        if (! empty($lightCurve)) {
+            $last = end($lightCurve);
+            [$H, $K] = [$last['H'], $last['K']];
+        }
+
+        $H = self::plausibleH($H);
+        $K = self::plausibleK($K);
+        if ($H === null || $K === null) {
+            return null;
+        }
+
+        return ['H' => $H, 'K' => $K, 'light_curve' => empty($lightCurve) ? null : $lightCurve];
+    }
+
+    /**
      * The ranges allow the fits of aerith.net for a single period, like
-     * H = -17 and K = 35 for a comet far from the Sun, K = 0 for a standstill
-     * or K = -5 for a comet that fades while it approaches the Sun.
+     * H = -17 and K = 35 for a comet far from the Sun, K = 0 for a standstill,
+     * K = -5 for a comet that fades while it approaches the Sun or K = 100
+     * for one that fades fast after its perihelion.
      */
     private static function plausibleH($H): ?float
     {
@@ -198,7 +222,7 @@ class UpdateCometPhotometry extends Command
 
     private static function plausibleK($K): ?float
     {
-        return is_numeric($K) && $K >= -20.0 && $K <= 60.0 ? floatval($K) : null;
+        return is_numeric($K) && $K >= -20.0 && $K <= 150.0 ? floatval($K) : null;
     }
 
     /**

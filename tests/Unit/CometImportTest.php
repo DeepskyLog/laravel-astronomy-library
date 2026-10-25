@@ -126,4 +126,31 @@ HTML;
         $this->assertEquals(-20.0, UpdateCometPhotometry::parseAerithPhotometry('  m1 = 7.9 + 5 log d + 19.5 log r(t - 20)  [  ,20]')['light_curve'][0]['shift']);
         $this->assertNull(UpdateCometPhotometry::parseAerithPhotometry('<P>No magnitudes yet.</P>'));
     }
+
+    /**
+     * Test which photometry is stored: H never without its K.
+     */
+    public function testUsablePhotometry()
+    {
+        // The steep last part of P/2024 S2 (Rankin) on aerith.net is a real fit
+        $found = UpdateCometPhotometry::parseAerithPhotometry('  m1 = -14.5 + 5 log d + 100 log r');
+        $photometry = UpdateCometPhotometry::usablePhotometry($found['H'], $found['K'], $found['light_curve']);
+        $this->assertEquals(-14.5, $photometry['H']);
+        $this->assertEquals(100.0, $photometry['K']);
+
+        // An implausible last part: H and K come from the last usable one
+        $parts = [
+            ['from' => null, 'to' => 0.0, 'H' => 7.0, 'K' => 4.5, 'shift' => 0.0],
+            ['from' => 0.0, 'to' => null, 'H' => -6.6, 'K' => 2451545.0, 'shift' => 0.0],
+        ];
+        $photometry = UpdateCometPhotometry::usablePhotometry(-6.6, 2451545.0, $parts);
+        $this->assertEquals(7.0, $photometry['H']);
+        $this->assertEquals(4.5, $photometry['K']);
+        $this->assertCount(1, $photometry['light_curve']);
+
+        // An H without a usable K is not stored, so SBDB is used instead
+        $this->assertNull(UpdateCometPhotometry::usablePhotometry(-8.8, 2451545.0));
+        $this->assertNull(UpdateCometPhotometry::usablePhotometry(-8.8, null));
+        $this->assertEquals(['H' => 8.5, 'K' => 21.75, 'light_curve' => null], UpdateCometPhotometry::usablePhotometry(8.5, 21.75));
+    }
 }
