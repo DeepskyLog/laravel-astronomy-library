@@ -2,6 +2,16 @@
 
 All notable changes to `laravel-astronomy-library` will be documented in this file.
 
+## Version 6.8.7
+
+Fixed:
+
+- Magnitudes of comets: `astronomy:updateCometPhotometry` stored H without its K when K was outside the plausible range. The last part of a light curve of aerith.net can be a steep fit for a comet that fades fast after its perihelion, like `m1 = -14.5 + 5 log d + 100 log r` for P/2024 S2 (Rankin); its K of 100 was rejected, but its H was stored, and an application that uses K = 10 when it is missing then gave magnitude -3 for this faint comet (151P/Helin, C/2002 X5 (Kudo-Fujikawa), C/2014 Q3 (Borisov) and C/2000 W1 (Utsunomiya-Jones) had the same problem). K may now be up to 150; julian days and the like are still rejected. H and K are only stored together: when aerith.net gives no plausible pair, M1 and K1 of SBDB are used. With a light curve, H and K are those of its last usable part.
+
+Added:
+
+- `UpdateCometPhotometry::usablePhotometry()`, a public static method that gives the H, K and light curve that are stored, with a test in `tests/Unit/CometImportTest.php`.
+
 ## Version 6.8.6
 
 Fixed:
